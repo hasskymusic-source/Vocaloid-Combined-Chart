@@ -3,295 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VOCALOID COMBINED CHART | 週刊ボカロ複合ランキング</title>
-  <style>
-    :root {
-      --bg-main: #0f172a;
-      --bg-card: #1e293b;
-      --bg-card-hover: #26354d;
-      --text-main: #f8fafc;
-      --text-sub: #94a3b8;
-      --accent: #38bdf8;
-      --yt-color: #ef4444;
-      --yt-sub: #f87171;
-      --nc-color: #3b82f6;
-      --nc-sub: #60a5fa;
-      --border: #334155;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-      background-color: var(--bg-main);
-      color: var(--text-main);
-      line-height: 1.6;
-    }
-
-    /* Header ("ソシャゲなう"風のステータスバー付きヘッダー) */
-    header {
-      background: rgba(15, 23, 42, 0.9);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .header-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 16px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .site-title {
-      font-size: 1.35rem;
-      font-weight: 800;
-      letter-spacing: 0.03em;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .site-title span.badge {
-      font-size: 0.75rem;
-      background: linear-gradient(135deg, var(--yt-color), var(--nc-color));
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-weight: 700;
-    }
-    .update-schedule {
-      font-size: 0.85rem;
-      color: var(--text-sub);
-      background: var(--bg-card);
-      padding: 6px 12px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-    }
-    .update-schedule strong { color: var(--accent); }
-
-    /* Navigation Tabs */
-    .nav-tabs {
-      max-width: 1100px;
-      margin: 20px auto 0;
-      padding: 0 20px;
-      display: flex;
-      gap: 8px;
-      border-bottom: 1px solid var(--border);
-    }
-    .tab-btn {
-      background: transparent;
-      color: var(--text-sub);
-      border: none;
-      padding: 12px 20px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      border-bottom: 3px solid transparent;
-      transition: all 0.2s;
-    }
-    .tab-btn:hover { color: var(--text-main); }
-    .tab-btn.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
-
-    /* Main Container */
-    main {
-      max-width: 1100px;
-      margin: 24px auto 60px;
-      padding: 0 20px;
-    }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    /* Chart Meta Banner */
-    .chart-meta {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 16px 20px;
-      margin-bottom: 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .legend {
-      display: flex;
-      gap: 16px;
-      font-size: 0.85rem;
-    }
-    .legend-item { display: flex; align-items: center; gap: 6px; }
-    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-    .dot.yt { background: var(--yt-color); }
-    .dot.nc { background: var(--nc-color); }
-
-    /* Ranking List */
-    .ranking-list { display: flex; flex-direction: column; gap: 14px; }
-    .rank-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 18px 20px;
-      transition: background 0.2s, transform 0.15s;
-      cursor: pointer;
-    }
-    .rank-card:hover {
-      background: var(--bg-card-hover);
-      transform: translateY(-2px);
-    }
-    .rank-header {
-      display: grid;
-      grid-template-columns: 60px 1fr auto;
-      align-items: center;
-      gap: 16px;
-    }
-    .rank-num-box {
-      text-align: center;
-    }
-    .rank-num {
-      font-size: 1.8rem;
-      font-weight: 900;
-      line-height: 1.1;
-    }
-    .rank-1 { color: #fbbf24; }
-    .rank-2 { color: #cbd5e1; }
-    .rank-3 { color: #d97706; }
-    .rank-diff {
-      font-size: 0.75rem;
-      font-weight: 700;
-      margin-top: 4px;
-    }
-    .diff-up { color: #4ade80; }
-    .diff-down { color: #f87171; }
-    .diff-new { color: #38bdf8; }
-
-    .song-info h3 {
-      font-size: 1.15rem;
-      margin-bottom: 4px;
-    }
-    .song-meta {
-      font-size: 0.85rem;
-      color: var(--text-sub);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .point-box {
-      text-align: right;
-    }
-    .total-pt {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--accent);
-    }
-    .total-pt span {
-      font-size: 0.8rem;
-      color: var(--text-sub);
-      font-weight: 400;
-      margin-left: 4px;
-    }
-
-    /* 6-Metric Share Bar (Billion Hits!風の指標構成比可視化) */
-    .share-bar-wrap {
-      margin-top: 14px;
-    }
-    .share-bar {
-      height: 8px;
-      border-radius: 4px;
-      overflow: hidden;
-      display: flex;
-      background: #0f172a;
-    }
-    .bar-yt { background: var(--yt-color); }
-    .bar-nc { background: var(--nc-color); }
-    .share-labels {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.78rem;
-      color: var(--text-sub);
-      margin-top: 6px;
-    }
-
-    /* Expandable Detail Panel (6指標の詳細＆解説) */
-    .detail-panel {
-      display: none;
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px dashed var(--border);
-    }
-    .rank-card.open .detail-panel { display: block; }
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-    .metric-box {
-      background: rgba(15, 23, 42, 0.6);
-      padding: 10px 12px;
-      border-radius: 6px;
-      border-left: 3px solid var(--border);
-    }
-    .metric-box.yt { border-left-color: var(--yt-color); }
-    .metric-box.nc { border-left-color: var(--nc-color); }
-    .metric-name { font-size: 0.75rem; color: var(--text-sub); }
-    .metric-raw { font-size: 0.95rem; font-weight: 700; margin-top: 2px; }
-    .metric-pt { font-size: 0.75rem; color: var(--accent); }
-
-    .commentary-box {
-      background: rgba(56, 189, 248, 0.08);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      border-radius: 6px;
-      padding: 12px 16px;
-      font-size: 0.9rem;
-    }
-    .commentary-box strong { color: var(--accent); }
-
-    /* Article / Methodology Style ("Billion Hits!"ベースの解説セクション) */
-    .article-box {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 28px;
-    }
-    .article-box h2 {
-      font-size: 1.3rem;
-      border-left: 4px solid var(--accent);
-      padding-left: 12px;
-      margin: 24px 0 12px;
-    }
-    .article-box h2:first-child { margin-top: 0; }
-    .article-box p { margin-bottom: 14px; color: #e2e8f0; }
-    .rule-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 16px 0 24px;
-      font-size: 0.9rem;
-    }
-    .rule-table th, .rule-table td {
-      border: 1px solid var(--border);
-      padding: 10px 14px;
-      text-align: left;
-    }
-    .rule-table th { background: rgba(15, 23, 42, 0.8); color: var(--accent); }
-
-    @media (max-width: 640px) {
-      .rank-header { grid-template-columns: 45px 1fr; }
-      .point-box { grid-column: 2; text-align: left; }
-    }
-  </style>
+  <title>週刊VOCALOID複合ランキング | YouTube×ニコ動 6指標チャート</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <!-- Chart.js の読み込み -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
   <header>
     <div class="header-inner">
       <div class="site-title">
-        <span>VOCALOID COMBINED CHART</span>
-        <span class="badge">YT × NICO 6指標複合</span>
+        <span>週刊VOCALOID複合ランキング</span>
+        <span class="badge">TOP 20</span>
       </div>
       <div class="update-schedule">
         集計: <strong>月曜 0:00 〜 日曜 23:59</strong> ｜ 更新: <strong>毎週水曜 13:00</strong>
@@ -300,46 +23,61 @@
   </header>
 
   <nav class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('ranking')">週間ランキング</button>
-    <button class="tab-btn" onclick="switchTab('analysis')">上位楽曲解説・トレンド分析</button>
-    <button class="tab-btn" onclick="switchTab('method')">ランキング作成方法・前提</button>
+    <button class="tab-btn active" data-tab="ranking">週間ランキング TOP 20</button>
+    <button class="tab-btn" data-tab="analysis">上位楽曲解説・トレンド分析</button>
+    <button class="tab-btn" data-tab="method">ランキング作成方法・前提</button>
   </nav>
 
   <main>
-    <!-- TAB 1: 週間ランキング -->
+    <!-- TAB 1: 週間ランキング TOP 20 -->
     <section id="tab-ranking" class="tab-content active">
+      <!-- 過去チャート切り替え＆メタ情報バー -->
       <div class="chart-meta">
         <div>
-          <strong id="chart-title">2026年10月14日公開（集計期間：10月5日〜10月11日）</strong>
-          <div style="font-size: 0.8rem; color: var(--text-sub);">※各楽曲カードをクリックすると6指標の獲得ポイント内訳と解説が表示されます</div>
+          <strong id="chart-title">データ読み込み中...</strong>
+          <div class="meta-note">※各楽曲カードをクリックすると6指標の詳細内訳・動画リンク・解説が開きます</div>
         </div>
-        <div class="legend">
-          <span class="legend-item"><span class="dot yt"></span>YouTube指標 (再生×1 / 高評価×50 / コメ×100)</span>
-          <span class="legend-item"><span class="dot nc"></span>ニコ動指標 (再生×5 / マイリス×100 / コメ×10)</span>
+        <div class="archive-control">
+          <label for="archive-select">📅 過去チャート切替:</label>
+          <select id="archive-select" class="archive-select">
+            <option value="./data/latest_ranking.json">最新チャート</option>
+          </select>
         </div>
       </div>
 
+      <!-- Billion Hits!風 6指標積み上げグラフ領域 -->
+      <div class="chart-visual-box">
+        <div class="visual-header">
+          <h2>📊 TOP 20 ポイント構成比グラフ（6指標積み上げ）</h2>
+          <button id="toggle-chart-btn" class="toggle-btn">グラフを折りたたむ</button>
+        </div>
+        <div id="chart-canvas-wrap" class="canvas-wrap">
+          <canvas id="top20Chart"></canvas>
+        </div>
+      </div>
+
+      <!-- ランキングカード一覧 -->
       <div id="ranking-container" class="ranking-list"></div>
     </section>
 
-    <!-- TAB 2: Billion Hits!風 上位楽曲解説 -->
+    <!-- TAB 2: 上位楽曲解説 -->
     <section id="tab-analysis" class="tab-content">
       <div class="article-box">
-        <h2>今週のチャート総括：グローバル再生と国内コア熱量の交差点</h2>
-        <p>当週（10月5日〜10月11日集計、10月14日13:00公開）の複合チャートでは、YouTubeで海外リスナーを巻き込みながら再生・高評価を伸ばした楽曲と、ニコニコ動画で高いマイリスト率を記録した楽曲がTOP3で激しく競り合う結果となった。</p>
+        <h2>今週のチャート総括</h2>
+        <p id="weekly-summary-text">データ読み込み中...</p>
         <div id="analysis-container"></div>
       </div>
     </section>
 
-    <!-- TAB 3: Billion Hits!風 ランキング作成方法・前提 -->
+    <!-- TAB 3: ランキング作成方法・前提 -->
     <section id="tab-method" class="tab-content">
       <div class="article-box">
         <h2>本チャートの前提と問題意識</h2>
         <p>現在のボーカロイド（合成音声）音楽シーンは、かつてのニコニコ動画単一コミュニティから、YouTubeやグローバルプラットフォームへと大きく拡大している。クリエイター・リスナー双方が国境を越える一方、単一プラットフォームのみを参照する既存チャートではシーンの全体像を捉えきれないという課題がある。</p>
-        <p>当サイトでは『Billion Hits!』の複合指標分析アプローチをベースに、YouTubeとニコニコ動画の6指標を統合・ポイント化し、毎週水曜日13:00に最新チャートを公開する。</p>
+        <p>当サイト『週刊VOCALOID複合ランキング』では、ブログ『Billion Hits!』の複合指標分析アプローチをベースに、YouTubeとニコニコ動画の6指標を統合・ポイント化し、毎週水曜日13:00に最新TOP 20チャートを公開する。</p>
 
         <h2>ランキング作成方法（6指標と補正係数）</h2>
-        <p>毎週月曜日0:00から日曜日23:59までの7日間における各指標の純増数（$\Delta$）を取得し、以下の補正係数を乗じて合算した総合ポイント順でランキングを算出する。</p>
+        <p>毎週月曜日0:00から日曜日23:59までの7日間における各指標の純増数（Δ）を取得し、以下の補正係数を乗じて合算した総合ポイント順で上位20曲（TOP 20）を算出する。</p>
         <table class="rule-table">
           <thead>
             <tr>
@@ -392,178 +130,6 @@
     </section>
   </main>
 
-  <script>
-    // サンプルデータ（本番時は fetch('./data/latest_ranking.json') で読み込む）
-    const weeklyChartData = {
-      publishDate: "2026-10-14 13:00",
-      period: "2026-10-05 〜 2026-10-11",
-      songs: [
-        {
-          rank: 1,
-          prevRank: "NEW",
-          title: "ネオンサイン・シンドローム",
-          producer: "Studio K / 韓国ボカロP",
-          vocal: "初音ミク・GUMI",
-          raw: { yt_views: 1450000, yt_likes: 42000, yt_comments: 3100, nc_views: 85000, nc_mylist: 3200, nc_comments: 1800 },
-          commentary: "韓国発のボカロPによる日韓英トリリンガルMV。YouTubeでの圧倒的な再生数（145万回）と高評価（4.2万件）が全体を牽引しつつ、ニコニコ動画でも3,200マイリストを獲得し総合1位で初登場。"
-        },
-        {
-          rank: 2,
-          prevRank: 1,
-          title: "アンチ・グラビティ・ガール",
-          producer: "ミナトP",
-          vocal: "重音テトSV",
-          raw: { yt_views: 680000, yt_likes: 21000, yt_comments: 1200, nc_views: 240000, nc_mylist: 11500, nc_comments: 9500 },
-          commentary: "ニコニコ動画で週間24万再生・1.15万マイリストという驚異的な支持率を記録。YouTube単体では2位以下だが、ニコ動のコア指標（マイリスト×100）が強力に作用し首位に肉薄した。"
-        },
-        {
-          rank: 3,
-          prevRank: 4,
-          title: "プラスチック・メモリア",
-          producer: "夜行性ハイウェイ",
-          vocal: "可不・星界",
-          raw: { yt_views: 920000, yt_likes: 28000, yt_comments: 1500, nc_views: 110000, nc_mylist: 4800, nc_comments: 2100 },
-          commentary: "YouTube指標68%・ニコニコ指標32%と両プラットフォームで理想的なバランスでポイントを積み上げ、前週4位から3位へ浮上。考察コメントの増加がスコアを押し上げた。"
-        }
-      ]
-    };
-
-    const WEIGHTS = {
-      yt_views: 1,
-      yt_likes: 50,
-      yt_comments: 100,
-      nc_views: 5,
-      nc_mylist: 100,
-      nc_comments: 10
-    };
-
-    function calcScores(raw) {
-      const pts = {
-        yt_views: raw.yt_views * WEIGHTS.yt_views,
-        yt_likes: raw.yt_likes * WEIGHTS.yt_likes,
-        yt_comments: raw.yt_comments * WEIGHTS.yt_comments,
-        nc_views: raw.nc_views * WEIGHTS.nc_views,
-        nc_mylist: raw.nc_mylist * WEIGHTS.nc_mylist,
-        nc_comments: raw.nc_comments * WEIGHTS.nc_comments
-      };
-      pts.yt_total = pts.yt_views + pts.yt_likes + pts.yt_comments;
-      pts.nc_total = pts.nc_views + pts.nc_mylist + pts.nc_comments;
-      pts.total = pts.yt_total + pts.nc_total;
-      pts.yt_share = ((pts.yt_total / pts.total) * 100).toFixed(1);
-      pts.nc_share = ((pts.nc_total / pts.total) * 100).toFixed(1);
-      return pts;
-    }
-
-    function formatDiff(rank, prev) {
-      if (prev === "NEW") return `<div class="rank-diff diff-new">NEW</div>`;
-      const diff = prev - rank;
-      if (diff > 0) return `<div class="rank-diff diff-up">▲${diff}</div>`;
-      if (diff < 0) return `<div class="rank-diff diff-down">▼${Math.abs(diff)}</div>`;
-      return `<div class="rank-diff" style="color:#94a3b8;">→</div>`;
-    }
-
-    function renderChart() {
-      const container = document.getElementById('ranking-container');
-      const analysisContainer = document.getElementById('analysis-container');
-      container.innerHTML = '';
-      analysisContainer.innerHTML = '';
-
-      weeklyChartData.songs.forEach(song => {
-        const pts = calcScores(song.raw);
-        const rankClass = song.rank <= 3 ? `rank-${song.rank}` : '';
-
-        const card = document.createElement('div');
-        card.className = 'rank-card';
-        card.onclick = () => card.classList.toggle('open');
-
-        card.innerHTML = `
-          <div class="rank-header">
-            <div class="rank-num-box">
-              <div class="rank-num ${rankClass}">${song.rank}</div>
-              ${formatDiff(song.rank, song.prevRank)}
-            </div>
-            <div class="song-info">
-              <h3>${song.title}</h3>
-              <div class="song-meta">
-                <span>P: <strong>${song.producer}</strong></span>
-                <span>Vocal: ${song.vocal}</span>
-              </div>
-            </div>
-            <div class="point-box">
-              <div class="total-pt">${pts.total.toLocaleString()}<span>pt</span></div>
-            </div>
-          </div>
-
-          <div class="share-bar-wrap">
-            <div class="share-bar">
-              <div class="bar-yt" style="width: ${pts.yt_share}%"></div>
-              <div class="bar-nc" style="width: ${pts.nc_share}%"></div>
-            </div>
-            <div class="share-labels">
-              <span>YouTube構成比: ${pts.yt_share}% (${pts.yt_total.toLocaleString()} pt)</span>
-              <span>ニコニコ構成比: ${pts.nc_share}% (${pts.nc_total.toLocaleString()} pt)</span>
-            </div>
-          </div>
-
-          <div class="detail-panel">
-            <div class="metrics-grid">
-              <div class="metric-box yt">
-                <div class="metric-name">YouTube 週間再生 (×1)</div>
-                <div class="metric-raw">+${song.raw.yt_views.toLocaleString()}回</div>
-                <div class="metric-pt">${pts.yt_views.toLocaleString()} pt</div>
-              </div>
-              <div class="metric-box yt">
-                <div class="metric-name">YouTube 週間高評価 (×50)</div>
-                <div class="metric-raw">+${song.raw.yt_likes.toLocaleString()}件</div>
-                <div class="metric-pt">${pts.yt_likes.toLocaleString()} pt</div>
-              </div>
-              <div class="metric-box yt">
-                <div class="metric-name">YouTube 週間コメント (×100)</div>
-                <div class="metric-raw">+${song.raw.yt_comments.toLocaleString()}件</div>
-                <div class="metric-pt">${pts.yt_comments.toLocaleString()} pt</div>
-              </div>
-              <div class="metric-box nc">
-                <div class="metric-name">ニコ動 週間再生 (×5)</div>
-                <div class="metric-raw">+${song.raw.nc_views.toLocaleString()}回</div>
-                <div class="metric-pt">${pts.nc_views.toLocaleString()} pt</div>
-              </div>
-              <div class="metric-box nc">
-                <div class="metric-name">ニコ動 週間マイリス (×100)</div>
-                <div class="metric-raw">+${song.raw.nc_mylist.toLocaleString()}件</div>
-                <div class="metric-pt">${pts.nc_mylist.toLocaleString()} pt</div>
-              </div>
-              <div class="metric-box nc">
-                <div class="metric-name">ニコ動 週間コメント (×10)</div>
-                <div class="metric-raw">+${song.raw.nc_comments.toLocaleString()}件</div>
-                <div class="metric-pt">${pts.nc_comments.toLocaleString()} pt</div>
-              </div>
-            </div>
-            <div class="commentary-box">
-              <strong>【指標動向・楽曲解説】</strong> ${song.commentary}
-            </div>
-          </div>
-        `;
-        container.appendChild(card);
-
-        // 上位楽曲解説タブへの出力（Billion Hits!スタイル）
-        analysisContainer.innerHTML += `
-          <h2>${song.rank}位：${song.producer}「${song.title}」（${pts.total.toLocaleString()} pt）</h2>
-          <p>${song.commentary}</p>
-          <p style="font-size:0.85rem; color:#94a3b8;">
-            指標内訳：YouTube再生 ${pts.yt_views.toLocaleString()}pt / YouTube高評価 ${pts.yt_likes.toLocaleString()}pt / YouTubeコメ ${pts.yt_comments.toLocaleString()}pt / ニコ動再生 ${pts.nc_views.toLocaleString()}pt / ニコ動マイリス ${pts.nc_mylist.toLocaleString()}pt / ニコ動コメ ${pts.nc_comments.toLocaleString()}pt
-          </p>
-        `;
-      });
-    }
-
-    function switchTab(tabName) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      event.currentTarget.classList.add('active');
-      document.getElementById(`tab-${tabName}`).classList.add('active');
-    }
-
-    renderChart();
-  </script>
+  <script src="./js/app.js"></script>
 </body>
 </html>

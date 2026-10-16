@@ -2,6 +2,8 @@ import json
 from datetime import datetime, timedelta
 from config import WEIGHTS, PREV_SNAPSHOT, LATEST_SNAPSHOT, DRAFT_FILE, PUBLIC_LATEST
 
+TOP_N = 20  # TOP 20まで集計
+
 def main():
     with open(PREV_SNAPSHOT, "r", encoding="utf-8") as f:
         prev_map = {item["song_id"]: item for item in json.load(f)}
@@ -17,7 +19,7 @@ def main():
                 pub_data = json.load(f)
                 prev_ranks = {s["song_id"]: s["rank"] for s in pub_data.get("songs", [])}
         except json.JSONDecodeError:
-            pass  # ファイルが空、または壊れている場合は無視して続行
+            pass
 
     ranked_songs = []
     for song in latest_list:
@@ -52,12 +54,13 @@ def main():
             "raw": raw_diff,
             "pts": pts,
             "prevRank": prev_ranks.get(sid, "NEW"),
-            "commentary": ""  # ★ここに月曜〜水曜昼の間に解説を追記できる
+            "commentary": ""
         })
 
-    # 総合ポイント降順ソート＆順位付け
+    # 総合ポイント降順ソート＆TOP 20に順位付け
     ranked_songs.sort(key=lambda x: x["total_pt"], reverse=True)
-    for idx, item in enumerate(ranked_songs[:100], start=1):
+    top_songs = ranked_songs[:TOP_N]
+    for idx, item in enumerate(top_songs, start=1):
         item["rank"] = idx
 
     now = datetime.now()
@@ -69,9 +72,9 @@ def main():
         "publishDate": wednesday.strftime("%Y-%m-%d 13:00"),
         "archiveId": wednesday.strftime("%Y-%m-%d"),
         "period": f"{start_day.strftime('%Y-%m-%d')} 〜 {end_day.strftime('%Y-%m-%d')}",
-        "weeklySummary": "ここに今週のチャート総括（Billion Hits!風の全体考察）を記入します。",
+        "weeklySummary": "ここに今週のチャート総括（全体トレンドや注目ポイントの考察）を記入します。",
         "weights": WEIGHTS,
-        "songs": ranked_songs[:100]
+        "songs": top_songs
     }
 
     DRAFT_FILE.parent.mkdir(parents=True, exist_ok=True)
