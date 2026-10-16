@@ -7,9 +7,10 @@ from datetime import datetime, timedelta
 from config import MASTER_FILE, PREV_SNAPSHOT, LATEST_SNAPSHOT
 from googleapiclient.discovery import build
 
-USER_AGENT = "VocaloidCombinedChartBot/1.0"
+USER_AGENT = "VocaloidCombinedChartBot/2.0"
 
 def rotate_snapshots_if_needed():
+    """前回のスナップショット取得から5日以上経過していれば prev_monday.json へローテーション"""
     if not LATEST_SNAPSHOT.exists():
         return
     try:
@@ -27,6 +28,7 @@ def rotate_snapshots_if_needed():
         print(f"Snapshot rotation check skipped: {e}")
 
 def fetch_youtube_stats_batch(youtube_ids: list, api_key: str) -> dict:
+    """YouTube Data API v3 で50曲ずつ一括取得"""
     result = {}
     if not api_key or not youtube_ids:
         return result
@@ -49,20 +51,20 @@ def fetch_youtube_stats_batch(youtube_ids: list, api_key: str) -> dict:
                     "yt_views": int(stats.get("viewCount", 0)),
                     "yt_likes": int(stats.get("likeCount", 0)),
                     "yt_comments": int(stats.get("commentCount", 0)),
-                    "published_at": snippet.get("publishedAt", "")
+                    "published_at": snippet.get("publishedAt", ""),
+                    "channel_title": snippet.get("channelTitle", "")
                 }
         except Exception as e:
             print(f"YouTube Batch API Error: {e}")
     return result
 
 def fetch_niconico_thumbinfo(niconico_id: str) -> dict:
-    """GitHub Actions(海外IP)から100%安定稼働する公式XML APIで取得"""
+    """ニコニコ動画の公式XML API (getthumbinfo) から実測値を取得"""
     if not niconico_id:
         return {}
     url = f"https://ext.nicovideo.jp/api/getthumbinfo/{niconico_id}"
-    headers = {"User-Agent": USER_AGENT}
     try:
-        res = requests.get(url, headers=headers, timeout=10)
+        res = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=10)
         root = ET.fromstring(res.text)
         if root.attrib.get("status") == "ok":
             thumb = root.find("thumb")
@@ -70,7 +72,8 @@ def fetch_niconico_thumbinfo(niconico_id: str) -> dict:
                 "nc_views": int(thumb.findtext("view_counter", "0")),
                 "nc_mylist": int(thumb.findtext("mylist_counter", "0")),
                 "nc_comments": int(thumb.findtext("comment_num", "0")),
-                "nc_published_at": thumb.findtext("first_retrieve", "")
+                "nc_published_at": thumb.findtext("first_retrieve", ""),
+                "nc_author": thumb.findtext("user_nickname", "")
             }
     except Exception as e:
         print(f"Niconico thumbinfo error ({niconico_id}): {e}")
@@ -106,22 +109,16 @@ def main():
         nc_mylist = nc_stats.get("nc_mylist", 0)
         nc_comments = nc_stats.get("nc_comments", 0)
 
-        # 万が一ニコ動側が未取得の場合、ボカロ曲の平均比率から補完して欠損(0pt)を防ぐ
-        if nc_views == 0 and yt_views > 0:
-            nc_views = max(1000, int(yt_views * 0.08))
-            nc_mylist = max(50, int(nc_views * 0.035))
-            nc_comments = max(30, int(nc_views * 0.02))
-        elif yt_views == 0 and nc_views > 0:
-            yt_views = max(5000, int(nc_views * 8.0))
-            yt_likes = max(200, int(yt_views * 0.035))
-            yt_comments = max(20, int(yt_views * 0.003))
+        if yt_views == 0 and nc_views == 0:
+            continue
 
         pub_date = yt_stats.get("published_at") or nc_stats.get("nc_published_at") or ""
+        producer = song.get("producer") or yt_stats.get("channel_title") or nc_stats.get("nc_author") or "ボカロP"
 
         snapshots.append({
             "song_id": song["song_id"],
             "title": song["title"],
-            "producer": song["producer"],
+            "producer": producer,
             "vocal": song.get("vocal", "VOCALOID"),
             "youtube_id": yid,
             "niconico_id": nid,
