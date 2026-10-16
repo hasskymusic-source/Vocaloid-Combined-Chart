@@ -1,0 +1,26 @@
+[
+  {
+    "song_id": "mesmerizer",
+    "title": "メズマライザー",
+    "producer": "サツキ",
+    "vocal": "初音ミク・重音テト",
+    "youtube_id": "19y8YTbvri8",
+    "niconico_id": "sm43708803"
+  },
+  {
+    "song_id": "rabbit_hole",
+    "title": "ラビットホール",
+    "producer": "DECO*27",
+    "vocal": "初音ミク",
+    "youtube_id": "eSW2LVbpLeE",
+    "niconico_id": "sm42224358"
+  },
+  {
+    "song_id": "overide",
+    "title": "オーバーライド",
+    "producer": "吉田夜世",
+    "vocal": "重音テト",
+    "youtube_id": "LLGRFBLykZg",
+    "niconico_id": "sm43083649"
+  }
+]
