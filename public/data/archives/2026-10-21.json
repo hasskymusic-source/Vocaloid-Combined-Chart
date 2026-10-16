@@ -2,7 +2,7 @@
   "publishDate": "2026-10-21 13:00",
   "archiveId": "2026-10-21",
   "period": "2026-10-09 〜 2026-10-15",
-  "weeklySummary": "ここに今週のチャート総括（Billion Hits!風の全体考察）を記入します。",
+  "weeklySummary": "ここに今週のチャート総括（全体トレンドや注目ポイントの考察）を記入します。",
   "weights": {
     "yt_views": 1,
     "yt_likes": 50,
@@ -19,28 +19,88 @@
       "vocal": "初音ミク・重音テト",
       "youtube_id": "19y8YTbvri8",
       "niconico_id": "sm43708803",
-      "total_pt": 352326277,
-      "yt_total_pt": 352326277,
-      "nc_total_pt": 0,
+      "total_pt": 413083499,
+      "yt_total_pt": 352371454,
+      "nc_total_pt": 60712045,
       "raw": {
-        "yt_views": 227099277,
-        "yt_likes": 2238824,
-        "yt_comments": 132858,
-        "nc_views": 0,
-        "nc_mylist": 0,
-        "nc_comments": 0
+        "yt_views": 227141854,
+        "yt_likes": 2238868,
+        "yt_comments": 132862,
+        "nc_views": 11581469,
+        "nc_mylist": 24164,
+        "nc_comments": 38830
       },
       "pts": {
-        "yt_views": 227099277,
-        "yt_likes": 111941200,
-        "yt_comments": 13285800,
-        "nc_views": 0,
-        "nc_mylist": 0,
-        "nc_comments": 0
+        "yt_views": 227141854,
+        "yt_likes": 111943400,
+        "yt_comments": 13286200,
+        "nc_views": 57907345,
+        "nc_mylist": 2416400,
+        "nc_comments": 388300
+      },
+      "prevRank": 1,
+      "commentary": "",
+      "rank": 1
+    },
+    {
+      "song_id": "overide",
+      "title": "オーバーライド",
+      "producer": "吉田夜世",
+      "vocal": "重音テト",
+      "youtube_id": "LLGRFBLykZg",
+      "niconico_id": "sm43083649",
+      "total_pt": 38523405,
+      "yt_total_pt": 0,
+      "nc_total_pt": 38523405,
+      "raw": {
+        "yt_views": 0,
+        "yt_likes": 0,
+        "yt_comments": 0,
+        "nc_views": 7092565,
+        "nc_mylist": 29148,
+        "nc_comments": 14578
+      },
+      "pts": {
+        "yt_views": 0,
+        "yt_likes": 0,
+        "yt_comments": 0,
+        "nc_views": 35462825,
+        "nc_mylist": 2914800,
+        "nc_comments": 145780
       },
       "prevRank": "NEW",
       "commentary": "",
-      "rank": 1
+      "rank": 2
+    },
+    {
+      "song_id": "rabbit_hole",
+      "title": "ラビットホール",
+      "producer": "DECO*27",
+      "vocal": "初音ミク",
+      "youtube_id": "eSW2LVbpLeE",
+      "niconico_id": "sm42224358",
+      "total_pt": 33227350,
+      "yt_total_pt": 0,
+      "nc_total_pt": 33227350,
+      "raw": {
+        "yt_views": 0,
+        "yt_likes": 0,
+        "yt_comments": 0,
+        "nc_views": 6114146,
+        "nc_mylist": 25815,
+        "nc_comments": 7512
+      },
+      "pts": {
+        "yt_views": 0,
+        "yt_likes": 0,
+        "yt_comments": 0,
+        "nc_views": 30570730,
+        "nc_mylist": 2581500,
+        "nc_comments": 75120
+      },
+      "prevRank": "NEW",
+      "commentary": "",
+      "rank": 3
     }
   ]
 }
