@@ -31,12 +31,10 @@ YT_ID_PATTERN = re.compile(
 NC_ID_PATTERN = re.compile(r"(sm\d{7,9})")
 
 def is_vocaloid_original(title: str, description: str = "", tags: str = "") -> bool:
-    """タイトルやタグから歌ってみた・二次創作・まとめ動画等のノイズを除外"""
     title_lower = title.lower()
     for ng in NG_KEYWORDS:
         if ng in title_lower:
             return False
-    # カバー表記の除外（ただし「Cover Illustration」等は除外しないようタイトルのみで判定）
     if re.search(r"\b(cover|covered by|歌:)\b", title_lower):
         return False
 
@@ -47,9 +45,11 @@ def is_vocaloid_original(title: str, description: str = "", tags: str = "") -> b
     return has_vocal_keyword
 
 def clean_song_title(raw_title: str) -> str:
-    """動画タイトルから【初音ミク】やボカロP名・feat.表記を除去して純粋な曲名を抽出"""
-    t = re.sub(r"【.*?】|\[.*?\]|『.*?』", lambda m: m.group(0)[1:-1] if m.group(0).startswith("『") else "", raw_title)
-    t = re.sub(r"\(.*?(?:MV|Official|Music Video|初音ミク|重音テト|可不|GUMI|flower).*?\)", "", t, flags=re.IGNORECASE)
+    # 括弧書きの除去（『』は残す）
+    t = re.sub(r"【[^】]*】|\[[^\]]*\]|『[^』]*』", lambda m: m.group(0)[1:-1] if m.group(0).startswith("『") else "", raw_title)
+    # (MV) などの除去
+    t = re.sub(r"\([^)]*(?:MV|Official|Music Video|初音ミク|重音テト|可不|GUMI|flower)[^)]*\)", "", t, flags=re.IGNORECASE)
+    # 区切り文字以降の除去
     for sep in [" / ", " ／ ", " - ", " feat.", " ft.", " Feat."]:
         if sep in t:
             parts = [p.strip() for p in t.split(sep) if p.strip()]
@@ -69,7 +69,6 @@ def detect_vocals(text: str) -> str:
     return "・".join(dict.fromkeys(found))[:25] if found else "VOCALOID / 合成音声"
 
 def get_niconico_thumbinfo(nc_id: str) -> dict:
-    """ニコ動公式XML APIから動画情報と説明文(YouTubeリンク含む)を取得"""
     if not nc_id:
         return {}
     url = f"https://ext.nicovideo.jp/api/getthumbinfo/{nc_id}"
@@ -93,11 +92,9 @@ def get_niconico_thumbinfo(nc_id: str) -> dict:
     return {}
 
 def crawl_niconico_trending() -> list:
-    """ニコニコ動画のVOCALOIDタグRSSおよび検索APIから今伸びているsm番号を自動収集"""
     nc_ids = []
     headers = {"User-Agent": USER_AGENT}
 
-    # 1. ニコニコ動画タグRSS（人気順・マイリスト順・新着順）
     rss_urls = [
         "https://www.nicovideo.jp/tag/VOCALOID?sort=h&rss=2.0&lang=ja-jp",
         "https://www.nicovideo.jp/tag/VOCALOID?sort=m&order=d&rss=2.0&lang=ja-jp",
@@ -114,7 +111,6 @@ def crawl_niconico_trending() -> list:
         except Exception:
             pass
 
-    # 2. スナップショット検索API（利用可能な場合）
     snap_url = "https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search"
     thirty_days_ago = (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y-%m-%dT00:00:00+09:00")
     for sort_key in ["-mylistCounter", "-viewCounter"]:
@@ -140,17 +136,16 @@ def crawl_niconico_trending() -> list:
     return nc_ids[:60]
 
 def crawl_youtube_trending(youtube) -> list:
-    """YouTube Data APIで期間別・キーワード別に今伸びているボカロMVを自動探索"""
     now = datetime.now(timezone.utc)
     d7 = (now - timedelta(days=7)).strftime("%Y-%m-%dT00:00:00Z")
+    d14 = (now - timedelta(days=14)).strftime("%Y-%m-%dT00:00:00Z")
     d30 = (now - timedelta(days=30)).strftime("%Y-%m-%dT00:00:00Z")
     d120 = (now - timedelta(days=120)).strftime("%Y-%m-%dT00:00:00Z")
     d730 = (now - timedelta(days=730)).strftime("%Y-%m-%dT00:00:00Z")
 
-    # 新譜・月間急上昇・グローバル・ロングヒットを網羅するマルチクエリ
     search_plans = [
         {"q": '"初音ミク" OR "重音テト" OR "VOCALOID" MV -歌ってみた -cover', "after": d7, "max": 25},
-        {"q": '"Synthesizer V" OR "可不" OR "GUMI" OR "flower" OR "足立レイ" MV -cover', "after": d14 := (now - timedelta(days=14)).strftime("%Y-%m-%dT00:00:00Z"), "max": 20},
+        {"q": '"Synthesizer V" OR "可不" OR "GUMI" OR "flower" OR "足立レイ" MV -cover', "after": d14, "max": 20},
         {"q": '"初音ミク" OR "重音テト" OR "VOCALOID" "nicovideo.jp/watch/sm"', "after": d30, "max": 30},
         {"q": '"初音ミク" OR "重音テト" Official MV -歌ってみた -cover', "after": d30, "max": 25},
         {"q": '"初音ミク" OR "重音テト" OR "ボカロ" MV -歌ってみた -cover', "after": d120, "max": 25},
@@ -178,7 +173,6 @@ def crawl_youtube_trending(youtube) -> list:
     return discovered_yt_ids
 
 def search_niconico_by_title(title: str, producer: str) -> str:
-    """YouTube概要欄にsm番号がない場合、ニコ動の検索RSSを使って曲名からsm番号を特定"""
     headers = {"User-Agent": USER_AGENT}
     for query in [f"{title} {producer}", f"{title} VOCALOID"]:
         try:
@@ -209,7 +203,6 @@ def main():
 
     youtube = build("youtube", "v3", developerKey=api_key)
 
-    # 既存のトラッキングプールを読み込む
     pool = []
     if MASTER_FILE.exists():
         try:
@@ -221,12 +214,10 @@ def main():
     by_yt = {s["youtube_id"]: s for s in pool if s.get("youtube_id")}
     by_nc = {s["niconico_id"]: s for s in pool if s.get("niconico_id")}
 
-    # 1. YouTubeから今伸びているボカロ候補曲を収集
     yt_candidates = crawl_youtube_trending(youtube)
     new_yt_ids = [vid for vid in yt_candidates if vid not in by_yt]
     print(f"YouTubeトレンド探索: 候補 {len(yt_candidates)} 件 (うち新規 {len(new_yt_ids)} 件)")
 
-    # 50件ずつ videos.list で詳細情報を取得してフィルタ＆ニコ動ID抽出
     for i in range(0, len(new_yt_ids), 50):
         chunk = new_yt_ids[i:i+50]
         try:
@@ -245,12 +236,10 @@ def main():
                 title = clean_song_title(raw_title)
                 vocal = detect_vocals(f"{raw_title} {desc} {tags}")
 
-                # 概要欄からニコ動の sm番号 を抽出、なければタイトル検索で照合
                 m = NC_ID_PATTERN.search(desc)
                 nc_id = m.group(1) if m else search_niconico_by_title(title, channel)
 
                 if nc_id and nc_id in by_nc:
-                    # 既にニコ動側から登録されていた場合はYouTube IDを統合
                     by_nc[nc_id]["youtube_id"] = vid
                     by_yt[vid] = by_nc[nc_id]
                     continue
@@ -270,12 +259,11 @@ def main():
         except Exception as e:
             print(f"YouTube details batch error: {e}")
 
-    # 2. ニコニコ動画から今伸びているボカロ候補曲を収集しYouTubeとペアリング
     nc_candidates = crawl_niconico_trending()
     new_nc_ids = [cid for cid in nc_candidates if cid not in by_nc]
     print(f"ニコニコ動画トレンド探索: 候補 {len(nc_candidates)} 件 (うち新規 {len(new_nc_ids)} 件)")
 
-    yt_search_budget = 10  # クォータ節約のためニコ動→YouTube検索フォールバックは最大10回
+    yt_search_budget = 10
     for cid in new_nc_ids:
         info = get_niconico_thumbinfo(cid)
         if not info:
@@ -290,7 +278,6 @@ def main():
         producer = info["producer"] or "ボカロP"
         vocal = detect_vocals(f"{raw_title} {tags}")
 
-        # ニコ動の説明文からYouTubeリンクを抽出
         m = YT_ID_PATTERN.search(desc)
         yt_id = m.group(1) if m else ""
 
@@ -325,7 +312,6 @@ def main():
         if yt_id:
             by_yt[yt_id] = entry
 
-    # 3. 既存プール内でニコ動IDが未特定のものがあれば再照合
     for song in pool[:40]:
         if song.get("youtube_id") and not song.get("niconico_id"):
             found_nc = search_niconico_by_title(song["title"], song["producer"])
