@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>週刊VOCALOID複合ランキング | YouTube×ニコ動 6指標チャート</title>
   <link rel="stylesheet" href="./css/style.css">
-  <!-- Chart.js の読み込み -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -24,43 +23,50 @@
 
   <nav class="nav-tabs">
     <button class="tab-btn active" data-tab="ranking">週間ランキング TOP 20</button>
+    <button class="tab-btn" data-tab="insight">ランキングインサイト</button>
     <button class="tab-btn" data-tab="analysis">上位楽曲解説・トレンド分析</button>
     <button class="tab-btn" data-tab="method">ランキング作成方法・前提</button>
   </nav>
 
   <main>
-    <!-- TAB 1: 週間ランキング TOP 20 -->
+    <!-- 共通ヘッダー：公開日＆過去チャート切替 -->
+    <div class="chart-meta">
+      <div>
+        <strong id="chart-title">データ読み込み中...</strong>
+        <div class="meta-note">※各楽曲カードをクリックすると6指標の詳細内訳・動画リンク・解説が開きます</div>
+      </div>
+      <div class="archive-control">
+        <label for="archive-select">📅 過去チャート切替:</label>
+        <select id="archive-select" class="archive-select">
+          <option value="./data/latest_ranking.json">最新チャート</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- TAB 1: 週間ランキング TOP 20（トップに1〜20位を大きく表示） -->
     <section id="tab-ranking" class="tab-content active">
-      <!-- 過去チャート切り替え＆メタ情報バー -->
-      <div class="chart-meta">
-        <div>
-          <strong id="chart-title">データ読み込み中...</strong>
-          <div class="meta-note">※各楽曲カードをクリックすると6指標の詳細内訳・動画リンク・解説が開きます</div>
-        </div>
-        <div class="archive-control">
-          <label for="archive-select">📅 過去チャート切替:</label>
-          <select id="archive-select" class="archive-select">
-            <option value="./data/latest_ranking.json">最新チャート</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Billion Hits!風 6指標積み上げグラフ領域 -->
-      <div class="chart-visual-box">
-        <div class="visual-header">
-          <h2>📊 TOP 20 ポイント構成比グラフ（6指標積み上げ）</h2>
-          <button id="toggle-chart-btn" class="toggle-btn">グラフを折りたたむ</button>
-        </div>
-        <div id="chart-canvas-wrap" class="canvas-wrap">
-          <canvas id="top20Chart"></canvas>
-        </div>
-      </div>
-
-      <!-- ランキングカード一覧 -->
       <div id="ranking-container" class="ranking-list"></div>
     </section>
 
-    <!-- TAB 2: 上位楽曲解説 -->
+    <!-- TAB 2: ランキングインサイト（1位〜5位のポイント構成比グラフ＆内訳表） -->
+    <section id="tab-insight" class="tab-content">
+      <div class="chart-visual-box">
+        <div class="visual-header">
+          <h2>📊 TOP 5 ポイント構成比グラフ（6指標積み上げ）</h2>
+          <p class="visual-sub">上位5曲がどのプラットフォーム・指標からポイントを獲得しているかの構造比較</p>
+        </div>
+        <div id="chart-canvas-wrap" class="canvas-wrap">
+          <canvas id="top5Chart"></canvas>
+        </div>
+      </div>
+
+      <div class="article-box">
+        <h2>TOP 5 プラットフォーム別・指標構成比データ</h2>
+        <div id="insight-table-container"></div>
+      </div>
+    </section>
+
+    <!-- TAB 3: 上位楽曲解説・トレンド分析 -->
     <section id="tab-analysis" class="tab-content">
       <div class="article-box">
         <h2>今週のチャート総括</h2>
@@ -69,7 +75,7 @@
       </div>
     </section>
 
-    <!-- TAB 3: ランキング作成方法・前提 -->
+    <!-- TAB 4: ランキング作成方法・前提 -->
     <section id="tab-method" class="tab-content">
       <div class="article-box">
         <h2>本チャートの前提と問題意識</h2>

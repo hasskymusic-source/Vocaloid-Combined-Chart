@@ -7,7 +7,6 @@
   --accent: #38bdf8;
   --border: #334155;
 
-  /* 6指標カラーパレット */
   --c-yt-views: #ef4444;
   --c-yt-likes: #f97316;
   --c-yt-comments: #eab308;
@@ -33,7 +32,7 @@ header {
   z-index: 100;
 }
 .header-inner {
-  max-width: 1100px;
+  max-width: 1140px;
   margin: 0 auto;
   padding: 16px 20px;
   display: flex;
@@ -43,7 +42,7 @@ header {
   gap: 12px;
 }
 .site-title {
-  font-size: 1.35rem;
+  font-size: 1.45rem;
   font-weight: 800;
   letter-spacing: 0.03em;
   display: flex;
@@ -51,7 +50,7 @@ header {
   gap: 10px;
 }
 .site-title span.badge {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   background: linear-gradient(135deg, var(--c-yt-views), var(--c-nc-views));
   padding: 3px 10px;
   border-radius: 4px;
@@ -68,7 +67,7 @@ header {
 .update-schedule strong { color: var(--accent); }
 
 .nav-tabs {
-  max-width: 1100px;
+  max-width: 1140px;
   margin: 20px auto 0;
   padding: 0 20px;
   display: flex;
@@ -95,20 +94,19 @@ header {
 }
 
 main {
-  max-width: 1100px;
+  max-width: 1140px;
   margin: 24px auto 60px;
   padding: 0 20px;
 }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
-/* メタバー＆過去チャート切替プルダウン */
 .chart-meta {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 16px 20px;
-  margin-bottom: 20px;
+  padding: 16px 22px;
+  margin-bottom: 22px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -137,71 +135,38 @@ main {
   cursor: pointer;
 }
 
-/* グラフ表示ボックス */
-.chart-visual-box {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 18px 20px;
-  margin-bottom: 24px;
-}
-.visual-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-.visual-header h2 {
-  font-size: 1.05rem;
-  color: var(--text-main);
-}
-.toggle-btn {
-  background: var(--bg-main);
-  color: var(--text-sub);
-  border: 1px solid var(--border);
-  padding: 5px 12px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  cursor: pointer;
-}
-.toggle-btn:hover { color: var(--text-main); border-color: var(--accent); }
-.canvas-wrap {
-  position: relative;
-  width: 100%;
-}
-.canvas-wrap.collapsed { display: none; }
-
-/* ランキングカード */
-.ranking-list { display: flex; flex-direction: column; gap: 14px; }
+/* ランキングカード（1位〜20位を大きく表示） */
+.ranking-list { display: flex; flex-direction: column; gap: 16px; }
 .rank-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 18px 20px;
-  transition: background 0.2s, transform 0.15s;
+  border-radius: 12px;
+  padding: 22px 26px;
+  transition: background 0.2s, transform 0.15s, border-color 0.2s;
   cursor: pointer;
 }
 .rank-card:hover {
   background: var(--bg-card-hover);
+  border-color: #475569;
   transform: translateY(-2px);
 }
 .rank-header {
   display: grid;
-  grid-template-columns: 60px 1fr auto;
+  grid-template-columns: 72px 1fr auto;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
 }
 .rank-num-box { text-align: center; }
 .rank-num {
-  font-size: 1.8rem;
+  font-size: 2.2rem;
   font-weight: 900;
-  line-height: 1.1;
+  line-height: 1.05;
 }
-.rank-1 { color: #fbbf24; }
-.rank-2 { color: #cbd5e1; }
-.rank-3 { color: #d97706; }
+.rank-1 { color: #fbbf24; font-size: 2.5rem; }
+.rank-2 { color: #cbd5e1; font-size: 2.35rem; }
+.rank-3 { color: #d97706; font-size: 2.35rem; }
 .rank-diff {
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   font-weight: 700;
   margin-top: 4px;
 }
@@ -209,32 +174,36 @@ main {
 .diff-down { color: #f87171; }
 .diff-new { color: #38bdf8; }
 
-.song-info h3 { font-size: 1.15rem; margin-bottom: 4px; }
+.song-info h3 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
 .song-meta {
-  font-size: 0.85rem;
+  font-size: 0.92rem;
   color: var(--text-sub);
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 16px;
 }
 .point-box { text-align: right; }
 .total-pt {
-  font-size: 1.4rem;
-  font-weight: 800;
+  font-size: 1.75rem;
+  font-weight: 900;
   color: var(--accent);
 }
 .total-pt span {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: var(--text-sub);
-  font-weight: 400;
+  font-weight: 500;
   margin-left: 4px;
 }
 
 /* 6指標構成比バー */
-.share-bar-wrap { margin-top: 14px; }
+.share-bar-wrap { margin-top: 16px; }
 .share-bar {
-  height: 10px;
-  border-radius: 5px;
+  height: 12px;
+  border-radius: 6px;
   overflow: hidden;
   display: flex;
   background: #0f172a;
@@ -249,22 +218,39 @@ main {
 .share-labels {
   display: flex;
   justify-content: space-between;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   color: var(--text-sub);
-  margin-top: 6px;
+  margin-top: 8px;
+}
+
+/* インサイトタブのグラフ領域 */
+.chart-visual-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.visual-header { margin-bottom: 16px; }
+.visual-header h2 { font-size: 1.25rem; color: var(--text-main); }
+.visual-sub { font-size: 0.85rem; color: var(--text-sub); margin-top: 4px; }
+.canvas-wrap {
+  position: relative;
+  width: 100%;
+  height: 360px;
 }
 
 /* 詳細展開パネル */
 .detail-panel {
   display: none;
-  margin-top: 16px;
-  padding-top: 16px;
+  margin-top: 18px;
+  padding-top: 18px;
   border-top: 1px dashed var(--border);
 }
 .rank-card.open .detail-panel { display: block; }
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 10px;
   margin-bottom: 14px;
 }
@@ -286,9 +272,9 @@ main {
 }
 .ext-btn {
   text-decoration: none;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  padding: 6px 12px;
+  padding: 7px 14px;
   border-radius: 6px;
   color: #fff;
   display: inline-flex;
@@ -308,11 +294,10 @@ main {
 }
 .commentary-box strong { color: var(--accent); }
 
-/* 解説・ルール記事ボックス */
 .article-box {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 28px;
 }
 .article-box h2 {
@@ -337,6 +322,6 @@ main {
 .rule-table th { background: rgba(15, 23, 42, 0.8); color: var(--accent); }
 
 @media (max-width: 640px) {
-  .rank-header { grid-template-columns: 45px 1fr; }
+  .rank-header { grid-template-columns: 50px 1fr; }
   .point-box { grid-column: 2; text-align: left; }
 }

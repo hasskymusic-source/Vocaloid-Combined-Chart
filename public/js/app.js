@@ -1,4 +1,5 @@
 let chartInstance = null;
+let currentData = null;
 
 const DEFAULT_WEIGHTS = {
   yt_views: 1,
@@ -9,7 +10,7 @@ const DEFAULT_WEIGHTS = {
   nc_comments: 10
 };
 
-// タブ切り替えイベントの設定
+// タブ切り替えイベント（インサイトタブを開いた時にグラフサイズを再計算）
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -17,22 +18,15 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.add('active');
     const tabName = btn.getAttribute('data-tab');
     document.getElementById(`tab-${tabName}`).classList.add('active');
+
+    if (tabName === 'insight' && currentData) {
+      renderTop5InsightChart(currentData);
+    }
   });
 });
 
-// グラフ折りたたみボタン
-const toggleBtn = document.getElementById('toggle-chart-btn');
-if (toggleBtn) {
-  toggleBtn.addEventListener('click', () => {
-    const wrap = document.getElementById('chart-canvas-wrap');
-    wrap.classList.toggle('collapsed');
-    toggleBtn.textContent = wrap.classList.contains('collapsed') ? 'グラフを展開する' : 'グラフを折りたたむ';
-  });
-}
-
 async function initApp() {
   try {
-    // 1. 過去チャート一覧(archive_index.json)の読み込み
     const indexRes = await fetch(`./data/archive_index.json?t=${Date.now()}`);
     if (indexRes.ok) {
       const archiveList = await indexRes.json();
@@ -40,8 +34,6 @@ async function initApp() {
         renderArchiveSelector(archiveList);
       }
     }
-
-    // 2. 最新ランキング(latest_ranking.json)の読み込み
     await loadChartData('./data/latest_ranking.json');
   } catch (err) {
     console.error('データの読み込みに失敗しました:', err);
@@ -73,8 +65,9 @@ async function loadChartData(jsonPath) {
     return;
   }
 
+  currentData = data;
   renderRankingView(data);
-  renderTop20StackedChart(data);
+  renderTop5InsightChart(data);
 }
 
 function calcSongPoints(song, weights) {
@@ -234,33 +227,31 @@ function renderRankingView(data) {
   });
 }
 
-function renderTop20StackedChart(data) {
-  const canvas = document.getElementById('top20Chart');
-  const wrap = document.getElementById('chart-canvas-wrap');
+function renderTop5InsightChart(data) {
+  const canvas = document.getElementById('top5Chart');
+  const tableContainer = document.getElementById('insight-table-container');
   if (!canvas || typeof Chart === 'undefined') return;
 
-  const songs = data.songs.slice(0, 20);
-  // 曲数に合わせてグラフの高さを自動調整
-  wrap.style.height = `${Math.max(240, songs.length * 42 + 70)}px`;
+  const top5 = data.songs.slice(0, 5);
 
   if (chartInstance) {
     chartInstance.destroy();
   }
 
-  const labels = songs.map(s => `${s.rank}位: ${s.title}`);
-  const calcList = songs.map(s => calcSongPoints(s, data.weights).pts);
+  const labels = top5.map(s => `${s.rank}位: ${s.title}`);
+  const calcList = top5.map(s => calcSongPoints(s, data.weights));
 
   chartInstance = new Chart(canvas, {
     type: 'bar',
     data: {
       labels,
       datasets: [
-        { label: 'YT再生(×1)', data: calcList.map(p => p.yt_views), backgroundColor: '#ef4444' },
-        { label: 'YT高評価(×50)', data: calcList.map(p => p.yt_likes), backgroundColor: '#f97316' },
-        { label: 'YTコメ(×100)', data: calcList.map(p => p.yt_comments), backgroundColor: '#eab308' },
-        { label: 'ニコ再生(×5)', data: calcList.map(p => p.nc_views), backgroundColor: '#3b82f6' },
-        { label: 'ニコマイリス(×100)', data: calcList.map(p => p.nc_mylist), backgroundColor: '#06b6d4' },
-        { label: 'ニココメ(×10)', data: calcList.map(p => p.nc_comments), backgroundColor: '#8b5cf6' }
+        { label: 'YT再生(×1)', data: calcList.map(c => c.pts.yt_views), backgroundColor: '#ef4444' },
+        { label: 'YT高評価(×50)', data: calcList.map(c => c.pts.yt_likes), backgroundColor: '#f97316' },
+        { label: 'YTコメ(×100)', data: calcList.map(c => c.pts.yt_comments), backgroundColor: '#eab308' },
+        { label: 'ニコ再生(×5)', data: calcList.map(c => c.pts.nc_views), backgroundColor: '#3b82f6' },
+        { label: 'ニコマイリス(×100)', data: calcList.map(c => c.pts.nc_mylist), backgroundColor: '#06b6d4' },
+        { label: 'ニココメ(×10)', data: calcList.map(c => c.pts.nc_comments), backgroundColor: '#8b5cf6' }
       ]
     },
     options: {
@@ -275,14 +266,12 @@ function renderTop20StackedChart(data) {
         },
         y: {
           stacked: true,
-          ticks: { color: '#f8fafc', font: { weight: 'bold' } },
+          ticks: { color: '#f8fafc', font: { size: 13, weight: 'bold' } },
           grid: { display: false }
         }
       },
       plugins: {
-        legend: {
-          labels: { color: '#f8fafc' }
-        },
+        legend: { labels: { color: '#f8fafc' } },
         tooltip: {
           callbacks: {
             label: (ctx) => `${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString()} pt`
@@ -291,6 +280,36 @@ function renderTop20StackedChart(data) {
       }
     }
   });
+
+  if (tableContainer) {
+    const rows = top5.map((s, idx) => {
+      const c = calcList[idx];
+      return `
+        <tr>
+          <td><strong>${s.rank}位</strong></td>
+          <td>${s.title} <span style="color:#94a3b8;font-size:0.8rem;">(${s.producer})</span></td>
+          <td><strong>${c.total.toLocaleString()} pt</strong></td>
+          <td style="color:#f87171;">${c.yt_share}% (${c.yt_total.toLocaleString()} pt)</td>
+          <td style="color:#60a5fa;">${c.nc_share}% (${c.nc_total.toLocaleString()} pt)</td>
+        </tr>
+      `;
+    }).join('');
+
+    tableContainer.innerHTML = `
+      <table class="rule-table">
+        <thead>
+          <tr>
+            <th>順位</th>
+            <th>楽曲名 (ボカロP)</th>
+            <th>総合ポイント</th>
+            <th>YouTube比率 (獲得pt)</th>
+            <th>ニコニコ動画比率 (獲得pt)</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+  }
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
