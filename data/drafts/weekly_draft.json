@@ -1,0 +1,46 @@
+{
+  "publishDate": "2026-10-21 13:00",
+  "archiveId": "2026-10-21",
+  "period": "2026-10-09 〜 2026-10-15",
+  "weeklySummary": "ここに今週のチャート総括（Billion Hits!風の全体考察）を記入します。",
+  "weights": {
+    "yt_views": 1,
+    "yt_likes": 50,
+    "yt_comments": 100,
+    "nc_views": 5,
+    "nc_mylist": 100,
+    "nc_comments": 10
+  },
+  "songs": [
+    {
+      "song_id": "mesmerizer",
+      "title": "メズマライザー",
+      "producer": "サツキ",
+      "vocal": "初音ミク・重音テト",
+      "youtube_id": "19y8YTbvri8",
+      "niconico_id": "sm43708803",
+      "total_pt": 352326277,
+      "yt_total_pt": 352326277,
+      "nc_total_pt": 0,
+      "raw": {
+        "yt_views": 227099277,
+        "yt_likes": 2238824,
+        "yt_comments": 132858,
+        "nc_views": 0,
+        "nc_mylist": 0,
+        "nc_comments": 0
+      },
+      "pts": {
+        "yt_views": 227099277,
+        "yt_likes": 111941200,
+        "yt_comments": 13285800,
+        "nc_views": 0,
+        "nc_mylist": 0,
+        "nc_comments": 0
+      },
+      "prevRank": "NEW",
+      "commentary": "",
+      "rank": 1
+    }
+  ]
+}
