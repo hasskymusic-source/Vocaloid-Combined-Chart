@@ -35,8 +35,10 @@ def fetch_niconico_stats(niconico_id):
             "fields": "viewCounter,mylistCounter,commentCounter",
             "filters[contentId][0]": niconico_id
         }
-        res = requests.get(url, params=params)
+        headers = {"User-Agent": "VocaloidCombinedChartBot/1.0"}
+        res = requests.get(url, params=params, headers=headers)
         data = res.json()
+        
         if data.get("data"):
             stats = data["data"][0]
             return {

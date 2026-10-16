@@ -12,9 +12,12 @@ def main():
     # 前週の公開ランキングから前回順位を取得
     prev_ranks = {}
     if PUBLIC_LATEST.exists():
-        with open(PUBLIC_LATEST, "r", encoding="utf-8") as f:
-            pub_data = json.load(f)
-            prev_ranks = {s["song_id"]: s["rank"] for s in pub_data.get("songs", [])}
+        try:
+            with open(PUBLIC_LATEST, "r", encoding="utf-8") as f:
+                pub_data = json.load(f)
+                prev_ranks = {s["song_id"]: s["rank"] for s in pub_data.get("songs", [])}
+        except json.JSONDecodeError:
+            pass  # ファイルが空、または壊れている場合は無視して続行
 
     ranked_songs = []
     for song in latest_list:
