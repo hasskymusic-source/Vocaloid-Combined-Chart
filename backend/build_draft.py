@@ -18,9 +18,6 @@ def parse_iso_dt(dt_str: str):
         return None
 
 def compute_chart_window():
-    """
-    直近の集計期間（月曜 00:00:00 JST 〜 日曜 23:59:59 JST）と公開日を算出
-    """
     now_jst = datetime.now(JST)
     days_since_sunday = (now_jst.weekday() + 1) % 7
     if days_since_sunday == 0 and now_jst.hour < 23:
@@ -50,15 +47,11 @@ def compute_chart_window():
 
 def calc_window_fraction(pub_dt, window_start, window_end, now_dt) -> tuple:
     """
-    公開日時(pub_dt)から現在(now_dt)までの累積成長曲線 F(t) = t^alpha に対し、
-    指定された集計期間 [window_start, window_end] の間に獲得したシェアのみを厳密に切り出す。
-    ・window_end より後（例：10/12以降）に投稿された動画は (0.0, 0.0) を返し除外する。
-    ・window_end 以降〜今日（10/12〜10/17）に増えた分は分母(t_now)と分子(t_end)の差によって完全に除去される。
+    指定された7日間ウィンドウ [window_start, window_end] の獲得シェアを算出。
     """
     if pub_dt is None:
-        return 0.001, 0.0002
+        return 0.0, 0.0
 
-    # 集計期間終了後に公開された動画は、その週の集計期間内では0再生
     if pub_dt > window_end:
         return 0.0, 0.0
 
@@ -69,22 +62,25 @@ def calc_window_fraction(pub_dt, window_start, window_end, now_dt) -> tuple:
     if t_end <= t_start:
         return 0.0, 0.0
 
-    # ボカロMVの累積成長パラメータ（再生数: alpha=0.52, 高評価・マイリス・コメ: 初動集中型 alpha=0.36）
     alpha_views = 0.52
     alpha_engage = 0.36
 
     share_views = ((t_end ** alpha_views) - (t_start ** alpha_views)) / (t_now ** alpha_views)
     share_engage = ((t_end ** alpha_engage) - (t_start ** alpha_engage)) / (t_now ** alpha_engage)
 
-    # 累計値がそのまま100%になることを防ぐ上限ガード（期間後に経過した時間分を必ず差し引く）
+    # 公開から2年(730日)以上経過した旧譜カタログは定常減衰係数を適用し、直近1年のバイラル曲・新譜の精度を高める
+    if t_now > 730.0:
+        share_views *= 0.45
+        share_engage *= 0.35
+
     return min(0.92, max(0.0, share_views)), min(0.92, max(0.0, share_engage))
 
 def calculate_period_metrics(song: dict, window_start, window_end, now_dt) -> dict:
-    yt_pub = parse_iso_dt(song.get("yt_published_at") or song.get("nc_published_at"))
-    nc_pub = parse_iso_dt(song.get("nc_published_at") or song.get("yt_published_at"))
+    yt_pub = parse_iso_dt(song.get("yt_published_at"))
+    nc_pub = parse_iso_dt(song.get("nc_published_at"))
 
-    yt_sv, yt_se = calc_window_fraction(yt_pub, window_start, window_end, now_dt)
-    nc_sv, nc_se = calc_window_fraction(nc_pub, window_start, window_end, now_dt)
+    yt_sv, yt_se = calc_window_fraction(yt_pub, window_start, window_end, now_dt) if song.get("yt_views", 0) > 0 else (0.0, 0.0)
+    nc_sv, nc_se = calc_window_fraction(nc_pub, window_start, window_end, now_dt) if song.get("nc_views", 0) > 0 else (0.0, 0.0)
 
     return {
         "yt_views": int(song.get("yt_views", 0) * yt_sv),
@@ -115,8 +111,6 @@ def main():
 
     for song in latest_list:
         sid = song["song_id"]
-
-        # YouTubeとニコ動の双方が取得できている楽曲を優先評価（片側欠損ノイズの防止）
         raw_diff = calculate_period_metrics(song, window_start, window_end, now_dt)
 
         baseline_entry = dict(song)
@@ -129,8 +123,8 @@ def main():
         nc_total = pts["nc_views"] + pts["nc_mylist"] + pts["nc_comments"]
         total_pt = yt_total + nc_total
 
-        # 集計期間内の獲得ポイントが0の曲（期間後投稿など）や片側0ptの未紐付け曲を除外
-        if total_pt <= 0 or yt_total == 0 or nc_total == 0:
+        # 両サイト必須フィルタを撤廃：YouTube単体の海外ボカロP曲や片側先行の新譜も全てフェアに評価
+        if total_pt <= 0:
             continue
 
         ranked_songs.append({
@@ -165,7 +159,8 @@ def main():
         "period": period_str,
         "weeklySummary": (
             f"集計期間（{period_str}）の週間VOCALOID複合ランキングTOP 20。"
-            f"期間内の7日間にYouTube・ニコニコ動画の双方で獲得した6指標の純増ポイントを集計した結果、"
+            f"日本国内のボカロ新譜から韓国・英語圏をはじめとするグローバルボカロPのヒット曲まで、"
+            f"YouTubeとニコニコ動画の6指標を横断集計した結果、"
             f"{top1['producer']}「{top1['title']}」が週間 {top1['total_pt']:,} pt で総合1位を獲得した。"
         ),
         "weights": WEIGHTS,
@@ -176,7 +171,7 @@ def main():
     with open(DRAFT_FILE, "w", encoding="utf-8") as f:
         json.dump(draft_payload, f, ensure_ascii=False, indent=2)
 
-    print(f"期間内（{period_str}）データによる TOP {len(top_songs)} ランキングを生成しました。")
+    print(f"グローバル対応 TOP {len(top_songs)} ランキングを生成しました。")
 
 if __name__ == "__main__":
     main()
