@@ -1,5 +1,39 @@
 [
   {
+    "song_id": "song_sm46354721",
+    "title": "ヤラララ",
+    "producer": "ABM (AnythingBecomeMoe)",
+    "vocal": "重音テト",
+    "youtube_id": "T24rF_x0TmQ",
+    "niconico_id": "sm46354721",
+    "yt_published_at": "2026-05-25T06:00:06Z",
+    "nc_published_at": "2026-05-25T16:22:04+09:00",
+    "yt_views": 64075810,
+    "yt_likes": 891835,
+    "yt_comments": 25663,
+    "nc_views": 713821,
+    "nc_mylist": 3013,
+    "nc_comments": 2284,
+    "updated_at": "2026-10-17T13:04:41.690360"
+  },
+  {
+    "song_id": "song_sm45964915",
+    "title": "처형박수",
+    "producer": "TRAP CHICK",
+    "vocal": "重音テト",
+    "youtube_id": "YcxhmHEykPg",
+    "niconico_id": "sm45964915",
+    "yt_published_at": "2026-02-14T11:00:05Z",
+    "nc_published_at": "2026-02-20T19:01:24+09:00",
+    "yt_views": 44469138,
+    "yt_likes": 560117,
+    "yt_comments": 23088,
+    "nc_views": 171349,
+    "nc_mylist": 808,
+    "nc_comments": 1099,
+    "updated_at": "2026-10-17T13:04:41.937493"
+  },
+  {
     "song_id": "song_sm46891435",
     "title": "惑星直列",
     "producer": "いよわ",
@@ -8,13 +42,64 @@
     "niconico_id": "sm46904359",
     "yt_published_at": "2026-10-09T10:00:17Z",
     "nc_published_at": "2026-10-09T19:00:00+09:00",
-    "yt_views": 916212,
-    "yt_likes": 45064,
-    "yt_comments": 1578,
-    "nc_views": 52196,
-    "nc_mylist": 813,
-    "nc_comments": 1020,
-    "updated_at": "2026-10-17T11:24:24.090285"
+    "yt_views": 918382,
+    "yt_likes": 45106,
+    "yt_comments": 1579,
+    "nc_views": 52488,
+    "nc_mylist": 814,
+    "nc_comments": 1024,
+    "updated_at": "2026-10-17T13:04:41.975286"
+  },
+  {
+    "song_id": "song_1scsTp6FG1Y",
+    "title": "ご主人様、ロックのお時間にございます",
+    "producer": "Neru",
+    "vocal": "鏡音リン・鏡音レン",
+    "youtube_id": "1scsTp6FG1Y",
+    "niconico_id": "sm46904318",
+    "yt_published_at": "2026-10-16T09:00:19Z",
+    "nc_published_at": "2026-10-09T20:00:00+09:00",
+    "yt_views": 3890,
+    "yt_likes": 145,
+    "yt_comments": 15,
+    "nc_views": 40704,
+    "nc_mylist": 704,
+    "nc_comments": 532,
+    "updated_at": "2026-10-17T13:04:42.212049"
+  },
+  {
+    "song_id": "song_GPr_cM7Nyzk",
+    "title": "肆足歩行",
+    "producer": "サツキ",
+    "vocal": "足立レイ",
+    "youtube_id": "GPr_cM7Nyzk",
+    "niconico_id": "sm46867629",
+    "yt_published_at": "2026-10-09T10:00:08Z",
+    "nc_published_at": "2026-10-09T19:00:00+09:00",
+    "yt_views": 621612,
+    "yt_likes": 38389,
+    "yt_comments": 848,
+    "nc_views": 32385,
+    "nc_mylist": 499,
+    "nc_comments": 577,
+    "updated_at": "2026-10-17T13:04:42.255295"
+  },
+  {
+    "song_id": "song_ez_kW8ELPZU",
+    "title": "もしもしも",
+    "producer": "なきそ",
+    "vocal": "初音ミク",
+    "youtube_id": "ez_kW8ELPZU",
+    "niconico_id": "",
+    "yt_published_at": "2026-09-21T11:47:53Z",
+    "nc_published_at": "",
+    "yt_views": 155,
+    "yt_likes": 5,
+    "yt_comments": 0,
+    "nc_views": 0,
+    "nc_mylist": 0,
+    "nc_comments": 0,
+    "updated_at": "2026-10-17T13:04:42.255318"
   },
   {
     "song_id": "song_sm43708803",
@@ -25,13 +110,13 @@
     "niconico_id": "sm43708803",
     "yt_published_at": "2024-04-27T10:00:02Z",
     "nc_published_at": "2024-04-27T19:00:00+09:00",
-    "yt_views": 227252089,
-    "yt_likes": 2239146,
-    "yt_comments": 132882,
-    "nc_views": 11582185,
+    "yt_views": 227267581,
+    "yt_likes": 2239177,
+    "yt_comments": 132884,
+    "nc_views": 11582327,
     "nc_mylist": 24163,
     "nc_comments": 38830,
-    "updated_at": "2026-10-17T11:24:24.309141"
+    "updated_at": "2026-10-17T13:04:42.467400"
   },
   {
     "song_id": "song_sm43083649",
@@ -42,13 +127,13 @@
     "niconico_id": "sm43083649",
     "yt_published_at": "2023-11-29T10:00:07Z",
     "nc_published_at": "2023-11-29T19:00:00+09:00",
-    "yt_views": 113102007,
-    "yt_likes": 784178,
-    "yt_comments": 22740,
-    "nc_views": 7093089,
+    "yt_views": 113107577,
+    "yt_likes": 784191,
+    "yt_comments": 22738,
+    "nc_views": 7093214,
     "nc_mylist": 29145,
     "nc_comments": 14582,
-    "updated_at": "2026-10-17T11:24:24.523892"
+    "updated_at": "2026-10-17T13:04:42.712107"
   },
   {
     "song_id": "song_sm42224358",
@@ -59,13 +144,13 @@
     "niconico_id": "sm42224358",
     "yt_published_at": "2023-05-19T10:00:29Z",
     "nc_published_at": "2023-05-19T19:00:00+09:00",
-    "yt_views": 127058910,
-    "yt_likes": 1289443,
+    "yt_views": 127063873,
+    "yt_likes": 1289461,
     "yt_comments": 29390,
-    "nc_views": 6114637,
-    "nc_mylist": 25816,
+    "nc_views": 6114767,
+    "nc_mylist": 25818,
     "nc_comments": 7512,
-    "updated_at": "2026-10-17T11:24:24.743108"
+    "updated_at": "2026-10-17T13:04:42.964723"
   },
   {
     "song_id": "song_sm39334235",
@@ -76,13 +161,13 @@
     "niconico_id": "sm39334235",
     "yt_published_at": "2021-09-17T10:00:05Z",
     "nc_published_at": "2021-09-17T19:00:00+09:00",
-    "yt_views": 94199957,
-    "yt_likes": 887991,
+    "yt_views": 94201317,
+    "yt_likes": 887988,
     "yt_comments": 16701,
-    "nc_views": 9985406,
-    "nc_mylist": 43200,
-    "nc_comments": 34515,
-    "updated_at": "2026-10-17T11:24:24.963089"
+    "nc_views": 9985584,
+    "nc_mylist": 43201,
+    "nc_comments": 34517,
+    "updated_at": "2026-10-17T13:04:43.178637"
   },
   {
     "song_id": "song_sm31791630",
@@ -93,13 +178,13 @@
     "niconico_id": "sm31791630",
     "yt_published_at": "2017-08-22T08:00:01Z",
     "nc_published_at": "2017-08-22T17:00:00+09:00",
-    "yt_views": 77965645,
-    "yt_likes": 563644,
-    "yt_comments": 18674,
-    "nc_views": 14742638,
+    "yt_views": 77966950,
+    "yt_likes": 563655,
+    "yt_comments": 18675,
+    "nc_views": 14742754,
     "nc_mylist": 87594,
-    "nc_comments": 277139,
-    "updated_at": "2026-10-17T11:24:25.189934"
+    "nc_comments": 277145,
+    "updated_at": "2026-10-17T13:04:43.430122"
   },
   {
     "song_id": "song_sm39356749",
@@ -116,7 +201,7 @@
     "nc_views": 271,
     "nc_mylist": 1,
     "nc_comments": 2,
-    "updated_at": "2026-10-17T11:24:25.399121"
+    "updated_at": "2026-10-17T13:04:43.977040"
   },
   {
     "song_id": "song_sm46889959",
@@ -127,13 +212,13 @@
     "niconico_id": "sm46889959",
     "yt_published_at": "2026-10-09T11:00:09Z",
     "nc_published_at": "2026-10-09T20:00:00+09:00",
-    "yt_views": 29226,
-    "yt_likes": 1741,
+    "yt_views": 29282,
+    "yt_likes": 1742,
     "yt_comments": 96,
-    "nc_views": 6053,
-    "nc_mylist": 161,
+    "nc_views": 6069,
+    "nc_mylist": 163,
     "nc_comments": 108,
-    "updated_at": "2026-10-17T11:24:25.627235"
+    "updated_at": "2026-10-17T13:04:44.225161"
   },
   {
     "song_id": "song_QkjTsGwlWsM",
@@ -144,13 +229,13 @@
     "niconico_id": "",
     "yt_published_at": "2026-10-15T11:00:17Z",
     "nc_published_at": "",
-    "yt_views": 5388,
+    "yt_views": 5495,
     "yt_likes": 0,
-    "yt_comments": 21,
+    "yt_comments": 22,
     "nc_views": 0,
     "nc_mylist": 0,
     "nc_comments": 0,
-    "updated_at": "2026-10-17T11:24:25.627253"
+    "updated_at": "2026-10-17T13:04:44.225189"
   },
   {
     "song_id": "song_KcUYdZfXljI",
@@ -161,13 +246,13 @@
     "niconico_id": "sm46927626",
     "yt_published_at": "2026-10-15T11:00:08Z",
     "nc_published_at": "2026-10-15T20:00:00+09:00",
-    "yt_views": 4901,
-    "yt_likes": 390,
+    "yt_views": 5046,
+    "yt_likes": 401,
     "yt_comments": 26,
-    "nc_views": 109,
+    "nc_views": 111,
     "nc_mylist": 1,
     "nc_comments": 2,
-    "updated_at": "2026-10-17T11:24:25.853294"
+    "updated_at": "2026-10-17T13:04:44.749736"
   },
   {
     "song_id": "song_bUZlkLUbP6s",
@@ -184,7 +269,7 @@
     "nc_views": 0,
     "nc_mylist": 0,
     "nc_comments": 0,
-    "updated_at": "2026-10-17T11:24:25.853316"
+    "updated_at": "2026-10-17T13:04:44.749770"
   },
   {
     "song_id": "song_CBmKJH2DKA4",
@@ -201,7 +286,7 @@
     "nc_views": 0,
     "nc_mylist": 0,
     "nc_comments": 0,
-    "updated_at": "2026-10-17T11:24:25.853329"
+    "updated_at": "2026-10-17T13:04:44.749784"
   },
   {
     "song_id": "song_26u1u6UIfy4",
@@ -218,7 +303,7 @@
     "nc_views": 0,
     "nc_mylist": 0,
     "nc_comments": 0,
-    "updated_at": "2026-10-17T11:24:25.853344"
+    "updated_at": "2026-10-17T13:04:44.749801"
   },
   {
     "song_id": "song_34bZ3GMllYs",
@@ -229,13 +314,13 @@
     "niconico_id": "",
     "yt_published_at": "2026-09-26T01:00:06Z",
     "nc_published_at": "",
-    "yt_views": 56764,
-    "yt_likes": 822,
+    "yt_views": 56832,
+    "yt_likes": 823,
     "yt_comments": 89,
     "nc_views": 0,
     "nc_mylist": 0,
     "nc_comments": 0,
-    "updated_at": "2026-10-17T11:24:25.853355"
+    "updated_at": "2026-10-17T13:04:44.749814"
   },
   {
     "song_id": "song_eup96Q_8zIE",
@@ -246,13 +331,13 @@
     "niconico_id": "",
     "yt_published_at": "2026-10-01T11:00:10Z",
     "nc_published_at": "",
-    "yt_views": 11568,
+    "yt_views": 11570,
     "yt_likes": 136,
     "yt_comments": 3,
     "nc_views": 0,
     "nc_mylist": 0,
     "nc_comments": 0,
-    "updated_at": "2026-10-17T11:24:25.853366"
+    "updated_at": "2026-10-17T13:04:44.749826"
   },
   {
     "song_id": "song_u8TSJwCgBtw",
@@ -269,7 +354,7 @@
     "nc_views": 0,
     "nc_mylist": 0,
     "nc_comments": 0,
-    "updated_at": "2026-10-17T11:24:25.853379"
+    "updated_at": "2026-10-17T13:04:44.749840"
   },
   {
     "song_id": "song_DFMJzhwqzhc",
@@ -280,13 +365,13 @@
     "niconico_id": "",
     "yt_published_at": "2026-08-29T08:00:29Z",
     "nc_published_at": "",
-    "yt_views": 161127,
-    "yt_likes": 5022,
+    "yt_views": 161227,
+    "yt_likes": 5023,
     "yt_comments": 223,
     "nc_views": 0,
     "nc_mylist": 0,
     "nc_comments": 0,
-    "updated_at": "2026-10-17T11:24:25.853390"
+    "updated_at": "2026-10-17T13:04:44.749853"
   },
   {
     "song_id": "song_fdgwPD-oqIY",
@@ -297,13 +382,13 @@
     "niconico_id": "sm46578647",
     "yt_published_at": "2026-07-25T10:00:15Z",
     "nc_published_at": "2026-07-25T19:00:00+09:00",
-    "yt_views": 72829,
+    "yt_views": 72833,
     "yt_likes": 1487,
     "yt_comments": 148,
     "nc_views": 6106,
     "nc_mylist": 58,
     "nc_comments": 58,
-    "updated_at": "2026-10-17T11:24:26.079671"
+    "updated_at": "2026-10-17T13:04:44.999810"
   },
   {
     "song_id": "song_FxYTehD6TjQ",
@@ -314,13 +399,13 @@
     "niconico_id": "sm46502115",
     "yt_published_at": "2026-07-02T09:00:16Z",
     "nc_published_at": "2026-07-02T18:49:48+09:00",
-    "yt_views": 38326,
+    "yt_views": 38330,
     "yt_likes": 2191,
     "yt_comments": 151,
     "nc_views": 7109,
     "nc_mylist": 14,
     "nc_comments": 11,
-    "updated_at": "2026-10-17T11:24:26.309675"
+    "updated_at": "2026-10-17T13:04:45.248255"
   },
   {
     "song_id": "song__s1kOGZO7gw",
@@ -331,13 +416,13 @@
     "niconico_id": "",
     "yt_published_at": "2026-08-18T11:57:18Z",
     "nc_published_at": "",
-    "yt_views": 31392,
+    "yt_views": 31397,
     "yt_likes": 0,
     "yt_comments": 53,
     "nc_views": 0,
     "nc_mylist": 0,
     "nc_comments": 0,
-    "updated_at": "2026-10-17T11:24:26.309696"
+    "updated_at": "2026-10-17T13:04:45.248287"
   },
   {
     "song_id": "song_WfYUSrVatxM",
@@ -348,13 +433,13 @@
     "niconico_id": "",
     "yt_published_at": "2026-07-12T11:58:06Z",
     "nc_published_at": "",
-    "yt_views": 28940,
+    "yt_views": 28941,
     "yt_likes": 2166,
     "yt_comments": 61,
     "nc_views": 0,
     "nc_mylist": 0,
     "nc_comments": 0,
-    "updated_at": "2026-10-17T11:24:26.309708"
+    "updated_at": "2026-10-17T13:04:45.248301"
   },
   {
     "song_id": "song_3gFvHG3IWPw",
@@ -371,7 +456,7 @@
     "nc_views": 0,
     "nc_mylist": 0,
     "nc_comments": 0,
-    "updated_at": "2026-10-17T11:24:26.309720"
+    "updated_at": "2026-10-17T13:04:45.248314"
   },
   {
     "song_id": "song_49OduWknsAA",
@@ -382,13 +467,13 @@
     "niconico_id": "",
     "yt_published_at": "2026-08-27T10:28:07Z",
     "nc_published_at": "",
-    "yt_views": 46091,
+    "yt_views": 46094,
     "yt_likes": 68,
     "yt_comments": 8,
     "nc_views": 0,
     "nc_mylist": 0,
     "nc_comments": 0,
-    "updated_at": "2026-10-17T11:24:26.309731"
+    "updated_at": "2026-10-17T13:04:45.248326"
   },
   {
     "song_id": "song_ZutnM9DriHU",
@@ -399,13 +484,13 @@
     "niconico_id": "",
     "yt_published_at": "2024-12-11T15:02:52Z",
     "nc_published_at": "",
-    "yt_views": 538218,
-    "yt_likes": 8981,
+    "yt_views": 538292,
+    "yt_likes": 8982,
     "yt_comments": 839,
     "nc_views": 0,
     "nc_mylist": 0,
     "nc_comments": 0,
-    "updated_at": "2026-10-17T11:24:26.309752"
+    "updated_at": "2026-10-17T13:04:45.248341"
   },
   {
     "song_id": "song_V1Kofl9jazU",
@@ -416,13 +501,13 @@
     "niconico_id": "sm44750078",
     "yt_published_at": "2025-03-13T09:00:06Z",
     "nc_published_at": "2025-03-13T18:00:00+09:00",
-    "yt_views": 109484,
+    "yt_views": 109470,
     "yt_likes": 2869,
     "yt_comments": 65,
-    "nc_views": 74064,
+    "nc_views": 74065,
     "nc_mylist": 472,
     "nc_comments": 218,
-    "updated_at": "2026-10-17T11:24:26.535595"
+    "updated_at": "2026-10-17T13:04:45.482967"
   },
   {
     "song_id": "song_JiE9drSO8nk",
@@ -433,13 +518,13 @@
     "niconico_id": "",
     "yt_published_at": "2025-11-02T15:00:37Z",
     "nc_published_at": "",
-    "yt_views": 104653,
+    "yt_views": 104663,
     "yt_likes": 4634,
     "yt_comments": 244,
     "nc_views": 0,
     "nc_mylist": 0,
     "nc_comments": 0,
-    "updated_at": "2026-10-17T11:24:26.535624"
+    "updated_at": "2026-10-17T13:04:45.482998"
   },
   {
     "song_id": "song_OKOIOQSW-jc",
@@ -456,7 +541,7 @@
     "nc_views": 10344,
     "nc_mylist": 23,
     "nc_comments": 12,
-    "updated_at": "2026-10-17T11:24:26.749922"
+    "updated_at": "2026-10-17T13:04:45.725841"
   },
   {
     "song_id": "song_sm7968355",
@@ -470,10 +555,10 @@
     "yt_views": 81218,
     "yt_likes": 1651,
     "yt_comments": 141,
-    "nc_views": 38190,
+    "nc_views": 38285,
     "nc_mylist": 821,
     "nc_comments": 395,
-    "updated_at": "2026-10-17T11:24:26.932595"
+    "updated_at": "2026-10-17T13:04:45.965279"
   },
   {
     "song_id": "song_sm46926911",
@@ -484,30 +569,13 @@
     "niconico_id": "sm46926911",
     "yt_published_at": "2026-10-09T11:00:36Z",
     "nc_published_at": "2026-10-15T19:00:00+09:00",
-    "yt_views": 15238,
-    "yt_likes": 1046,
+    "yt_views": 15316,
+    "yt_likes": 1049,
     "yt_comments": 19,
-    "nc_views": 664,
-    "nc_mylist": 47,
+    "nc_views": 678,
+    "nc_mylist": 48,
     "nc_comments": 29,
-    "updated_at": "2026-10-17T11:24:27.150283"
-  },
-  {
-    "song_id": "song_sm46904318",
-    "title": "ご主人様、ロックのお時間にございます",
-    "producer": "Neru",
-    "vocal": "鏡音リン・鏡音レン",
-    "youtube_id": "MecJkEnEG9w",
-    "niconico_id": "sm46904318",
-    "yt_published_at": "2026-10-09T11:00:11Z",
-    "nc_published_at": "2026-10-09T20:00:00+09:00",
-    "yt_views": 742409,
-    "yt_likes": 32085,
-    "yt_comments": 1039,
-    "nc_views": 40496,
-    "nc_mylist": 704,
-    "nc_comments": 531,
-    "updated_at": "2026-10-17T11:24:27.420592"
+    "updated_at": "2026-10-17T13:04:46.216818"
   },
   {
     "song_id": "song_sm20765934",
@@ -518,13 +586,13 @@
     "niconico_id": "sm20765934",
     "yt_published_at": "2017-12-20T10:00:06Z",
     "nc_published_at": "2013-05-03T21:00:38+09:00",
-    "yt_views": 5427263,
+    "yt_views": 5427379,
     "yt_likes": 83574,
     "yt_comments": 836,
-    "nc_views": 2582168,
+    "nc_views": 2582179,
     "nc_mylist": 32849,
     "nc_comments": 73352,
-    "updated_at": "2026-10-17T11:24:27.644458"
+    "updated_at": "2026-10-17T13:04:46.463717"
   },
   {
     "song_id": "song_sm26705595",
@@ -535,13 +603,13 @@
     "niconico_id": "sm26705595",
     "yt_published_at": "2015-07-29T11:10:11Z",
     "nc_published_at": "2015-07-14T19:00:25+09:00",
-    "yt_views": 1263152,
-    "yt_likes": 22327,
+    "yt_views": 1263198,
+    "yt_likes": 22328,
     "yt_comments": 294,
-    "nc_views": 1034163,
+    "nc_views": 1034167,
     "nc_mylist": 13982,
     "nc_comments": 5924,
-    "updated_at": "2026-10-17T11:24:27.867829"
+    "updated_at": "2026-10-17T13:04:46.682119"
   },
   {
     "song_id": "song_sm46875283",
@@ -552,30 +620,13 @@
     "niconico_id": "sm46875283",
     "yt_published_at": "2026-10-10T10:00:11Z",
     "nc_published_at": "2026-10-10T19:00:00+09:00",
-    "yt_views": 576245,
-    "yt_likes": 34020,
-    "yt_comments": 1315,
-    "nc_views": 34493,
-    "nc_mylist": 223,
+    "yt_views": 581032,
+    "yt_likes": 34165,
+    "yt_comments": 1325,
+    "nc_views": 34946,
+    "nc_mylist": 224,
     "nc_comments": 150,
-    "updated_at": "2026-10-17T11:24:28.088346"
-  },
-  {
-    "song_id": "song_sm46867629",
-    "title": "肆足歩行",
-    "producer": "サツキ",
-    "vocal": "足立レイ",
-    "youtube_id": "GPr_cM7Nyzk",
-    "niconico_id": "sm46867629",
-    "yt_published_at": "2026-10-09T10:00:08Z",
-    "nc_published_at": "2026-10-09T19:00:00+09:00",
-    "yt_views": 619550,
-    "yt_likes": 38316,
-    "yt_comments": 846,
-    "nc_views": 32069,
-    "nc_mylist": 498,
-    "nc_comments": 575,
-    "updated_at": "2026-10-17T11:24:28.308051"
+    "updated_at": "2026-10-17T13:04:46.953556"
   },
   {
     "song_id": "song_sm46916933",
@@ -586,13 +637,13 @@
     "niconico_id": "sm46916933",
     "yt_published_at": "2026-10-12T11:00:11Z",
     "nc_published_at": "2026-10-12T20:00:00+09:00",
-    "yt_views": 9492,
-    "yt_likes": 527,
+    "yt_views": 9528,
+    "yt_likes": 528,
     "yt_comments": 50,
-    "nc_views": 7175,
-    "nc_mylist": 138,
+    "nc_views": 7274,
+    "nc_mylist": 139,
     "nc_comments": 71,
-    "updated_at": "2026-10-17T11:24:28.528049"
+    "updated_at": "2026-10-17T13:04:47.163680"
   },
   {
     "song_id": "song_sm46924585",
@@ -603,13 +654,13 @@
     "niconico_id": "sm46924585",
     "yt_published_at": "2026-07-27T11:00:06Z",
     "nc_published_at": "2026-10-14T19:00:00+09:00",
-    "yt_views": 48055,
+    "yt_views": 48056,
     "yt_likes": 2693,
     "yt_comments": 184,
-    "nc_views": 1301,
+    "nc_views": 1325,
     "nc_mylist": 43,
     "nc_comments": 24,
-    "updated_at": "2026-10-17T11:24:28.742013"
+    "updated_at": "2026-10-17T13:04:47.401521"
   },
   {
     "song_id": "song_sm2937784",
@@ -620,13 +671,13 @@
     "niconico_id": "",
     "yt_published_at": "2018-04-08T11:47:01Z",
     "nc_published_at": "",
-    "yt_views": 26881972,
-    "yt_likes": 373345,
-    "yt_comments": 42364,
+    "yt_views": 26882626,
+    "yt_likes": 373347,
+    "yt_comments": 42365,
     "nc_views": 0,
     "nc_mylist": 0,
     "nc_comments": 0,
-    "updated_at": "2026-10-17T11:24:28.742036"
+    "updated_at": "2026-10-17T13:04:47.401554"
   },
   {
     "song_id": "song_sm15172108",
@@ -637,13 +688,13 @@
     "niconico_id": "",
     "yt_published_at": "2012-10-13T03:41:47Z",
     "nc_published_at": "",
-    "yt_views": 7210523,
-    "yt_likes": 140068,
+    "yt_views": 7210620,
+    "yt_likes": 140070,
     "yt_comments": 3943,
     "nc_views": 0,
     "nc_mylist": 0,
     "nc_comments": 0,
-    "updated_at": "2026-10-17T11:24:28.742051"
+    "updated_at": "2026-10-17T13:04:47.401572"
   },
   {
     "song_id": "song_sm46930484",
@@ -654,13 +705,13 @@
     "niconico_id": "sm46930484",
     "yt_published_at": "2026-10-16T10:00:22Z",
     "nc_published_at": "2026-10-16T19:00:00+09:00",
-    "yt_views": 24005,
-    "yt_likes": 1597,
-    "yt_comments": 28,
-    "nc_views": 1965,
-    "nc_mylist": 59,
+    "yt_views": 26146,
+    "yt_likes": 1713,
+    "yt_comments": 29,
+    "nc_views": 2201,
+    "nc_mylist": 61,
     "nc_comments": 31,
-    "updated_at": "2026-10-17T11:24:28.962595"
+    "updated_at": "2026-10-17T13:04:47.634049"
   },
   {
     "song_id": "song_sm46927183",
@@ -674,10 +725,10 @@
     "yt_views": 3386,
     "yt_likes": 265,
     "yt_comments": 27,
-    "nc_views": 696,
-    "nc_mylist": 52,
+    "nc_views": 764,
+    "nc_mylist": 53,
     "nc_comments": 35,
-    "updated_at": "2026-10-17T11:24:29.180535"
+    "updated_at": "2026-10-17T13:04:47.876483"
   },
   {
     "song_id": "song_sm46929546",
@@ -688,13 +739,13 @@
     "niconico_id": "sm46929546",
     "yt_published_at": "2025-07-05T11:58:33Z",
     "nc_published_at": "2026-10-15T23:25:27+09:00",
-    "yt_views": 14291,
+    "yt_views": 14293,
     "yt_likes": 143,
     "yt_comments": 5,
-    "nc_views": 858,
-    "nc_mylist": 18,
+    "nc_views": 900,
+    "nc_mylist": 19,
     "nc_comments": 36,
-    "updated_at": "2026-10-17T11:24:29.391242"
+    "updated_at": "2026-10-17T13:04:48.115509"
   },
   {
     "song_id": "song_sm46924321",
@@ -708,10 +759,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 174,
+    "nc_views": 215,
     "nc_mylist": 8,
-    "nc_comments": 60,
-    "updated_at": "2026-10-17T11:24:29.621752"
+    "nc_comments": 64,
+    "updated_at": "2026-10-17T13:04:48.161284"
   },
   {
     "song_id": "song_sm46930444",
@@ -725,10 +776,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 200,
+    "nc_views": 207,
     "nc_mylist": 9,
     "nc_comments": 36,
-    "updated_at": "2026-10-17T11:24:29.829908"
+    "updated_at": "2026-10-17T13:04:48.203608"
   },
   {
     "song_id": "song_sm46914848",
@@ -742,10 +793,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 163,
-    "nc_mylist": 11,
-    "nc_comments": 82,
-    "updated_at": "2026-10-17T11:24:30.038598"
+    "nc_views": 195,
+    "nc_mylist": 12,
+    "nc_comments": 87,
+    "updated_at": "2026-10-17T13:04:48.240075"
   },
   {
     "song_id": "song_sm46928791",
@@ -759,10 +810,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 1206,
-    "nc_mylist": 15,
+    "nc_views": 1244,
+    "nc_mylist": 16,
     "nc_comments": 48,
-    "updated_at": "2026-10-17T11:24:30.383698"
+    "updated_at": "2026-10-17T13:04:48.282590"
   },
   {
     "song_id": "song_sm46925712",
@@ -773,13 +824,13 @@
     "niconico_id": "sm46925712",
     "yt_published_at": "2026-10-16T12:00:28Z",
     "nc_published_at": "2026-10-16T21:00:00+09:00",
-    "yt_views": 683,
-    "yt_likes": 132,
-    "yt_comments": 20,
-    "nc_views": 192,
-    "nc_mylist": 15,
+    "yt_views": 868,
+    "yt_likes": 144,
+    "yt_comments": 22,
+    "nc_views": 207,
+    "nc_mylist": 16,
     "nc_comments": 14,
-    "updated_at": "2026-10-17T11:24:30.648154"
+    "updated_at": "2026-10-17T13:04:48.524823"
   },
   {
     "song_id": "song_sm46851509",
@@ -793,10 +844,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 133,
+    "nc_views": 157,
     "nc_mylist": 11,
-    "nc_comments": 84,
-    "updated_at": "2026-10-17T11:24:30.868615"
+    "nc_comments": 88,
+    "updated_at": "2026-10-17T13:04:48.564271"
   },
   {
     "song_id": "song_sm46929634",
@@ -810,10 +861,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 171,
-    "nc_mylist": 5,
-    "nc_comments": 41,
-    "updated_at": "2026-10-17T11:24:31.087341"
+    "nc_views": 197,
+    "nc_mylist": 6,
+    "nc_comments": 49,
+    "updated_at": "2026-10-17T13:04:48.601080"
   },
   {
     "song_id": "song_sm46932182",
@@ -824,13 +875,13 @@
     "niconico_id": "sm46932182",
     "yt_published_at": "2026-10-16T11:00:18Z",
     "nc_published_at": "2026-10-16T20:02:33+09:00",
-    "yt_views": 270,
+    "yt_views": 267,
     "yt_likes": 22,
     "yt_comments": 1,
-    "nc_views": 193,
-    "nc_mylist": 16,
+    "nc_views": 210,
+    "nc_mylist": 17,
     "nc_comments": 27,
-    "updated_at": "2026-10-17T11:24:31.303363"
+    "updated_at": "2026-10-17T13:04:48.838733"
   },
   {
     "song_id": "song_sm46925775",
@@ -844,10 +895,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 586,
-    "nc_mylist": 19,
+    "nc_views": 600,
+    "nc_mylist": 20,
     "nc_comments": 189,
-    "updated_at": "2026-10-17T11:24:31.515143"
+    "updated_at": "2026-10-17T13:04:48.878629"
   },
   {
     "song_id": "song_sm46929875",
@@ -861,10 +912,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 202,
+    "nc_views": 207,
     "nc_mylist": 1,
     "nc_comments": 19,
-    "updated_at": "2026-10-17T11:24:31.783165"
+    "updated_at": "2026-10-17T13:04:48.921423"
   },
   {
     "song_id": "song_sm46930277",
@@ -875,13 +926,13 @@
     "niconico_id": "sm46930277",
     "yt_published_at": "2026-10-16T11:00:20Z",
     "nc_published_at": "2026-10-17T00:00:00+09:00",
-    "yt_views": 1707,
-    "yt_likes": 235,
+    "yt_views": 2164,
+    "yt_likes": 248,
     "yt_comments": 10,
-    "nc_views": 151,
-    "nc_mylist": 12,
-    "nc_comments": 22,
-    "updated_at": "2026-10-17T11:24:32.227751"
+    "nc_views": 165,
+    "nc_mylist": 13,
+    "nc_comments": 24,
+    "updated_at": "2026-10-17T13:04:49.162961"
   },
   {
     "song_id": "song_sm46931072",
@@ -895,10 +946,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 247,
-    "nc_mylist": 9,
-    "nc_comments": 22,
-    "updated_at": "2026-10-17T11:24:32.442019"
+    "nc_views": 323,
+    "nc_mylist": 11,
+    "nc_comments": 29,
+    "updated_at": "2026-10-17T13:04:49.201852"
   },
   {
     "song_id": "song_sm46928771",
@@ -909,13 +960,13 @@
     "niconico_id": "sm46928771",
     "yt_published_at": "2026-10-16T10:00:06Z",
     "nc_published_at": "2026-10-16T19:00:00+09:00",
-    "yt_views": 495,
-    "yt_likes": 63,
-    "yt_comments": 15,
-    "nc_views": 153,
+    "yt_views": 527,
+    "yt_likes": 65,
+    "yt_comments": 16,
+    "nc_views": 158,
     "nc_mylist": 9,
     "nc_comments": 11,
-    "updated_at": "2026-10-17T11:24:32.651406"
+    "updated_at": "2026-10-17T13:04:49.448189"
   },
   {
     "song_id": "song_sm46826857",
@@ -926,13 +977,13 @@
     "niconico_id": "sm46826857",
     "yt_published_at": "2026-10-16T09:00:09Z",
     "nc_published_at": "2026-10-16T18:00:00+09:00",
-    "yt_views": 1093,
-    "yt_likes": 113,
+    "yt_views": 1342,
+    "yt_likes": 125,
     "yt_comments": 8,
-    "nc_views": 166,
+    "nc_views": 171,
     "nc_mylist": 5,
     "nc_comments": 7,
-    "updated_at": "2026-10-17T11:24:32.863377"
+    "updated_at": "2026-10-17T13:04:49.694148"
   },
   {
     "song_id": "song_sm46922103",
@@ -946,10 +997,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 111,
+    "nc_views": 120,
     "nc_mylist": 10,
     "nc_comments": 14,
-    "updated_at": "2026-10-17T11:24:33.074612"
+    "updated_at": "2026-10-17T13:04:49.730268"
   },
   {
     "song_id": "song_sm46931799",
@@ -960,13 +1011,13 @@
     "niconico_id": "sm46931799",
     "yt_published_at": "2026-10-16T10:00:07Z",
     "nc_published_at": "2026-10-16T19:00:00+09:00",
-    "yt_views": 3791,
-    "yt_likes": 445,
-    "yt_comments": 36,
-    "nc_views": 227,
+    "yt_views": 4621,
+    "yt_likes": 504,
+    "yt_comments": 38,
+    "nc_views": 254,
     "nc_mylist": 11,
-    "nc_comments": 9,
-    "updated_at": "2026-10-17T11:24:33.281493"
+    "nc_comments": 10,
+    "updated_at": "2026-10-17T13:04:49.975508"
   },
   {
     "song_id": "song_sm15630734",
@@ -977,13 +1028,13 @@
     "niconico_id": "sm15630734",
     "yt_published_at": "2014-12-02T09:40:07Z",
     "nc_published_at": "2011-09-17T19:00:28+09:00",
-    "yt_views": 86348029,
-    "yt_likes": 647533,
-    "yt_comments": 30853,
-    "nc_views": 18774485,
+    "yt_views": 86350577,
+    "yt_likes": 647548,
+    "yt_comments": 30854,
+    "nc_views": 18774548,
     "nc_mylist": 333691,
-    "nc_comments": 1584862,
-    "updated_at": "2026-10-17T11:24:33.506565"
+    "nc_comments": 1584871,
+    "updated_at": "2026-10-17T13:04:50.221111"
   },
   {
     "song_id": "song_sm21360174",
@@ -994,13 +1045,13 @@
     "niconico_id": "sm21360174",
     "yt_published_at": "2014-12-02T09:40:22Z",
     "nc_published_at": "2013-07-15T18:01:13+09:00",
-    "yt_views": 2816117,
-    "yt_likes": 48923,
+    "yt_views": 2816225,
+    "yt_likes": 48924,
     "yt_comments": 808,
-    "nc_views": 1561837,
+    "nc_views": 1561859,
     "nc_mylist": 30560,
     "nc_comments": 21751,
-    "updated_at": "2026-10-17T11:24:33.691910"
+    "updated_at": "2026-10-17T13:04:50.464158"
   },
   {
     "song_id": "song_sm1715919",
@@ -1011,13 +1062,13 @@
     "niconico_id": "sm1715919",
     "yt_published_at": "2026-01-22T12:00:06Z",
     "nc_published_at": "2007-12-07T20:46:02+09:00",
-    "yt_views": 37388088,
-    "yt_likes": 158741,
+    "yt_views": 37388478,
+    "yt_likes": 158743,
     "yt_comments": 7854,
-    "nc_views": 17197143,
-    "nc_mylist": 311298,
+    "nc_views": 17197228,
+    "nc_mylist": 311299,
     "nc_comments": 1064766,
-    "updated_at": "2026-10-17T11:24:33.901595"
+    "updated_at": "2026-10-17T13:04:50.709745"
   },
   {
     "song_id": "song_sm11398357",
@@ -1028,13 +1079,13 @@
     "niconico_id": "sm11398357",
     "yt_published_at": "2014-01-20T02:56:57Z",
     "nc_published_at": "2010-07-15T20:17:34+09:00",
-    "yt_views": 10234494,
-    "yt_likes": 115942,
+    "yt_views": 10234607,
+    "yt_likes": 115944,
     "yt_comments": 2594,
-    "nc_views": 13314421,
-    "nc_mylist": 225959,
+    "nc_views": 13314461,
+    "nc_mylist": 225961,
     "nc_comments": 534360,
-    "updated_at": "2026-10-17T11:24:34.130268"
+    "updated_at": "2026-10-17T13:04:50.946333"
   },
   {
     "song_id": "song_sm17520775",
@@ -1045,13 +1096,13 @@
     "niconico_id": "sm17520775",
     "yt_published_at": "2013-01-07T13:50:02Z",
     "nc_published_at": "2012-04-11T19:55:10+09:00",
-    "yt_views": 62568003,
-    "yt_likes": 514763,
+    "yt_views": 62568730,
+    "yt_likes": 514769,
     "yt_comments": 22283,
-    "nc_views": 12174964,
+    "nc_views": 12175011,
     "nc_mylist": 197689,
-    "nc_comments": 320615,
-    "updated_at": "2026-10-17T11:24:34.357255"
+    "nc_comments": 320617,
+    "updated_at": "2026-10-17T13:04:51.177599"
   },
   {
     "song_id": "song_sm19133907",
@@ -1062,13 +1113,13 @@
     "niconico_id": "sm19133907",
     "yt_published_at": "2013-09-13T02:40:24Z",
     "nc_published_at": "2012-10-19T20:00:00+09:00",
-    "yt_views": 90856022,
-    "yt_likes": 535767,
+    "yt_views": 90857917,
+    "yt_likes": 535774,
     "yt_comments": 24543,
-    "nc_views": 11367601,
+    "nc_views": 11367637,
     "nc_mylist": 170234,
     "nc_comments": 209958,
-    "updated_at": "2026-10-17T11:24:34.566547"
+    "updated_at": "2026-10-17T13:04:51.418553"
   },
   {
     "song_id": "song_sm15751190",
@@ -1079,13 +1130,13 @@
     "niconico_id": "sm15751190",
     "yt_published_at": "2013-02-22T12:39:44Z",
     "nc_published_at": "2011-09-30T07:06:29+09:00",
-    "yt_views": 25571686,
-    "yt_likes": 281648,
+    "yt_views": 25571944,
+    "yt_likes": 281649,
     "yt_comments": 58189,
-    "nc_views": 9641536,
+    "nc_views": 9641554,
     "nc_mylist": 160478,
     "nc_comments": 503476,
-    "updated_at": "2026-10-17T11:24:34.790299"
+    "updated_at": "2026-10-17T13:04:51.662013"
   },
   {
     "song_id": "song_sm18623327",
@@ -1096,13 +1147,13 @@
     "niconico_id": "sm18623327",
     "yt_published_at": "2019-10-03T09:35:41Z",
     "nc_published_at": "2012-08-15T20:07:48+09:00",
-    "yt_views": 28082587,
-    "yt_likes": 292083,
-    "yt_comments": 6567,
-    "nc_views": 8475833,
+    "yt_views": 28083069,
+    "yt_likes": 292078,
+    "yt_comments": 6568,
+    "nc_views": 8475854,
     "nc_mylist": 148521,
     "nc_comments": 127274,
-    "updated_at": "2026-10-17T11:24:34.971412"
+    "updated_at": "2026-10-17T13:04:52.203721"
   },
   {
     "song_id": "song_sm13386216",
@@ -1113,13 +1164,13 @@
     "niconico_id": "sm13386216",
     "yt_published_at": "2013-10-01T21:07:16Z",
     "nc_published_at": "2011-01-23T16:32:24+09:00",
-    "yt_views": 34238320,
-    "yt_likes": 253572,
+    "yt_views": 34238672,
+    "yt_likes": 253571,
     "yt_comments": 8033,
-    "nc_views": 9366924,
+    "nc_views": 9366944,
     "nc_mylist": 143078,
     "nc_comments": 201183,
-    "updated_at": "2026-10-17T11:24:35.186839"
+    "updated_at": "2026-10-17T13:04:52.411391"
   },
   {
     "song_id": "song_sm7550182",
@@ -1130,13 +1181,13 @@
     "niconico_id": "sm7550182",
     "yt_published_at": "2013-10-06T19:42:35Z",
     "nc_published_at": "2009-07-06T02:24:11+09:00",
-    "yt_views": 17162192,
-    "yt_likes": 216141,
+    "yt_views": 17162418,
+    "yt_likes": 216142,
     "yt_comments": 9947,
-    "nc_views": 7485207,
-    "nc_mylist": 139131,
+    "nc_views": 7485231,
+    "nc_mylist": 139132,
     "nc_comments": 152024,
-    "updated_at": "2026-10-17T11:24:35.409543"
+    "updated_at": "2026-10-17T13:04:52.623906"
   },
   {
     "song_id": "song_sm31606995",
@@ -1147,13 +1198,13 @@
     "niconico_id": "sm31606995",
     "yt_published_at": "2017-07-21T08:00:01Z",
     "nc_published_at": "2017-07-21T17:00:00+09:00",
-    "yt_views": 97946203,
-    "yt_likes": 851819,
+    "yt_views": 97948928,
+    "yt_likes": 851827,
     "yt_comments": 43405,
-    "nc_views": 12434517,
+    "nc_views": 12434576,
     "nc_mylist": 118231,
-    "nc_comments": 258035,
-    "updated_at": "2026-10-17T11:24:35.597759"
+    "nc_comments": 258036,
+    "updated_at": "2026-10-17T13:04:52.865811"
   },
   {
     "song_id": "song_sm29194168",
@@ -1164,13 +1215,13 @@
     "niconico_id": "sm29194168",
     "yt_published_at": "2016-07-06T12:12:03Z",
     "nc_published_at": "2016-07-06T21:00:13+09:00",
-    "yt_views": 3156095,
-    "yt_likes": 53308,
+    "yt_views": 3156138,
+    "yt_likes": 53309,
     "yt_comments": 789,
-    "nc_views": 1134061,
+    "nc_views": 1134063,
     "nc_mylist": 11204,
     "nc_comments": 5603,
-    "updated_at": "2026-10-17T11:24:35.805520"
+    "updated_at": "2026-10-17T13:04:53.107739"
   },
   {
     "song_id": "song_sm22138447",
@@ -1181,13 +1232,13 @@
     "niconico_id": "sm22138447",
     "yt_published_at": "2013-10-28T10:28:41Z",
     "nc_published_at": "2013-10-28T19:22:41+09:00",
-    "yt_views": 69131565,
-    "yt_likes": 449218,
+    "yt_views": 69131990,
+    "yt_likes": 449219,
     "yt_comments": 14018,
-    "nc_views": 11808406,
+    "nc_views": 11808461,
     "nc_mylist": 125094,
     "nc_comments": 141045,
-    "updated_at": "2026-10-17T11:24:36.027068"
+    "updated_at": "2026-10-17T13:04:53.595414"
   },
   {
     "song_id": "song_sm31685272",
@@ -1198,13 +1249,13 @@
     "niconico_id": "sm31685272",
     "yt_published_at": "2017-08-04T10:00:04Z",
     "nc_published_at": "2017-08-04T19:00:00+09:00",
-    "yt_views": 86503613,
-    "yt_likes": 629339,
-    "yt_comments": 21902,
-    "nc_views": 11563853,
-    "nc_mylist": 94730,
+    "yt_views": 86505207,
+    "yt_likes": 629357,
+    "yt_comments": 21905,
+    "nc_views": 11563939,
+    "nc_mylist": 94731,
     "nc_comments": 59152,
-    "updated_at": "2026-10-17T11:24:36.252505"
+    "updated_at": "2026-10-17T13:04:53.841775"
   },
   {
     "song_id": "song_sm39257413",
@@ -1215,13 +1266,13 @@
     "niconico_id": "sm39257413",
     "yt_published_at": "2021-08-29T11:00:01Z",
     "nc_published_at": "2021-08-29T20:00:00+09:00",
-    "yt_views": 121650556,
-    "yt_likes": 1144035,
-    "yt_comments": 39837,
-    "nc_views": 11392797,
-    "nc_mylist": 45205,
+    "yt_views": 121656171,
+    "yt_likes": 1144052,
+    "yt_comments": 39838,
+    "nc_views": 11392930,
+    "nc_mylist": 45204,
     "nc_comments": 22867,
-    "updated_at": "2026-10-17T11:24:36.475995"
+    "updated_at": "2026-10-17T13:04:54.075262"
   },
   {
     "song_id": "song_sm33624822",
@@ -1232,13 +1283,13 @@
     "niconico_id": "sm33624822",
     "yt_published_at": "2018-08-02T11:09:09Z",
     "nc_published_at": "2018-08-02T20:00:00+09:00",
-    "yt_views": 75793857,
-    "yt_likes": 623008,
+    "yt_views": 75795082,
+    "yt_likes": 623015,
     "yt_comments": 19492,
-    "nc_views": 10989990,
+    "nc_views": 10990037,
     "nc_mylist": 64904,
     "nc_comments": 56123,
-    "updated_at": "2026-10-17T11:24:36.701919"
+    "updated_at": "2026-10-17T13:04:54.602056"
   },
   {
     "song_id": "song_sm38833751",
@@ -1249,13 +1300,13 @@
     "niconico_id": "sm38833751",
     "yt_published_at": "2021-06-05T10:00:16Z",
     "nc_published_at": "2021-06-05T19:00:00+09:00",
-    "yt_views": 78846136,
+    "yt_views": 78847517,
     "yt_likes": 718650,
-    "yt_comments": 14067,
-    "nc_views": 10871108,
-    "nc_mylist": 50111,
+    "yt_comments": 14066,
+    "nc_views": 10871159,
+    "nc_mylist": 50110,
     "nc_comments": 28127,
-    "updated_at": "2026-10-17T11:24:36.881531"
+    "updated_at": "2026-10-17T13:04:54.857758"
   },
   {
     "song_id": "song_sm30177801",
@@ -1266,13 +1317,13 @@
     "niconico_id": "sm30177801",
     "yt_published_at": "2020-02-09T09:00:10Z",
     "nc_published_at": "2016-12-06T19:45:25+09:00",
-    "yt_views": 12935594,
-    "yt_likes": 140739,
+    "yt_views": 12935897,
+    "yt_likes": 140741,
     "yt_comments": 2635,
-    "nc_views": 9585125,
-    "nc_mylist": 79704,
-    "nc_comments": 47422,
-    "updated_at": "2026-10-17T11:24:37.107525"
+    "nc_views": 9585158,
+    "nc_mylist": 79705,
+    "nc_comments": 47424,
+    "updated_at": "2026-10-17T13:04:55.097292"
   },
   {
     "song_id": "song_sm46897047",
@@ -1286,10 +1337,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 41,
-    "nc_mylist": 2,
-    "nc_comments": 22,
-    "updated_at": "2026-10-17T11:24:37.321797"
+    "nc_views": 47,
+    "nc_mylist": 3,
+    "nc_comments": 26,
+    "updated_at": "2026-10-17T13:04:55.137249"
   },
   {
     "song_id": "song_sm46882174",
@@ -1303,10 +1354,10 @@
     "yt_views": 193,
     "yt_likes": 15,
     "yt_comments": 1,
-    "nc_views": 432,
+    "nc_views": 433,
     "nc_mylist": 24,
     "nc_comments": 69,
-    "updated_at": "2026-10-17T11:24:37.538223"
+    "updated_at": "2026-10-17T13:04:55.382829"
   },
   {
     "song_id": "song_sm46932641",
@@ -1320,10 +1371,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 29,
+    "nc_views": 31,
     "nc_mylist": 0,
     "nc_comments": 2,
-    "updated_at": "2026-10-17T11:24:37.719849"
+    "updated_at": "2026-10-17T13:04:55.424684"
   },
   {
     "song_id": "song_sm46906016",
@@ -1337,10 +1388,10 @@
     "yt_views": 2112,
     "yt_likes": 21,
     "yt_comments": 21,
-    "nc_views": 167,
+    "nc_views": 168,
     "nc_mylist": 3,
-    "nc_comments": 4,
-    "updated_at": "2026-10-17T11:24:37.944312"
+    "nc_comments": 5,
+    "updated_at": "2026-10-17T13:04:55.667203"
   },
   {
     "song_id": "song_sm46864870",
@@ -1354,10 +1405,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 76,
+    "nc_views": 77,
     "nc_mylist": 7,
     "nc_comments": 23,
-    "updated_at": "2026-10-17T11:24:38.151272"
+    "updated_at": "2026-10-17T13:04:55.705739"
   },
   {
     "song_id": "song_PsPxd9JvOwE",
@@ -1374,7 +1425,7 @@
     "nc_views": 0,
     "nc_mylist": 0,
     "nc_comments": 0,
-    "updated_at": "2026-10-17T11:24:38.151291"
+    "updated_at": "2026-10-17T13:04:55.705762"
   },
   {
     "song_id": "song_18yO536WE6s",
@@ -1391,7 +1442,7 @@
     "nc_views": 0,
     "nc_mylist": 0,
     "nc_comments": 0,
-    "updated_at": "2026-10-17T11:24:38.151308"
+    "updated_at": "2026-10-17T13:04:55.705782"
   },
   {
     "song_id": "song_sm46811602",
@@ -1405,10 +1456,10 @@
     "yt_views": 1371,
     "yt_likes": 89,
     "yt_comments": 15,
-    "nc_views": 1083,
+    "nc_views": 1084,
     "nc_mylist": 30,
     "nc_comments": 126,
-    "updated_at": "2026-10-17T11:24:38.365278"
+    "updated_at": "2026-10-17T13:04:55.952810"
   },
   {
     "song_id": "song_sm46917950",
@@ -1419,13 +1470,13 @@
     "niconico_id": "sm46917950",
     "yt_published_at": "2026-10-12T12:00:27Z",
     "nc_published_at": "2026-10-12T21:00:00+09:00",
-    "yt_views": 213,
+    "yt_views": 203,
     "yt_likes": 25,
     "yt_comments": 1,
-    "nc_views": 2126,
+    "nc_views": 2169,
     "nc_mylist": 19,
     "nc_comments": 16,
-    "updated_at": "2026-10-17T11:24:38.691737"
+    "updated_at": "2026-10-17T13:04:56.159786"
   },
   {
     "song_id": "song_sm32906820",
@@ -1439,10 +1490,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 233957,
+    "nc_views": 233960,
     "nc_mylist": 769,
     "nc_comments": 686,
-    "updated_at": "2026-10-17T11:24:38.901817"
+    "updated_at": "2026-10-17T13:04:56.198413"
   },
   {
     "song_id": "song_sm44650250",
@@ -1456,10 +1507,10 @@
     "yt_views": 803155,
     "yt_likes": 23674,
     "yt_comments": 917,
-    "nc_views": 31180,
+    "nc_views": 31192,
     "nc_mylist": 317,
     "nc_comments": 146,
-    "updated_at": "2026-10-17T11:24:39.113495"
+    "updated_at": "2026-10-17T13:04:56.432350"
   },
   {
     "song_id": "song_sm46932186",
@@ -1476,7 +1527,7 @@
     "nc_views": 17,
     "nc_mylist": 0,
     "nc_comments": 3,
-    "updated_at": "2026-10-17T11:24:39.309785"
+    "updated_at": "2026-10-17T13:04:56.470831"
   },
   {
     "song_id": "song_sm46930602",
@@ -1493,7 +1544,7 @@
     "nc_views": 28,
     "nc_mylist": 0,
     "nc_comments": 1,
-    "updated_at": "2026-10-17T11:24:39.521903"
+    "updated_at": "2026-10-17T13:04:56.710086"
   },
   {
     "song_id": "song_sm46643018",
@@ -1507,10 +1558,10 @@
     "yt_views": 13,
     "yt_likes": 2,
     "yt_comments": 0,
-    "nc_views": 298,
+    "nc_views": 299,
     "nc_mylist": 6,
     "nc_comments": 36,
-    "updated_at": "2026-10-17T11:24:39.743261"
+    "updated_at": "2026-10-17T13:04:56.959582"
   },
   {
     "song_id": "song_sm46696938",
@@ -1527,7 +1578,7 @@
     "nc_views": 419,
     "nc_mylist": 19,
     "nc_comments": 47,
-    "updated_at": "2026-10-17T11:24:39.965116"
+    "updated_at": "2026-10-17T13:04:57.486600"
   },
   {
     "song_id": "song_sm46907113",
@@ -1541,10 +1592,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 370,
+    "nc_views": 371,
     "nc_mylist": 30,
     "nc_comments": 16,
-    "updated_at": "2026-10-17T11:24:40.187341"
+    "updated_at": "2026-10-17T13:04:57.527940"
   },
   {
     "song_id": "song_sm46896900",
@@ -1558,10 +1609,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 48,
+    "nc_views": 50,
     "nc_mylist": 1,
     "nc_comments": 3,
-    "updated_at": "2026-10-17T11:24:40.404573"
+    "updated_at": "2026-10-17T13:04:57.566384"
   },
   {
     "song_id": "song_sm46818509",
@@ -1578,7 +1629,7 @@
     "nc_views": 328,
     "nc_mylist": 24,
     "nc_comments": 86,
-    "updated_at": "2026-10-17T11:24:40.626996"
+    "updated_at": "2026-10-17T13:04:57.603467"
   },
   {
     "song_id": "song_sm44527407",
@@ -1595,7 +1646,7 @@
     "nc_views": 16547,
     "nc_mylist": 228,
     "nc_comments": 60,
-    "updated_at": "2026-10-17T11:24:40.839810"
+    "updated_at": "2026-10-17T13:04:57.855179"
   },
   {
     "song_id": "song_sm39481813",
@@ -1606,13 +1657,13 @@
     "niconico_id": "sm39481813",
     "yt_published_at": "2021-10-15T10:00:11Z",
     "nc_published_at": "2021-10-15T19:00:00+09:00",
-    "yt_views": 1916039,
-    "yt_likes": 62425,
+    "yt_views": 1916056,
+    "yt_likes": 62426,
     "yt_comments": 1020,
     "nc_views": 323151,
     "nc_mylist": 1384,
     "nc_comments": 820,
-    "updated_at": "2026-10-17T11:24:41.059632"
+    "updated_at": "2026-10-17T13:04:58.091229"
   },
   {
     "song_id": "song_sm45764716",
@@ -1629,7 +1680,7 @@
     "nc_views": 1239,
     "nc_mylist": 8,
     "nc_comments": 5,
-    "updated_at": "2026-10-17T11:24:41.268701"
+    "updated_at": "2026-10-17T13:04:58.335824"
   },
   {
     "song_id": "song_sm45781517",
@@ -1646,7 +1697,7 @@
     "nc_views": 2214,
     "nc_mylist": 25,
     "nc_comments": 23,
-    "updated_at": "2026-10-17T11:24:41.497913"
+    "updated_at": "2026-10-17T13:04:58.577687"
   },
   {
     "song_id": "song_sm45776454",
@@ -1663,7 +1714,7 @@
     "nc_views": 2217,
     "nc_mylist": 41,
     "nc_comments": 128,
-    "updated_at": "2026-10-17T11:24:41.711193"
+    "updated_at": "2026-10-17T13:04:58.827537"
   },
   {
     "song_id": "song_sm45781806",
@@ -1680,7 +1731,7 @@
     "nc_views": 556,
     "nc_mylist": 3,
     "nc_comments": 5,
-    "updated_at": "2026-10-17T11:24:41.934487"
+    "updated_at": "2026-10-17T13:04:59.091173"
   },
   {
     "song_id": "song_sm45770612",
@@ -1697,7 +1748,7 @@
     "nc_views": 1790,
     "nc_mylist": 30,
     "nc_comments": 13,
-    "updated_at": "2026-10-17T11:24:42.154735"
+    "updated_at": "2026-10-17T13:04:59.334841"
   },
   {
     "song_id": "song_sm45775103",
@@ -1714,7 +1765,7 @@
     "nc_views": 481,
     "nc_mylist": 25,
     "nc_comments": 14,
-    "updated_at": "2026-10-17T11:24:42.413479"
+    "updated_at": "2026-10-17T13:04:59.371988"
   },
   {
     "song_id": "song_sm46933867",
@@ -1728,10 +1779,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 126,
+    "nc_views": 152,
     "nc_mylist": 5,
-    "nc_comments": 48,
-    "updated_at": "2026-10-17T11:24:42.663657"
+    "nc_comments": 50,
+    "updated_at": "2026-10-17T13:04:59.466599"
   },
   {
     "song_id": "song_sm46929116",
@@ -1745,10 +1796,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 75,
+    "nc_views": 88,
     "nc_mylist": 9,
-    "nc_comments": 50,
-    "updated_at": "2026-10-17T11:24:42.872684"
+    "nc_comments": 51,
+    "updated_at": "2026-10-17T13:04:59.505268"
   },
   {
     "song_id": "song_sm46887855",
@@ -1759,13 +1810,13 @@
     "niconico_id": "sm46887855",
     "yt_published_at": "2026-10-06T10:00:04Z",
     "nc_published_at": "2026-10-06T19:00:00+09:00",
-    "yt_views": 393960,
-    "yt_likes": 15232,
-    "yt_comments": 395,
-    "nc_views": 38316,
-    "nc_mylist": 490,
+    "yt_views": 394556,
+    "yt_likes": 15246,
+    "yt_comments": 394,
+    "nc_views": 38427,
+    "nc_mylist": 491,
     "nc_comments": 198,
-    "updated_at": "2026-10-17T11:24:43.082015"
+    "updated_at": "2026-10-17T13:04:59.750466"
   },
   {
     "song_id": "song_sm46932975",
@@ -1776,13 +1827,13 @@
     "niconico_id": "sm46932975",
     "yt_published_at": "2026-10-16T13:57:41Z",
     "nc_published_at": "2026-10-16T23:15:12+09:00",
-    "yt_views": 6069,
-    "yt_likes": 628,
+    "yt_views": 7101,
+    "yt_likes": 710,
     "yt_comments": 16,
-    "nc_views": 113,
-    "nc_mylist": 4,
+    "nc_views": 124,
+    "nc_mylist": 6,
     "nc_comments": 6,
-    "updated_at": "2026-10-17T11:24:43.304180"
+    "updated_at": "2026-10-17T13:04:59.996708"
   },
   {
     "song_id": "song_sm46915976",
@@ -1796,10 +1847,10 @@
     "yt_views": 560,
     "yt_likes": 62,
     "yt_comments": 2,
-    "nc_views": 272,
-    "nc_mylist": 21,
+    "nc_views": 286,
+    "nc_mylist": 22,
     "nc_comments": 16,
-    "updated_at": "2026-10-17T11:24:43.523623"
+    "updated_at": "2026-10-17T13:05:00.238445"
   },
   {
     "song_id": "song_sm46843617",
@@ -1810,13 +1861,13 @@
     "niconico_id": "sm46843617",
     "yt_published_at": "2026-10-09T10:00:09Z",
     "nc_published_at": "2026-10-09T20:00:00+09:00",
-    "yt_views": 44180,
-    "yt_likes": 3842,
+    "yt_views": 44515,
+    "yt_likes": 3860,
     "yt_comments": 136,
-    "nc_views": 4106,
+    "nc_views": 4119,
     "nc_mylist": 207,
     "nc_comments": 107,
-    "updated_at": "2026-10-17T11:24:43.753220"
+    "updated_at": "2026-10-17T13:05:00.476954"
   },
   {
     "song_id": "song_sm46851361",
@@ -1830,10 +1881,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 60,
+    "nc_views": 71,
     "nc_mylist": 3,
-    "nc_comments": 37,
-    "updated_at": "2026-10-17T11:24:43.849561"
+    "nc_comments": 43,
+    "updated_at": "2026-10-17T13:05:00.519133"
   },
   {
     "song_id": "song_sm46906568",
@@ -1844,13 +1895,13 @@
     "niconico_id": "sm46906568",
     "yt_published_at": "2026-10-10T09:00:07Z",
     "nc_published_at": "2026-10-10T18:00:00+09:00",
-    "yt_views": 79522,
-    "yt_likes": 5729,
-    "yt_comments": 228,
-    "nc_views": 4522,
+    "yt_views": 80277,
+    "yt_likes": 5761,
+    "yt_comments": 229,
+    "nc_views": 4551,
     "nc_mylist": 137,
     "nc_comments": 96,
-    "updated_at": "2026-10-17T11:24:44.071965"
+    "updated_at": "2026-10-17T13:05:00.767549"
   },
   {
     "song_id": "song_sm46885945",
@@ -1864,10 +1915,10 @@
     "yt_views": 0,
     "yt_likes": 0,
     "yt_comments": 0,
-    "nc_views": 125,
+    "nc_views": 126,
     "nc_mylist": 3,
     "nc_comments": 13,
-    "updated_at": "2026-10-17T11:24:44.124866"
+    "updated_at": "2026-10-17T13:05:00.804277"
   },
   {
     "song_id": "song_sm46819050",
@@ -1881,9 +1932,94 @@
     "yt_views": 81,
     "yt_likes": 2,
     "yt_comments": 0,
-    "nc_views": 450,
+    "nc_views": 451,
     "nc_mylist": 5,
     "nc_comments": 3,
-    "updated_at": "2026-10-17T11:24:44.351905"
+    "updated_at": "2026-10-17T13:05:01.047180"
+  },
+  {
+    "song_id": "song_sm46933736",
+    "title": "Go Mad",
+    "producer": "HiroBeatz",
+    "vocal": "VOCALOID / 合成音声",
+    "youtube_id": "",
+    "niconico_id": "sm46933736",
+    "yt_published_at": "",
+    "nc_published_at": "2026-10-17T04:41:17+09:00",
+    "yt_views": 0,
+    "yt_likes": 0,
+    "yt_comments": 0,
+    "nc_views": 172,
+    "nc_mylist": 8,
+    "nc_comments": 44,
+    "updated_at": "2026-10-17T13:05:01.083980"
+  },
+  {
+    "song_id": "song_sm46922194",
+    "title": "俺はパンクだ",
+    "producer": "げんぞRock",
+    "vocal": "VOCALOID / 合成音声",
+    "youtube_id": "TphdhmUvbmw",
+    "niconico_id": "sm46922194",
+    "yt_published_at": "",
+    "nc_published_at": "2026-10-17T00:00:00+09:00",
+    "yt_views": 0,
+    "yt_likes": 0,
+    "yt_comments": 0,
+    "nc_views": 90,
+    "nc_mylist": 5,
+    "nc_comments": 44,
+    "updated_at": "2026-10-17T13:05:01.121240"
+  },
+  {
+    "song_id": "song_sm46914580",
+    "title": "僕らの日々",
+    "producer": "ジャージ佐藤",
+    "vocal": "VOCALOID / 合成音声",
+    "youtube_id": "",
+    "niconico_id": "sm46914580",
+    "yt_published_at": "",
+    "nc_published_at": "2026-10-17T00:00:00+09:00",
+    "yt_views": 0,
+    "yt_likes": 0,
+    "yt_comments": 0,
+    "nc_views": 125,
+    "nc_mylist": 7,
+    "nc_comments": 23,
+    "updated_at": "2026-10-17T13:05:01.164931"
+  },
+  {
+    "song_id": "song_sm46918218",
+    "title": "秒針",
+    "producer": "A.K",
+    "vocal": "VOCALOID / 合成音声",
+    "youtube_id": "MeM8dXgXw10",
+    "niconico_id": "sm46918218",
+    "yt_published_at": "2026-10-12T12:43:40Z",
+    "nc_published_at": "2026-10-12T21:40:26+09:00",
+    "yt_views": 48,
+    "yt_likes": 0,
+    "yt_comments": 0,
+    "nc_views": 19,
+    "nc_mylist": 2,
+    "nc_comments": 8,
+    "updated_at": "2026-10-17T13:05:01.201351"
+  },
+  {
+    "song_id": "song_sm46219013",
+    "title": "ボイジャー",
+    "producer": "kei",
+    "vocal": "初音ミク",
+    "youtube_id": "",
+    "niconico_id": "sm46219013",
+    "yt_published_at": "",
+    "nc_published_at": "2026-04-24T10:35:06+09:00",
+    "yt_views": 0,
+    "yt_likes": 0,
+    "yt_comments": 0,
+    "nc_views": 258,
+    "nc_mylist": 1,
+    "nc_comments": 7,
+    "updated_at": "2026-10-17T13:05:01.274980"
   }
 ]

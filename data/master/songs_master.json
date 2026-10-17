@@ -1,11 +1,51 @@
 [
   {
+    "song_id": "song_sm46354721",
+    "title": "ヤラララ",
+    "producer": "ABM (AnythingBecomeMoe)",
+    "vocal": "重音テト",
+    "youtube_id": "T24rF_x0TmQ",
+    "niconico_id": "sm46354721"
+  },
+  {
+    "song_id": "song_sm45964915",
+    "title": "처형박수",
+    "producer": "TRAP CHICK",
+    "vocal": "重音テト",
+    "youtube_id": "YcxhmHEykPg",
+    "niconico_id": "sm45964915"
+  },
+  {
     "song_id": "song_sm46891435",
     "title": "惑星直列",
     "producer": "いよわ",
     "vocal": "足立レイ",
     "youtube_id": "hL9W5TSUfwM",
     "niconico_id": "sm46904359"
+  },
+  {
+    "song_id": "song_1scsTp6FG1Y",
+    "title": "ご主人様、ロックのお時間にございます",
+    "producer": "Neru",
+    "vocal": "鏡音リン・鏡音レン",
+    "youtube_id": "1scsTp6FG1Y",
+    "niconico_id": "sm46904318"
+  },
+  {
+    "song_id": "song_GPr_cM7Nyzk",
+    "title": "肆足歩行",
+    "producer": "サツキ",
+    "vocal": "足立レイ",
+    "youtube_id": "GPr_cM7Nyzk",
+    "niconico_id": "sm46867629"
+  },
+  {
+    "song_id": "song_ez_kW8ELPZU",
+    "title": "もしもしも",
+    "producer": "なきそ",
+    "vocal": "初音ミク",
+    "youtube_id": "ez_kW8ELPZU",
+    "niconico_id": ""
   },
   {
     "song_id": "song_sm43708803",
@@ -232,14 +272,6 @@
     "niconico_id": "sm46926911"
   },
   {
-    "song_id": "song_sm46904318",
-    "title": "ご主人様、ロックのお時間にございます",
-    "producer": "Neru",
-    "vocal": "鏡音リン・鏡音レン",
-    "youtube_id": "MecJkEnEG9w",
-    "niconico_id": "sm46904318"
-  },
-  {
     "song_id": "song_sm20765934",
     "title": "イドラのサーカス",
     "producer": "Neru",
@@ -262,14 +294,6 @@
     "vocal": "重音テト",
     "youtube_id": "sQCn62k1ycs",
     "niconico_id": "sm46875283"
-  },
-  {
-    "song_id": "song_sm46867629",
-    "title": "肆足歩行",
-    "producer": "サツキ",
-    "vocal": "足立レイ",
-    "youtube_id": "GPr_cM7Nyzk",
-    "niconico_id": "sm46867629"
   },
   {
     "song_id": "song_sm46916933",
@@ -886,5 +910,45 @@
     "vocal": "巡音ルカ",
     "youtube_id": "2Zc3zHMO8zc",
     "niconico_id": "sm46819050"
+  },
+  {
+    "song_id": "song_sm46933736",
+    "title": "Go Mad",
+    "producer": "HiroBeatz",
+    "vocal": "VOCALOID / 合成音声",
+    "youtube_id": "",
+    "niconico_id": "sm46933736"
+  },
+  {
+    "song_id": "song_sm46922194",
+    "title": "俺はパンクだ",
+    "producer": "げんぞRock",
+    "vocal": "VOCALOID / 合成音声",
+    "youtube_id": "TphdhmUvbmw",
+    "niconico_id": "sm46922194"
+  },
+  {
+    "song_id": "song_sm46914580",
+    "title": "僕らの日々",
+    "producer": "ジャージ佐藤",
+    "vocal": "VOCALOID / 合成音声",
+    "youtube_id": "",
+    "niconico_id": "sm46914580"
+  },
+  {
+    "song_id": "song_sm46918218",
+    "title": "秒針",
+    "producer": "A.K",
+    "vocal": "VOCALOID / 合成音声",
+    "youtube_id": "MeM8dXgXw10",
+    "niconico_id": "sm46918218"
+  },
+  {
+    "song_id": "song_sm46219013",
+    "title": "ボイジャー",
+    "producer": "kei",
+    "vocal": "初音ミク",
+    "youtube_id": "",
+    "niconico_id": "sm46219013"
   }
 ]
