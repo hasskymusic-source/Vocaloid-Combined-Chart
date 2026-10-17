@@ -7,10 +7,9 @@ from datetime import datetime, timedelta
 from config import MASTER_FILE, PREV_SNAPSHOT, LATEST_SNAPSHOT
 from googleapiclient.discovery import build
 
-USER_AGENT = "VocaloidCombinedChartBot/2.0"
+USER_AGENT = "VocaloidCombinedChartBot/3.0"
 
 def rotate_snapshots_if_needed():
-    """前回のスナップショット取得から5日以上経過していれば prev_monday.json へローテーション"""
     if not LATEST_SNAPSHOT.exists():
         return
     try:
@@ -28,7 +27,6 @@ def rotate_snapshots_if_needed():
         print(f"Snapshot rotation check skipped: {e}")
 
 def fetch_youtube_stats_batch(youtube_ids: list, api_key: str) -> dict:
-    """YouTube Data API v3 で50曲ずつ一括取得"""
     result = {}
     if not api_key or not youtube_ids:
         return result
@@ -51,7 +49,7 @@ def fetch_youtube_stats_batch(youtube_ids: list, api_key: str) -> dict:
                     "yt_views": int(stats.get("viewCount", 0)),
                     "yt_likes": int(stats.get("likeCount", 0)),
                     "yt_comments": int(stats.get("commentCount", 0)),
-                    "published_at": snippet.get("publishedAt", ""),
+                    "yt_published_at": snippet.get("publishedAt", ""),
                     "channel_title": snippet.get("channelTitle", "")
                 }
         except Exception as e:
@@ -59,7 +57,6 @@ def fetch_youtube_stats_batch(youtube_ids: list, api_key: str) -> dict:
     return result
 
 def fetch_niconico_thumbinfo(niconico_id: str) -> dict:
-    """ニコニコ動画の公式XML API (getthumbinfo) から実測値を取得"""
     if not niconico_id:
         return {}
     url = f"https://ext.nicovideo.jp/api/getthumbinfo/{niconico_id}"
@@ -112,7 +109,6 @@ def main():
         if yt_views == 0 and nc_views == 0:
             continue
 
-        pub_date = yt_stats.get("published_at") or nc_stats.get("nc_published_at") or ""
         producer = song.get("producer") or yt_stats.get("channel_title") or nc_stats.get("nc_author") or "ボカロP"
 
         snapshots.append({
@@ -122,7 +118,8 @@ def main():
             "vocal": song.get("vocal", "VOCALOID"),
             "youtube_id": yid,
             "niconico_id": nid,
-            "published_at": pub_date,
+            "yt_published_at": yt_stats.get("yt_published_at", ""),
+            "nc_published_at": nc_stats.get("nc_published_at", ""),
             "yt_views": yt_views,
             "yt_likes": yt_likes,
             "yt_comments": yt_comments,
