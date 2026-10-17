@@ -57,7 +57,7 @@
   },
   {
     "song_id": "song_sm46889959",
-    "title": "ふたりぼっち音楽隊 -  初音ミク",
+    "title": "ふたりぼっち音楽隊",
     "producer": "猫舘 こたつ / Nekotachi Kotatsu",
     "vocal": "初音ミク",
     "youtube_id": "ir6YTTvvDLA",
@@ -77,7 +77,7 @@
     "producer": "ドレド",
     "vocal": "初音ミク・重音テト",
     "youtube_id": "KcUYdZfXljI",
-    "niconico_id": ""
+    "niconico_id": "sm46927626"
   },
   {
     "song_id": "song_bUZlkLUbP6s",
@@ -89,7 +89,7 @@
   },
   {
     "song_id": "song_CBmKJH2DKA4",
-    "title": "テットテト 重音テト SV",
+    "title": "テットテト",
     "producer": "種たる命の花葬にて",
     "vocal": "重音テト",
     "youtube_id": "CBmKJH2DKA4",
@@ -129,7 +129,7 @@
   },
   {
     "song_id": "song_DFMJzhwqzhc",
-    "title": "Chopil",
+    "title": "ラッキーボンボン",
     "producer": "야기 YAGI",
     "vocal": "初音ミク",
     "youtube_id": "DFMJzhwqzhc",
@@ -141,15 +141,15 @@
     "producer": "神様うさぎ / kamisama usagi",
     "vocal": "初音ミク",
     "youtube_id": "fdgwPD-oqIY",
-    "niconico_id": ""
+    "niconico_id": "sm46578647"
   },
   {
     "song_id": "song_FxYTehD6TjQ",
-    "title": "Chopil",
+    "title": "おかしいよね",
     "producer": "Chopil",
     "vocal": "初音ミク",
     "youtube_id": "FxYTehD6TjQ",
-    "niconico_id": ""
+    "niconico_id": "sm46502115"
   },
   {
     "song_id": "song__s1kOGZO7gw",
@@ -161,7 +161,7 @@
   },
   {
     "song_id": "song_WfYUSrVatxM",
-    "title": "MV「乙女辞表」是",
+    "title": "乙女辞表",
     "producer": "是",
     "vocal": "初音ミク",
     "youtube_id": "WfYUSrVatxM",
@@ -169,7 +169,7 @@
   },
   {
     "song_id": "song_3gFvHG3IWPw",
-    "title": "「見つけちゃった」feat.初音ミク",
+    "title": "見つけちゃった",
     "producer": "PonzuP",
     "vocal": "初音ミク",
     "youtube_id": "3gFvHG3IWPw",
@@ -185,7 +185,7 @@
   },
   {
     "song_id": "song_ZutnM9DriHU",
-    "title": "래오 -계획 이상 有! MV",
+    "title": "계획 이상 有!",
     "producer": "래오 - ani & music",
     "vocal": "重音テト",
     "youtube_id": "ZutnM9DriHU",
@@ -193,11 +193,11 @@
   },
   {
     "song_id": "song_V1Kofl9jazU",
-    "title": "初音ミク灰冠り",
+    "title": "灰冠り",
     "producer": "Sohbana",
     "vocal": "初音ミク",
     "youtube_id": "V1Kofl9jazU",
-    "niconico_id": ""
+    "niconico_id": "sm44750078"
   },
   {
     "song_id": "song_JiE9drSO8nk",
@@ -209,11 +209,11 @@
   },
   {
     "song_id": "song_OKOIOQSW-jc",
-    "title": "ラブドブギfeat.初音ミク MV",
+    "title": "ラブドブギ",
     "producer": "KAMURA",
     "vocal": "初音ミク",
     "youtube_id": "OKOIOQSW-jc",
-    "niconico_id": ""
+    "niconico_id": "sm44860220"
   },
   {
     "song_id": "song_sm7968355",
@@ -225,7 +225,7 @@
   },
   {
     "song_id": "song_sm46926911",
-    "title": "眠る、n号棟の夢。／ たのしいパソコン教室",
+    "title": "眠る、n号棟の夢。",
     "producer": "佐藤乃子",
     "vocal": "VOCALOID / 合成音声",
     "youtube_id": "908_C47WgzI",
@@ -241,19 +241,19 @@
   },
   {
     "song_id": "song_sm20765934",
-    "title": "Neru",
+    "title": "イドラのサーカス",
     "producer": "Neru",
     "vocal": "鏡音リン",
     "youtube_id": "u6lHwB3e-z8",
-    "niconico_id": ""
+    "niconico_id": "sm20765934"
   },
   {
     "song_id": "song_sm26705595",
-    "title": "Neru",
+    "title": "世界を壊している",
     "producer": "Neru",
     "vocal": "鏡音リン",
     "youtube_id": "YICFtIl2tEg",
-    "niconico_id": ""
+    "niconico_id": "sm26705595"
   },
   {
     "song_id": "song_sm46875283",
@@ -289,7 +289,7 @@
   },
   {
     "song_id": "song_sm2937784",
-    "title": "初音ミクの消失(THE END OF HATSUNE MIKU)",
+    "title": "初音ミクの消失",
     "producer": "cosMo＠暴走P",
     "vocal": "初音ミク",
     "youtube_id": "VWVtIg5cdDU",
@@ -308,7 +308,7 @@
     "title": "栞",
     "producer": "wotaku",
     "vocal": "VOCALOID",
-    "youtube_id": "",
+    "youtube_id": "bOtfL94ln1A",
     "niconico_id": "sm46930484"
   },
   {
@@ -393,7 +393,7 @@
   },
   {
     "song_id": "song_sm46925775",
-    "title": "シゴデキ☆ガール／シトハイ",
+    "title": "シゴデキ☆ガール／シトハイ feat.弦巻マキ",
     "producer": "シトハイ",
     "vocal": "VOCALOID",
     "youtube_id": "",
@@ -425,23 +425,23 @@
   },
   {
     "song_id": "song_sm46928771",
-    "title": "rotten D, garakuta kuraku - 世を弄る",
+    "title": "世を弄る",
     "producer": "rotten D",
     "vocal": "VOCALOID",
-    "youtube_id": "",
+    "youtube_id": "hOZdS8IvlDo",
     "niconico_id": "sm46928771"
   },
   {
     "song_id": "song_sm46826857",
-    "title": "喜楽依存症　/　MidLuster",
+    "title": "喜楽依存症",
     "producer": "MidLuster",
     "vocal": "初音ミク",
-    "youtube_id": "",
+    "youtube_id": "25XVRxqDScQ",
     "niconico_id": "sm46826857"
   },
   {
     "song_id": "song_sm46922103",
-    "title": "干ししいたけ",
+    "title": "Silent Howling",
     "producer": "干ししいたけ",
     "vocal": "重音テト・重音テトSV",
     "youtube_id": "",
@@ -452,39 +452,39 @@
     "title": "ライフリング・ラブ",
     "producer": "サブサキ",
     "vocal": "重音テト",
-    "youtube_id": "",
+    "youtube_id": "GBd2bG0nyN4",
     "niconico_id": "sm46931799"
   },
   {
     "song_id": "song_sm15630734",
-    "title": "初音ミク千本桜オリジナル曲PV",
+    "title": "千本桜",
     "producer": "黒うさ",
     "vocal": "初音ミク",
-    "youtube_id": "",
+    "youtube_id": "shs0rAiwsGQ",
     "niconico_id": "sm15630734"
   },
   {
     "song_id": "song_sm21360174",
-    "title": "KAITO v3上弦の月オリジナル曲PV",
+    "title": "上弦の月",
     "producer": "黒うさ",
     "vocal": "KAITO",
-    "youtube_id": "",
+    "youtube_id": "-r_sn_pF5Pw",
     "niconico_id": "sm21360174"
   },
   {
     "song_id": "song_sm1715919",
-    "title": "初音ミク　が　オリジナル曲を歌ってくれたよ「メルト」",
+    "title": "メルト",
     "producer": "ryo",
     "vocal": "初音ミク",
-    "youtube_id": "",
+    "youtube_id": "XRymkHlMB-k",
     "niconico_id": "sm1715919"
   },
   {
     "song_id": "song_sm11398357",
-    "title": "DECO*27",
+    "title": "モザイクロール",
     "producer": "DECO*27",
     "vocal": "GUMI",
-    "youtube_id": "",
+    "youtube_id": "DnLFVUi3oOU",
     "niconico_id": "sm11398357"
   },
   {
@@ -492,7 +492,7 @@
     "title": "六兆年と一夜物語",
     "producer": "kemu",
     "vocal": "IA",
-    "youtube_id": "",
+    "youtube_id": "Om3MTou2kPg",
     "niconico_id": "sm17520775"
   },
   {
@@ -500,7 +500,7 @@
     "title": "脳漿炸裂ガール",
     "producer": "れるりり",
     "vocal": "初音ミク・GUMI",
-    "youtube_id": "",
+    "youtube_id": "Ey_NHZNYTeE",
     "niconico_id": "sm19133907"
   },
   {
@@ -508,7 +508,7 @@
     "title": "カゲロウデイズ",
     "producer": "じん",
     "vocal": "初音ミク",
-    "youtube_id": "",
+    "youtube_id": "EMGyiiTC7sg",
     "niconico_id": "sm15751190"
   },
   {
@@ -516,7 +516,7 @@
     "title": "いーあるふぁんくらぶ",
     "producer": "みきとP",
     "vocal": "初音ミク・GUMI・鏡音リン",
-    "youtube_id": "",
+    "youtube_id": "oBgADhsOoog",
     "niconico_id": "sm18623327"
   },
   {
@@ -524,7 +524,7 @@
     "title": "パンダヒーロー",
     "producer": "ハチ",
     "vocal": "GUMI",
-    "youtube_id": "",
+    "youtube_id": "0RU_05zpETo",
     "niconico_id": "sm13386216"
   },
   {
@@ -532,15 +532,15 @@
     "title": "結ンデ開イテ羅刹ト骸",
     "producer": "ハチ",
     "vocal": "初音ミク",
-    "youtube_id": "",
+    "youtube_id": "AKffZySqQts",
     "niconico_id": "sm7550182"
   },
   {
     "song_id": "song_sm31606995",
-    "title": "ハチ MV「砂の惑星",
+    "title": "砂の惑星",
     "producer": "ハチ",
     "vocal": "初音ミク",
-    "youtube_id": "",
+    "youtube_id": "AS4q9yaWJkI",
     "niconico_id": "sm31606995"
   },
   {
@@ -548,23 +548,23 @@
     "title": "ラプンツェル",
     "producer": "n-buna",
     "vocal": "初音ミク",
-    "youtube_id": "",
+    "youtube_id": "1okLHuZUftU",
     "niconico_id": "sm29194168"
   },
   {
     "song_id": "song_sm22138447",
-    "title": "GUMI MV「ドーナツホール」",
+    "title": "ドーナツホール",
     "producer": "ハチ",
     "vocal": "GUMI",
-    "youtube_id": "",
+    "youtube_id": "qnX2CdOBcDI",
     "niconico_id": "sm22138447"
   },
   {
     "song_id": "song_sm31685272",
-    "title": "DECO*27",
+    "title": "ヒバナ",
     "producer": "DECO*27",
     "vocal": "初音ミク",
-    "youtube_id": "",
+    "youtube_id": "hxSg2Ioz3LM",
     "niconico_id": "sm31685272"
   },
   {
@@ -572,7 +572,7 @@
     "title": "きゅうくらりん",
     "producer": "いよわ",
     "vocal": "可不",
-    "youtube_id": "",
+    "youtube_id": "2b1IexhKPz4",
     "niconico_id": "sm39257413"
   },
   {
@@ -580,7 +580,7 @@
     "title": "ベノム",
     "producer": "かいりきベア",
     "vocal": "v_flower",
-    "youtube_id": "",
+    "youtube_id": "oRJBwaZ59fQ",
     "niconico_id": "sm33624822"
   },
   {
@@ -588,7 +588,7 @@
     "title": "フォニイ",
     "producer": "ツミキ",
     "vocal": "可不",
-    "youtube_id": "",
+    "youtube_id": "9QLT1Aw_45s",
     "niconico_id": "sm38833751"
   },
   {
@@ -596,7 +596,7 @@
     "title": "ダンスロボットダンス",
     "producer": "ナユタン星人",
     "vocal": "初音ミク",
-    "youtube_id": "",
+    "youtube_id": "g7dvpD_zlIM",
     "niconico_id": "sm30177801"
   },
   {
@@ -612,7 +612,7 @@
     "title": "アローン",
     "producer": "プリンの畑",
     "vocal": "知声",
-    "youtube_id": "",
+    "youtube_id": "BPyj_2PN79o",
     "niconico_id": "sm46882174"
   },
   {
@@ -628,12 +628,12 @@
     "title": "M N N K",
     "producer": "koge koge",
     "vocal": "音街ウナ",
-    "youtube_id": "",
+    "youtube_id": "cu9Cm1Cx2LQ",
     "niconico_id": "sm46906016"
   },
   {
     "song_id": "song_sm46864870",
-    "title": "My bad qualities　feat. 小春六花／ music by machi",
+    "title": "My bad qualities",
     "producer": "machi",
     "vocal": "VOCALOID",
     "youtube_id": "",
@@ -654,5 +654,221 @@
     "vocal": "初音ミク",
     "youtube_id": "18yO536WE6s",
     "niconico_id": ""
+  },
+  {
+    "song_id": "song_sm46811602",
+    "title": "シグナリズム",
+    "producer": "ReneOn",
+    "vocal": "初音ミク",
+    "youtube_id": "94mUqIaX9H0",
+    "niconico_id": "sm46811602"
+  },
+  {
+    "song_id": "song_sm46917950",
+    "title": "レイトケージ",
+    "producer": "雨木青",
+    "vocal": "音街ウナ",
+    "youtube_id": "oO1aQmKSRrM",
+    "niconico_id": "sm46917950"
+  },
+  {
+    "song_id": "song_sm32906820",
+    "title": "昨非今是のイノセンス",
+    "producer": "いよわ",
+    "vocal": "v_flower・flower",
+    "youtube_id": "",
+    "niconico_id": "sm32906820"
+  },
+  {
+    "song_id": "song_sm44650250",
+    "title": "パラノイア",
+    "producer": "東京真中",
+    "vocal": "重音テト",
+    "youtube_id": "GVyT5IrajG0",
+    "niconico_id": "sm44650250"
+  },
+  {
+    "song_id": "song_sm46932186",
+    "title": "裏命",
+    "producer": "忘華",
+    "vocal": "裏命",
+    "youtube_id": "",
+    "niconico_id": "sm46932186"
+  },
+  {
+    "song_id": "song_sm46930602",
+    "title": "Running Away",
+    "producer": "SHARUKI",
+    "vocal": "VOCALOID",
+    "youtube_id": "2JysFP_0A_4",
+    "niconico_id": "sm46930602"
+  },
+  {
+    "song_id": "song_sm46643018",
+    "title": "PRIME ME",
+    "producer": "はるかのなつ",
+    "vocal": "VOCALOID",
+    "youtube_id": "3gcCuQ1l2GU",
+    "niconico_id": "sm46643018"
+  },
+  {
+    "song_id": "song_sm46696938",
+    "title": "僕らの歌を",
+    "producer": "ソルファ。",
+    "vocal": "巡音ルカ",
+    "youtube_id": "4HGyxE1gvO8",
+    "niconico_id": "sm46696938"
+  },
+  {
+    "song_id": "song_sm46907113",
+    "title": "青空のノイズ",
+    "producer": "雨沢レイ（Ray）",
+    "vocal": "VOCALOID",
+    "youtube_id": "",
+    "niconico_id": "sm46907113"
+  },
+  {
+    "song_id": "song_sm46896900",
+    "title": "煮るなり焼くなり",
+    "producer": "すりごま/Surigoma",
+    "vocal": "重音テト",
+    "youtube_id": "",
+    "niconico_id": "sm46896900"
+  },
+  {
+    "song_id": "song_sm46818509",
+    "title": "くだらない時間の中に花束を",
+    "producer": "プリンの畑",
+    "vocal": "知声",
+    "youtube_id": "",
+    "niconico_id": "sm46818509"
+  },
+  {
+    "song_id": "song_sm44527407",
+    "title": "ヘルライクヘヴン",
+    "producer": "shikisai",
+    "vocal": "可不・鏡音レン",
+    "youtube_id": "X7BP3xj0m28",
+    "niconico_id": "sm44527407"
+  },
+  {
+    "song_id": "song_sm39481813",
+    "title": "ノロ",
+    "producer": "¿?shimon",
+    "vocal": "v_flower・flower",
+    "youtube_id": "-FB8ndjAp_U",
+    "niconico_id": "sm39481813"
+  },
+  {
+    "song_id": "song_sm45764716",
+    "title": "ブルーバードファントム",
+    "producer": "MED0HAD0",
+    "vocal": "初音ミク",
+    "youtube_id": "w0R68eog2Wo",
+    "niconico_id": "sm45764716"
+  },
+  {
+    "song_id": "song_sm45781517",
+    "title": "きえなさい",
+    "producer": "はるな。",
+    "vocal": "歌愛ユキ",
+    "youtube_id": "gvCT4rWaZ0E",
+    "niconico_id": "sm45781517"
+  },
+  {
+    "song_id": "song_sm45776454",
+    "title": "私の心を波立てるのは、あなただけであればいい",
+    "producer": "蒼二才",
+    "vocal": "歌愛ユキ",
+    "youtube_id": "HIpW2W3kVOk",
+    "niconico_id": "sm45776454"
+  },
+  {
+    "song_id": "song_sm45781806",
+    "title": "アンチノミー・メイ",
+    "producer": "ヲミフ",
+    "vocal": "初音ミク",
+    "youtube_id": "R0EthxrqxOY",
+    "niconico_id": "sm45781806"
+  },
+  {
+    "song_id": "song_sm45770612",
+    "title": "インダストリアル",
+    "producer": "アリアドネ, natsu, ゆい",
+    "vocal": "初音ミク",
+    "youtube_id": "3cCJmsvKTnI",
+    "niconico_id": "sm45770612"
+  },
+  {
+    "song_id": "song_sm45775103",
+    "title": "Make Loving You Easy",
+    "producer": "Cagayake",
+    "vocal": "鏡音レン",
+    "youtube_id": "",
+    "niconico_id": "sm45775103"
+  },
+  {
+    "song_id": "song_sm46933867",
+    "title": "SUPER進化",
+    "producer": "IDA.TOA（イダトーア）",
+    "vocal": "初音ミク",
+    "youtube_id": "",
+    "niconico_id": "sm46933867"
+  },
+  {
+    "song_id": "song_sm46929116",
+    "title": "GOODHART'S LAW",
+    "producer": "ぎっちょ",
+    "vocal": "初音ミク",
+    "youtube_id": "",
+    "niconico_id": "sm46929116"
+  },
+  {
+    "song_id": "song_sm46887855",
+    "title": "マイバッド",
+    "producer": "はるまきごはん",
+    "vocal": "初音ミク",
+    "youtube_id": "BBCRBlHT_Go",
+    "niconico_id": "sm46887855"
+  },
+  {
+    "song_id": "song_sm46932975",
+    "title": "最後にあなたに呪いを！",
+    "producer": "原口沙輔",
+    "vocal": "初音ミク・重音テト",
+    "youtube_id": "tvG8QVqVUN4",
+    "niconico_id": "sm46932975"
+  },
+  {
+    "song_id": "song_sm46915976",
+    "title": "リライトハート",
+    "producer": "オクチカ",
+    "vocal": "初音ミク",
+    "youtube_id": "l8XfOqoj7Yk",
+    "niconico_id": "sm46915976"
+  },
+  {
+    "song_id": "song_sm46843617",
+    "title": "Desktop♡Princess",
+    "producer": "きさら",
+    "vocal": "初音ミク",
+    "youtube_id": "mZxDjbWrTbw",
+    "niconico_id": "sm46843617"
+  },
+  {
+    "song_id": "song_sm46851361",
+    "title": "REAL MYSELF",
+    "producer": "LR40",
+    "vocal": "初音ミク",
+    "youtube_id": "",
+    "niconico_id": "sm46851361"
+  },
+  {
+    "song_id": "song_sm46906568",
+    "title": "Charming☆Happy☆Star",
+    "producer": "なみぐる",
+    "vocal": "初音ミク・重音テト",
+    "youtube_id": "oGyaTCOgdVI",
+    "niconico_id": "sm46906568"
   }
 ]
