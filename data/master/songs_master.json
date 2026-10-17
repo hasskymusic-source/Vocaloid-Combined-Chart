@@ -870,5 +870,21 @@
     "vocal": "初音ミク・重音テト",
     "youtube_id": "oGyaTCOgdVI",
     "niconico_id": "sm46906568"
+  },
+  {
+    "song_id": "song_sm46885945",
+    "title": "夜にほどける/ 知声",
+    "producer": "フタツノハカリ",
+    "vocal": "知声",
+    "youtube_id": "",
+    "niconico_id": "sm46885945"
+  },
+  {
+    "song_id": "song_sm46819050",
+    "title": "Jazzy Cres",
+    "producer": "VouVouP",
+    "vocal": "巡音ルカ",
+    "youtube_id": "2Zc3zHMO8zc",
+    "niconico_id": "sm46819050"
   }
 ]

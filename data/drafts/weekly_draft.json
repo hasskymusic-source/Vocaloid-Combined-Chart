@@ -2,7 +2,7 @@
   "publishDate": "2026-10-14 13:00",
   "archiveId": "2026-10-14",
   "period": "2026-10-05 〜 2026-10-11",
-  "weeklySummary": "集計期間（2026-10-05 〜 2026-10-11）の週間VOCALOID複合ランキングTOP 20。期間内の7日間にYouTube・ニコニコ動画の双方で獲得した6指標の純増ポイントを集計した結果、いよわ「惑星直列」が週間 2,214,563 pt で総合1位を獲得した。",
+  "weeklySummary": "集計期間（2026-10-05 〜 2026-10-11）の週間VOCALOID複合ランキングTOP 20。期間内の7日間にYouTube・ニコニコ動画の双方で獲得した6指標の純増ポイントを集計した結果、いよわ「惑星直列」が週間 2,213,170 pt で総合1位を獲得した。",
   "weights": {
     "yt_views": 1,
     "yt_likes": 50,
@@ -19,26 +19,26 @@
       "vocal": "足立レイ",
       "youtube_id": "hL9W5TSUfwM",
       "niconico_id": "sm46904359",
-      "total_pt": 2214563,
-      "yt_total_pt": 2019733,
-      "nc_total_pt": 194830,
+      "total_pt": 2213170,
+      "yt_total_pt": 2018290,
+      "nc_total_pt": 194880,
       "raw": {
-        "yt_views": 479533,
-        "yt_likes": 28788,
-        "yt_comments": 1008,
-        "nc_views": 27282,
+        "yt_views": 479140,
+        "yt_likes": 28769,
+        "yt_comments": 1007,
+        "nc_views": 27294,
         "nc_mylist": 519,
-        "nc_comments": 652
+        "nc_comments": 651
       },
       "pts": {
-        "yt_views": 479533,
-        "yt_likes": 1439400,
-        "yt_comments": 100800,
-        "nc_views": 136410,
+        "yt_views": 479140,
+        "yt_likes": 1438450,
+        "yt_comments": 100700,
+        "nc_views": 136470,
         "nc_mylist": 51900,
-        "nc_comments": 6520
+        "nc_comments": 6510
       },
-      "prevRank": 2,
+      "prevRank": 1,
       "commentary": "",
       "rank": 1
     },
@@ -49,26 +49,26 @@
       "vocal": "足立レイ",
       "youtube_id": "GPr_cM7Nyzk",
       "niconico_id": "sm46867629",
-      "total_pt": 1721075,
-      "yt_total_pt": 1601875,
-      "nc_total_pt": 119200,
+      "total_pt": 1720185,
+      "yt_total_pt": 1600995,
+      "nc_total_pt": 119190,
       "raw": {
-        "yt_views": 324025,
-        "yt_likes": 24477,
+        "yt_views": 323845,
+        "yt_likes": 24463,
         "yt_comments": 540,
-        "nc_views": 16746,
-        "nc_mylist": 318,
+        "nc_views": 16764,
+        "nc_mylist": 317,
         "nc_comments": 367
       },
       "pts": {
-        "yt_views": 324025,
-        "yt_likes": 1223850,
+        "yt_views": 323845,
+        "yt_likes": 1223150,
         "yt_comments": 54000,
-        "nc_views": 83730,
-        "nc_mylist": 31800,
+        "nc_views": 83820,
+        "nc_mylist": 31700,
         "nc_comments": 3670
       },
-      "prevRank": 3,
+      "prevRank": 2,
       "commentary": "",
       "rank": 2
     },
@@ -79,26 +79,26 @@
       "vocal": "鏡音リン・鏡音レン",
       "youtube_id": "MecJkEnEG9w",
       "niconico_id": "sm46904318",
-      "total_pt": 1624786,
-      "yt_total_pt": 1471531,
-      "nc_total_pt": 153255,
+      "total_pt": 1623927,
+      "yt_total_pt": 1470732,
+      "nc_total_pt": 153195,
       "raw": {
-        "yt_views": 385681,
-        "yt_likes": 20399,
-        "yt_comments": 659,
-        "nc_views": 21037,
+        "yt_views": 385482,
+        "yt_likes": 20385,
+        "yt_comments": 660,
+        "nc_views": 21025,
         "nc_mylist": 447,
         "nc_comments": 337
       },
       "pts": {
-        "yt_views": 385681,
-        "yt_likes": 1019950,
-        "yt_comments": 65900,
-        "nc_views": 105185,
+        "yt_views": 385482,
+        "yt_likes": 1019250,
+        "yt_comments": 66000,
+        "nc_views": 105125,
         "nc_mylist": 44700,
         "nc_comments": 3370
       },
-      "prevRank": 4,
+      "prevRank": 3,
       "commentary": "",
       "rank": 3
     },
@@ -109,26 +109,26 @@
       "vocal": "初音ミク・重音テト",
       "youtube_id": "19y8YTbvri8",
       "niconico_id": "sm43708803",
-      "total_pt": 1515050,
-      "yt_total_pt": 1272615,
-      "nc_total_pt": 242435,
+      "total_pt": 1515054,
+      "yt_total_pt": 1272624,
+      "nc_total_pt": 242430,
       "raw": {
-        "yt_views": 920765,
+        "yt_views": 920774,
         "yt_likes": 6291,
         "yt_comments": 373,
-        "nc_views": 46929,
+        "nc_views": 46928,
         "nc_mylist": 67,
         "nc_comments": 109
       },
       "pts": {
-        "yt_views": 920765,
+        "yt_views": 920774,
         "yt_likes": 314550,
         "yt_comments": 37300,
-        "nc_views": 234645,
+        "nc_views": 234640,
         "nc_mylist": 6700,
         "nc_comments": 1090
       },
-      "prevRank": 5,
+      "prevRank": 4,
       "commentary": "",
       "rank": 4
     },
@@ -139,26 +139,26 @@
       "vocal": "重音テト",
       "youtube_id": "sQCn62k1ycs",
       "niconico_id": "sm46875283",
-      "total_pt": 1308853,
-      "yt_total_pt": 1225428,
-      "nc_total_pt": 83425,
+      "total_pt": 1309777,
+      "yt_total_pt": 1226232,
+      "nc_total_pt": 83545,
       "raw": {
-        "yt_views": 236178,
-        "yt_likes": 18367,
+        "yt_views": 236482,
+        "yt_likes": 18377,
         "yt_comments": 709,
-        "nc_views": 14123,
-        "nc_mylist": 120,
+        "nc_views": 14167,
+        "nc_mylist": 119,
         "nc_comments": 81
       },
       "pts": {
-        "yt_views": 236178,
-        "yt_likes": 918350,
+        "yt_views": 236482,
+        "yt_likes": 918850,
         "yt_comments": 70900,
-        "nc_views": 70615,
-        "nc_mylist": 12000,
+        "nc_views": 70835,
+        "nc_mylist": 11900,
         "nc_comments": 810
       },
-      "prevRank": 1,
+      "prevRank": 5,
       "commentary": "",
       "rank": 5
     },
@@ -169,26 +169,26 @@
       "vocal": "初音ミク",
       "youtube_id": "BBCRBlHT_Go",
       "niconico_id": "sm46887855",
-      "total_pt": 1061297,
-      "yt_total_pt": 890132,
-      "nc_total_pt": 171165,
+      "total_pt": 1060822,
+      "yt_total_pt": 889637,
+      "nc_total_pt": 171185,
       "raw": {
-        "yt_views": 271332,
-        "yt_likes": 11766,
+        "yt_views": 271137,
+        "yt_likes": 11760,
         "yt_comments": 305,
-        "nc_views": 26367,
+        "nc_views": 26373,
         "nc_mylist": 378,
-        "nc_comments": 153
+        "nc_comments": 152
       },
       "pts": {
-        "yt_views": 271332,
-        "yt_likes": 588300,
+        "yt_views": 271137,
+        "yt_likes": 588000,
         "yt_comments": 30500,
-        "nc_views": 131835,
+        "nc_views": 131865,
         "nc_mylist": 37800,
-        "nc_comments": 1530
+        "nc_comments": 1520
       },
-      "prevRank": "NEW",
+      "prevRank": 6,
       "commentary": "",
       "rank": 6
     },
@@ -199,11 +199,11 @@
       "vocal": "初音ミク",
       "youtube_id": "XRymkHlMB-k",
       "niconico_id": "sm1715919",
-      "total_pt": 661502,
-      "yt_total_pt": 600852,
+      "total_pt": 661478,
+      "yt_total_pt": 600828,
       "nc_total_pt": 60650,
       "raw": {
-        "yt_views": 517002,
+        "yt_views": 516978,
         "yt_likes": 1527,
         "yt_comments": 75,
         "nc_views": 9092,
@@ -211,14 +211,14 @@
         "nc_comments": 389
       },
       "pts": {
-        "yt_views": 517002,
+        "yt_views": 516978,
         "yt_likes": 76350,
         "yt_comments": 7500,
         "nc_views": 45460,
         "nc_mylist": 11300,
         "nc_comments": 3890
       },
-      "prevRank": "NEW",
+      "prevRank": 7,
       "commentary": "",
       "rank": 7
     },
@@ -229,11 +229,11 @@
       "vocal": "重音テトSV",
       "youtube_id": "LLjfal8jCYI",
       "niconico_id": "sm43083649",
-      "total_pt": 622929,
-      "yt_total_pt": 492444,
+      "total_pt": 622930,
+      "yt_total_pt": 492445,
       "nc_total_pt": 130485,
       "raw": {
-        "yt_views": 392694,
+        "yt_views": 392695,
         "yt_likes": 1887,
         "yt_comments": 54,
         "nc_views": 24627,
@@ -241,14 +241,14 @@
         "nc_comments": 35
       },
       "pts": {
-        "yt_views": 392694,
+        "yt_views": 392695,
         "yt_likes": 94350,
         "yt_comments": 5400,
         "nc_views": 123135,
         "nc_mylist": 7000,
         "nc_comments": 350
       },
-      "prevRank": 6,
+      "prevRank": 8,
       "commentary": "",
       "rank": 8
     },
@@ -259,11 +259,11 @@
       "vocal": "初音ミク",
       "youtube_id": "eSW2LVbPThw",
       "niconico_id": "sm42224358",
-      "total_pt": 603990,
-      "yt_total_pt": 509065,
+      "total_pt": 603992,
+      "yt_total_pt": 509067,
       "nc_total_pt": 94925,
       "raw": {
-        "yt_views": 372265,
+        "yt_views": 372267,
         "yt_likes": 2618,
         "yt_comments": 59,
         "nc_views": 17915,
@@ -271,14 +271,14 @@
         "nc_comments": 15
       },
       "pts": {
-        "yt_views": 372265,
+        "yt_views": 372267,
         "yt_likes": 130900,
         "yt_comments": 5900,
         "nc_views": 89575,
         "nc_mylist": 5200,
         "nc_comments": 150
       },
-      "prevRank": 7,
+      "prevRank": 9,
       "commentary": "",
       "rank": 9
     },
@@ -289,11 +289,11 @@
       "vocal": "可不",
       "youtube_id": "2b1IexhKPz4",
       "niconico_id": "sm39257413",
-      "total_pt": 436310,
-      "yt_total_pt": 319150,
+      "total_pt": 436312,
+      "yt_total_pt": 319152,
       "nc_total_pt": 117160,
       "raw": {
-        "yt_views": 236750,
+        "yt_views": 236752,
         "yt_likes": 1542,
         "yt_comments": 53,
         "nc_views": 22172,
@@ -301,14 +301,14 @@
         "nc_comments": 30
       },
       "pts": {
-        "yt_views": 236750,
+        "yt_views": 236752,
         "yt_likes": 77100,
         "yt_comments": 5300,
         "nc_views": 110860,
         "nc_mylist": 6000,
         "nc_comments": 300
       },
-      "prevRank": 12,
+      "prevRank": 10,
       "commentary": "",
       "rank": 10
     },
@@ -338,7 +338,7 @@
         "nc_mylist": 5800,
         "nc_comments": 470
       },
-      "prevRank": 8,
+      "prevRank": 11,
       "commentary": "",
       "rank": 11
     },
@@ -349,14 +349,14 @@
       "vocal": "可不",
       "youtube_id": "9QLT1Aw_45s",
       "niconico_id": "sm38833751",
-      "total_pt": 302820,
+      "total_pt": 302815,
       "yt_total_pt": 194875,
-      "nc_total_pt": 107945,
+      "nc_total_pt": 107940,
       "raw": {
         "yt_views": 146775,
         "yt_likes": 926,
         "yt_comments": 18,
-        "nc_views": 20237,
+        "nc_views": 20236,
         "nc_mylist": 64,
         "nc_comments": 36
       },
@@ -364,11 +364,11 @@
         "yt_views": 146775,
         "yt_likes": 46300,
         "yt_comments": 1800,
-        "nc_views": 101185,
+        "nc_views": 101180,
         "nc_mylist": 6400,
         "nc_comments": 360
       },
-      "prevRank": 13,
+      "prevRank": 12,
       "commentary": "",
       "rank": 12
     },
@@ -379,26 +379,26 @@
       "vocal": "初音ミク・重音テト",
       "youtube_id": "oGyaTCOgdVI",
       "niconico_id": "sm46906568",
-      "total_pt": 218814,
-      "yt_total_pt": 201469,
+      "total_pt": 219079,
+      "yt_total_pt": 201734,
       "nc_total_pt": 17345,
       "raw": {
-        "yt_views": 33069,
-        "yt_likes": 3120,
+        "yt_views": 33134,
+        "yt_likes": 3124,
         "yt_comments": 124,
         "nc_views": 1885,
         "nc_mylist": 74,
         "nc_comments": 52
       },
       "pts": {
-        "yt_views": 33069,
-        "yt_likes": 156000,
+        "yt_views": 33134,
+        "yt_likes": 156200,
         "yt_comments": 12400,
         "nc_views": 9425,
         "nc_mylist": 7400,
         "nc_comments": 520
       },
-      "prevRank": "NEW",
+      "prevRank": 13,
       "commentary": "",
       "rank": 13
     },
@@ -409,11 +409,11 @@
       "vocal": "初音ミク",
       "youtube_id": "AS4q9yaWJkI",
       "niconico_id": "sm31606995",
-      "total_pt": 218697,
-      "yt_total_pt": 140827,
+      "total_pt": 218698,
+      "yt_total_pt": 140828,
       "nc_total_pt": 77870,
       "raw": {
-        "yt_views": 105777,
+        "yt_views": 105778,
         "yt_likes": 637,
         "yt_comments": 32,
         "nc_views": 13428,
@@ -421,14 +421,14 @@
         "nc_comments": 193
       },
       "pts": {
-        "yt_views": 105777,
+        "yt_views": 105778,
         "yt_likes": 31850,
         "yt_comments": 3200,
         "nc_views": 67140,
         "nc_mylist": 8800,
         "nc_comments": 1930
       },
-      "prevRank": 15,
+      "prevRank": 14,
       "commentary": "",
       "rank": 14
     },
@@ -458,7 +458,7 @@
         "nc_mylist": 6600,
         "nc_comments": 2090
       },
-      "prevRank": 10,
+      "prevRank": 15,
       "commentary": "",
       "rank": 15
     },
@@ -488,7 +488,7 @@
         "nc_mylist": 5400,
         "nc_comments": 470
       },
-      "prevRank": 17,
+      "prevRank": 16,
       "commentary": "",
       "rank": 16
     },
@@ -518,7 +518,7 @@
         "nc_mylist": 7100,
         "nc_comments": 440
       },
-      "prevRank": 18,
+      "prevRank": 17,
       "commentary": "",
       "rank": 17
     },
@@ -529,26 +529,26 @@
       "vocal": "初音ミク",
       "youtube_id": "mZxDjbWrTbw",
       "niconico_id": "sm46843617",
-      "total_pt": 178513,
-      "yt_total_pt": 154073,
-      "nc_total_pt": 24440,
+      "total_pt": 178665,
+      "yt_total_pt": 154240,
+      "nc_total_pt": 24425,
       "raw": {
-        "yt_views": 23073,
-        "yt_likes": 2448,
+        "yt_views": 23090,
+        "yt_likes": 2451,
         "yt_comments": 86,
-        "nc_views": 2132,
+        "nc_views": 2131,
         "nc_mylist": 131,
-        "nc_comments": 68
+        "nc_comments": 67
       },
       "pts": {
-        "yt_views": 23073,
-        "yt_likes": 122400,
+        "yt_views": 23090,
+        "yt_likes": 122550,
         "yt_comments": 8600,
-        "nc_views": 10660,
+        "nc_views": 10655,
         "nc_mylist": 13100,
-        "nc_comments": 680
+        "nc_comments": 670
       },
-      "prevRank": "NEW",
+      "prevRank": 18,
       "commentary": "",
       "rank": 18
     },
@@ -578,7 +578,7 @@
         "nc_mylist": 15200,
         "nc_comments": 7250
       },
-      "prevRank": 16,
+      "prevRank": 19,
       "commentary": "",
       "rank": 19
     },
@@ -608,7 +608,7 @@
         "nc_mylist": 8400,
         "nc_comments": 1030
       },
-      "prevRank": "NEW",
+      "prevRank": 20,
       "commentary": "",
       "rank": 20
     }
