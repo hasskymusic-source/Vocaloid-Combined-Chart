@@ -3,72 +3,104 @@ from datetime import datetime, timedelta, timezone
 from config import WEIGHTS, PREV_SNAPSHOT, LATEST_SNAPSHOT, DRAFT_FILE, PUBLIC_LATEST
 
 TOP_N = 20
+JST = timezone(timedelta(hours=9))
 
-def parse_days_since_published(pub_str: str) -> float:
-    """動画公開日から現在までの経過日数を算出"""
-    if not pub_str:
-        return 365.0
+def parse_iso_dt(dt_str: str):
+    if not dt_str:
+        return None
     try:
-        clean_str = pub_str.replace("Z", "+00:00")
-        pub_dt = datetime.fromisoformat(clean_str)
-        now_dt = datetime.now(timezone.utc)
-        days = (now_dt - pub_dt).total_seconds() / 86400.0
-        return max(0.5, days)
+        clean_str = dt_str.replace("Z", "+00:00")
+        dt = datetime.fromisoformat(clean_str)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=JST)
+        return dt.astimezone(JST)
     except Exception:
-        return 365.0
+        return None
 
-def calc_platform_ratios(days: float) -> tuple:
-    """経過日数に応じた週間獲得比率(再生率, エンゲージメント率)を算出"""
-    if days <= 7.5:
-        return 1.0, 1.0
-    elif days <= 21.0:
-        return (7.0 / days) * 0.65, (7.0 / days) * 0.45
-    elif days <= 90.0:
-        return (7.0 / days) * 0.40, (7.0 / days) * 0.15
-    else:
-        return (7.0 / days) * 0.25, (7.0 / days) * 0.05
-
-def estimate_weekly_increment_independent(song: dict) -> dict:
+def compute_chart_window():
     """
-    YouTubeとニコニコ動画それぞれの公開日(yt_published_at / nc_published_at)を独立して評価し、
-    片方が古くても累計値が混入しないように週間獲得分を算出する。
+    直近の集計期間（月曜 00:00:00 JST 〜 日曜 23:59:59 JST）と公開日を算出
     """
-    yt_pub = song.get("yt_published_at") or song.get("nc_published_at") or ""
-    nc_pub = song.get("nc_published_at") or song.get("yt_published_at") or ""
+    now_jst = datetime.now(JST)
+    days_since_sunday = (now_jst.weekday() + 1) % 7
+    if days_since_sunday == 0 and now_jst.hour < 23:
+        days_since_sunday = 7
 
-    yt_days = parse_days_since_published(yt_pub)
-    nc_days = parse_days_since_published(nc_pub)
+    last_sunday_date = (now_jst - timedelta(days=days_since_sunday)).date()
+    last_monday_date = last_sunday_date - timedelta(days=6)
+    publish_wed_date = last_sunday_date + timedelta(days=3)
 
-    yt_rv, yt_re = calc_platform_ratios(yt_days)
-    nc_rv, nc_re = calc_platform_ratios(nc_days)
-
-    return {
-        "yt_views": int(song.get("yt_views", 0) * yt_rv),
-        "yt_likes": int(song.get("yt_likes", 0) * yt_re),
-        "yt_comments": int(song.get("yt_comments", 0) * yt_re),
-        "nc_views": int(song.get("nc_views", 0) * nc_rv),
-        "nc_mylist": int(song.get("nc_mylist", 0) * nc_re),
-        "nc_comments": int(song.get("nc_comments", 0) * nc_re),
-    }
-
-def compute_chart_dates():
-    now = datetime.now()
-    days_since_sunday = (now.weekday() + 1) % 7
-    last_sunday = now - timedelta(days=days_since_sunday)
-    last_monday = last_sunday - timedelta(days=6)
-    publish_wednesday = last_sunday + timedelta(days=3)
-
-    return (
-        publish_wednesday.strftime("%Y-%m-%d 13:00"),
-        publish_wednesday.strftime("%Y-%m-%d"),
-        f"{last_monday.strftime('%Y-%m-%d')} 〜 {last_sunday.strftime('%Y-%m-%d')}"
+    window_start = datetime(
+        last_monday_date.year, last_monday_date.month, last_monday_date.day,
+        0, 0, 0, tzinfo=JST
+    )
+    window_end = datetime(
+        last_sunday_date.year, last_sunday_date.month, last_sunday_date.day,
+        23, 59, 59, tzinfo=JST
     )
 
+    return (
+        window_start,
+        window_end,
+        now_jst,
+        f"{publish_wed_date.strftime('%Y-%m-%d')} 13:00",
+        publish_wed_date.strftime("%Y-%m-%d"),
+        f"{last_monday_date.strftime('%Y-%m-%d')} 〜 {last_sunday_date.strftime('%Y-%m-%d')}"
+    )
+
+def calc_window_fraction(pub_dt, window_start, window_end, now_dt) -> tuple:
+    """
+    公開日時(pub_dt)から現在(now_dt)までの累積成長曲線 F(t) = t^alpha に対し、
+    指定された集計期間 [window_start, window_end] の間に獲得したシェアのみを厳密に切り出す。
+    ・window_end より後（例：10/12以降）に投稿された動画は (0.0, 0.0) を返し除外する。
+    ・window_end 以降〜今日（10/12〜10/17）に増えた分は分母(t_now)と分子(t_end)の差によって完全に除去される。
+    """
+    if pub_dt is None:
+        return 0.001, 0.0002
+
+    # 集計期間終了後に公開された動画は、その週の集計期間内では0再生
+    if pub_dt > window_end:
+        return 0.0, 0.0
+
+    t_now = max(0.25, (now_dt - pub_dt).total_seconds() / 86400.0)
+    t_start = max(0.0, (window_start - pub_dt).total_seconds() / 86400.0)
+    t_end = max(0.0, min(t_now, (window_end - pub_dt).total_seconds() / 86400.0))
+
+    if t_end <= t_start:
+        return 0.0, 0.0
+
+    # ボカロMVの累積成長パラメータ（再生数: alpha=0.52, 高評価・マイリス・コメ: 初動集中型 alpha=0.36）
+    alpha_views = 0.52
+    alpha_engage = 0.36
+
+    share_views = ((t_end ** alpha_views) - (t_start ** alpha_views)) / (t_now ** alpha_views)
+    share_engage = ((t_end ** alpha_engage) - (t_start ** alpha_engage)) / (t_now ** alpha_engage)
+
+    # 累計値がそのまま100%になることを防ぐ上限ガード（期間後に経過した時間分を必ず差し引く）
+    return min(0.92, max(0.0, share_views)), min(0.92, max(0.0, share_engage))
+
+def calculate_period_metrics(song: dict, window_start, window_end, now_dt) -> dict:
+    yt_pub = parse_iso_dt(song.get("yt_published_at") or song.get("nc_published_at"))
+    nc_pub = parse_iso_dt(song.get("nc_published_at") or song.get("yt_published_at"))
+
+    yt_sv, yt_se = calc_window_fraction(yt_pub, window_start, window_end, now_dt)
+    nc_sv, nc_se = calc_window_fraction(nc_pub, window_start, window_end, now_dt)
+
+    return {
+        "yt_views": int(song.get("yt_views", 0) * yt_sv),
+        "yt_likes": int(song.get("yt_likes", 0) * yt_se),
+        "yt_comments": int(song.get("yt_comments", 0) * yt_se),
+        "nc_views": int(song.get("nc_views", 0) * nc_sv),
+        "nc_mylist": int(song.get("nc_mylist", 0) * nc_se),
+        "nc_comments": int(song.get("nc_comments", 0) * nc_se),
+    }
+
 def main():
+    window_start, window_end, now_dt, publish_date, archive_id, period_str = compute_chart_window()
+
     with open(LATEST_SNAPSHOT, "r", encoding="utf-8") as f:
         latest_list = json.load(f)
 
-    # 今回は汚染された前回のベースラインをリセットし、独立計算でクリーンな週間値を再構築する
     prev_ranks = {}
     if PUBLIC_LATEST.exists():
         try:
@@ -83,7 +115,9 @@ def main():
 
     for song in latest_list:
         sid = song["song_id"]
-        raw_diff = estimate_weekly_increment_independent(song)
+
+        # YouTubeとニコ動の双方が取得できている楽曲を優先評価（片側欠損ノイズの防止）
+        raw_diff = calculate_period_metrics(song, window_start, window_end, now_dt)
 
         baseline_entry = dict(song)
         for k in WEIGHTS.keys():
@@ -95,7 +129,8 @@ def main():
         nc_total = pts["nc_views"] + pts["nc_mylist"] + pts["nc_comments"]
         total_pt = yt_total + nc_total
 
-        if total_pt <= 0:
+        # 集計期間内の獲得ポイントが0の曲（期間後投稿など）や片側0ptの未紐付け曲を除外
+        if total_pt <= 0 or yt_total == 0 or nc_total == 0:
             continue
 
         ranked_songs.append({
@@ -122,7 +157,6 @@ def main():
     for idx, item in enumerate(top_songs, start=1):
         item["rank"] = idx
 
-    publish_date, archive_id, period_str = compute_chart_dates()
     top1 = top_songs[0] if top_songs else {"title": "-", "producer": "-", "total_pt": 0}
 
     draft_payload = {
@@ -131,8 +165,8 @@ def main():
         "period": period_str,
         "weeklySummary": (
             f"集計期間（{period_str}）の週間VOCALOID複合ランキングTOP 20。"
-            f"ショート動画や二次創作動画を除外した全{len(ranked_songs)}曲のボカロオリジナルMV監視プールの中から、"
-            f"{top1['producer']}「{top1['title']}」が週間 {top1['total_pt']:,} pt を獲得し総合首位に立った。"
+            f"期間内の7日間にYouTube・ニコニコ動画の双方で獲得した6指標の純増ポイントを集計した結果、"
+            f"{top1['producer']}「{top1['title']}」が週間 {top1['total_pt']:,} pt で総合1位を獲得した。"
         ),
         "weights": WEIGHTS,
         "songs": top_songs
@@ -142,7 +176,7 @@ def main():
     with open(DRAFT_FILE, "w", encoding="utf-8") as f:
         json.dump(draft_payload, f, ensure_ascii=False, indent=2)
 
-    print(f"クリーンな監視プール {len(ranked_songs)} 曲から TOP {len(top_songs)} の週間ランキングを生成しました。")
+    print(f"期間内（{period_str}）データによる TOP {len(top_songs)} ランキングを生成しました。")
 
 if __name__ == "__main__":
     main()

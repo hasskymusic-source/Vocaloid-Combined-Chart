@@ -5,9 +5,10 @@ import xml.etree.ElementTree as ET
 import requests
 from datetime import datetime, timedelta
 from config import MASTER_FILE, PREV_SNAPSHOT, LATEST_SNAPSHOT
+from discover_songs import clean_song_title
 from googleapiclient.discovery import build
 
-USER_AGENT = "VocaloidCombinedChartBot/3.0"
+USER_AGENT = "VocaloidCombinedChartBot/4.0"
 
 def rotate_snapshots_if_needed():
     if not LATEST_SNAPSHOT.exists():
@@ -46,6 +47,7 @@ def fetch_youtube_stats_batch(youtube_ids: list, api_key: str) -> dict:
                 stats = item.get("statistics", {})
                 snippet = item.get("snippet", {})
                 result[vid] = {
+                    "yt_title": snippet.get("title", ""),
                     "yt_views": int(stats.get("viewCount", 0)),
                     "yt_likes": int(stats.get("likeCount", 0)),
                     "yt_comments": int(stats.get("commentCount", 0)),
@@ -66,6 +68,7 @@ def fetch_niconico_thumbinfo(niconico_id: str) -> dict:
         if root.attrib.get("status") == "ok":
             thumb = root.find("thumb")
             return {
+                "nc_title": thumb.findtext("title", ""),
                 "nc_views": int(thumb.findtext("view_counter", "0")),
                 "nc_mylist": int(thumb.findtext("mylist_counter", "0")),
                 "nc_comments": int(thumb.findtext("comment_num", "0")),
@@ -109,11 +112,17 @@ def main():
         if yt_views == 0 and nc_views == 0:
             continue
 
-        producer = song.get("producer") or yt_stats.get("channel_title") or nc_stats.get("nc_author") or "ボカロP"
+        producer = song.get("producer") or nc_stats.get("nc_author") or yt_stats.get("channel_title") or "ボカロP"
+        title = clean_song_title(song["title"], producer)
+
+        # もし曲名がボカロP名と同じになってしまっていたら、元動画タイトルから再抽出
+        if title.lower() == producer.lower() or len(title) <= 1:
+            raw_t = yt_stats.get("yt_title") or nc_stats.get("nc_title") or song["title"]
+            title = clean_song_title(raw_t, producer)
 
         snapshots.append({
             "song_id": song["song_id"],
-            "title": song["title"],
+            "title": title,
             "producer": producer,
             "vocal": song.get("vocal", "VOCALOID"),
             "youtube_id": yid,
