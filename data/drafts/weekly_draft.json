@@ -2,7 +2,7 @@
   "publishDate": "2026-10-14 13:00",
   "archiveId": "2026-10-14",
   "period": "2026-10-05 〜 2026-10-11",
-  "weeklySummary": "集計期間（2026-10-05 〜 2026-10-11）の週間VOCALOID複合ランキングTOP 20（初回公開）。日本国内のボカロ新譜から韓国・英語圏をはじめとするグローバルボカロPのヒット曲まで、YouTubeとニコニコ動画の6指標を横断集計した結果、뭐든지모에화「展示中毒」が週間 2,981,916 pt で総合1位を獲得した。",
+  "weeklySummary": "集計期間（2026-10-05 〜 2026-10-11）の週間VOCALOID複合ランキングTOP 20（初回公開）。日本国内のボカロ新譜から韓国・英語圏をはじめとするグローバルボカロPのヒット曲まで、YouTubeとニコニコ動画の6指標を横断集計した結果、뭐든지모에화「展示中毒」が週間 2,982,444 pt で総合1位を獲得した。",
   "weights": {
     "yt_views": 1,
     "yt_likes": 50,
@@ -19,22 +19,22 @@
       "vocal": "初音ミク",
       "youtube_id": "786OXxbw2aM",
       "niconico_id": "sm46828928",
-      "total_pt": 2981916,
-      "yt_total_pt": 2967356,
-      "nc_total_pt": 14560,
+      "total_pt": 2982444,
+      "yt_total_pt": 2967879,
+      "nc_total_pt": 14565,
       "raw": {
-        "yt_views": 1470056,
-        "yt_likes": 26330,
+        "yt_views": 1470679,
+        "yt_likes": 26328,
         "yt_comments": 1808,
-        "nc_views": 2406,
+        "nc_views": 2407,
         "nc_mylist": 23,
         "nc_comments": 23
       },
       "pts": {
-        "yt_views": 1470056,
-        "yt_likes": 1316500,
+        "yt_views": 1470679,
+        "yt_likes": 1316400,
         "yt_comments": 180800,
-        "nc_views": 12030,
+        "nc_views": 12035,
         "nc_mylist": 2300,
         "nc_comments": 230
       },
@@ -49,11 +49,11 @@
       "vocal": "重音テト",
       "youtube_id": "T24rF_x0TmQ",
       "niconico_id": "sm46354721",
-      "total_pt": 2619113,
-      "yt_total_pt": 2520873,
+      "total_pt": 2619276,
+      "yt_total_pt": 2521036,
       "nc_total_pt": 98240,
       "raw": {
-        "yt_views": 1666223,
+        "yt_views": 1666386,
         "yt_likes": 16163,
         "yt_comments": 465,
         "nc_views": 18486,
@@ -61,7 +61,7 @@
         "nc_comments": 41
       },
       "pts": {
-        "yt_views": 1666223,
+        "yt_views": 1666386,
         "yt_likes": 808150,
         "yt_comments": 46500,
         "nc_views": 92430,
@@ -79,51 +79,51 @@
       "vocal": "足立レイ",
       "youtube_id": "hL9W5TSUfwM",
       "niconico_id": "sm46904359",
-      "total_pt": 2154055,
-      "yt_total_pt": 1957580,
-      "nc_total_pt": 196475,
+      "total_pt": 2153285,
+      "yt_total_pt": 1956800,
+      "nc_total_pt": 196485,
       "raw": {
-        "yt_views": 465230,
-        "yt_likes": 27905,
-        "yt_comments": 971,
-        "nc_views": 27809,
+        "yt_views": 465050,
+        "yt_likes": 27895,
+        "yt_comments": 970,
+        "nc_views": 27813,
         "nc_mylist": 511,
-        "nc_comments": 633
+        "nc_comments": 632
       },
       "pts": {
-        "yt_views": 465230,
-        "yt_likes": 1395250,
-        "yt_comments": 97100,
-        "nc_views": 139045,
+        "yt_views": 465050,
+        "yt_likes": 1394750,
+        "yt_comments": 97000,
+        "nc_views": 139065,
         "nc_mylist": 51100,
-        "nc_comments": 6330
+        "nc_comments": 6320
       },
       "prevRank": "NEW",
       "commentary": "",
       "rank": 3
     },
     {
-      "song_id": "song_JkGyMUwzxQE",
-      "title": "ただ浮かぶ脳裏のモーション",
-      "producer": "バーバパパ",
-      "vocal": "重音テト",
-      "youtube_id": "JkGyMUwzxQE",
+      "song_id": "song_cY0qV7q9IC4",
+      "title": "Clover",
+      "producer": "Various artists",
+      "vocal": "知声",
+      "youtube_id": "cY0qV7q9IC4",
       "niconico_id": "",
-      "total_pt": 2021167,
-      "yt_total_pt": 2021167,
+      "total_pt": 2015396,
+      "yt_total_pt": 2015396,
       "nc_total_pt": 0,
       "raw": {
-        "yt_views": 722817,
-        "yt_likes": 24023,
-        "yt_comments": 972,
+        "yt_views": 586396,
+        "yt_likes": 25152,
+        "yt_comments": 1714,
         "nc_views": 0,
         "nc_mylist": 0,
         "nc_comments": 0
       },
       "pts": {
-        "yt_views": 722817,
-        "yt_likes": 1201150,
-        "yt_comments": 97200,
+        "yt_views": 586396,
+        "yt_likes": 1257600,
+        "yt_comments": 171400,
         "nc_views": 0,
         "nc_mylist": 0,
         "nc_comments": 0
@@ -133,64 +133,34 @@
       "rank": 4
     },
     {
-      "song_id": "song_cY0qV7q9IC4",
-      "title": "Clover",
-      "producer": "Various artists",
-      "vocal": "知声",
-      "youtube_id": "cY0qV7q9IC4",
-      "niconico_id": "",
-      "total_pt": 2015731,
-      "yt_total_pt": 2015731,
-      "nc_total_pt": 0,
-      "raw": {
-        "yt_views": 586431,
-        "yt_likes": 25158,
-        "yt_comments": 1714,
-        "nc_views": 0,
-        "nc_mylist": 0,
-        "nc_comments": 0
-      },
-      "pts": {
-        "yt_views": 586431,
-        "yt_likes": 1257900,
-        "yt_comments": 171400,
-        "nc_views": 0,
-        "nc_mylist": 0,
-        "nc_comments": 0
-      },
-      "prevRank": "NEW",
-      "commentary": "",
-      "rank": 5
-    },
-    {
       "song_id": "song_sm46865356",
       "title": "えねみぃ",
       "producer": "ピノキオピー",
       "vocal": "初音ミク・重音テト",
       "youtube_id": "MflA4ZIKD3U",
       "niconico_id": "sm46865356",
-      "total_pt": 1839208,
-      "yt_total_pt": 1712488,
-      "nc_total_pt": 126720,
+      "total_pt": 1838831,
+      "yt_total_pt": 1712141,
+      "nc_total_pt": 126690,
       "raw": {
-        "yt_views": 660288,
-        "yt_likes": 19708,
+        "yt_views": 660291,
+        "yt_likes": 19701,
         "yt_comments": 668,
-        "nc_views": 20702,
+        "nc_views": 20696,
         "nc_mylist": 214,
         "nc_comments": 181
       },
       "pts": {
-        "yt_views": 660288,
-        "yt_likes": 985400,
+        "yt_views": 660291,
+        "yt_likes": 985050,
         "yt_comments": 66800,
-        "nc_views": 103510,
+        "nc_views": 103480,
         "nc_mylist": 21400,
         "nc_comments": 1810
       },
       "prevRank": "NEW",
       "commentary": "",
-      "rank": 6
+      "rank": 5
     },
     {
       "song_id": "song_GPr_cM7Nyzk",
@@ -199,28 +169,28 @@
       "vocal": "足立レイ",
       "youtube_id": "GPr_cM7Nyzk",
       "niconico_id": "sm46867629",
-      "total_pt": 1692458,
-      "yt_total_pt": 1568613,
-      "nc_total_pt": 123845,
+      "total_pt": 1692012,
+      "yt_total_pt": 1568087,
+      "nc_total_pt": 123925,
       "raw": {
-        "yt_views": 319213,
-        "yt_likes": 23942,
+        "yt_views": 319137,
+        "yt_likes": 23933,
         "yt_comments": 523,
-        "nc_views": 17625,
+        "nc_views": 17641,
         "nc_mylist": 312,
         "nc_comments": 452
       },
       "pts": {
-        "yt_views": 319213,
-        "yt_likes": 1197100,
+        "yt_views": 319137,
+        "yt_likes": 1196650,
         "yt_comments": 52300,
-        "nc_views": 88125,
+        "nc_views": 88205,
         "nc_mylist": 31200,
         "nc_comments": 4520
       },
       "prevRank": "NEW",
       "commentary": "",
-      "rank": 7
+      "rank": 6
     },
     {
       "song_id": "song_sm46904318",
@@ -229,28 +199,28 @@
       "vocal": "鏡音リン・鏡音レン",
       "youtube_id": "MecJkEnEG9w",
       "niconico_id": "sm46904318",
-      "total_pt": 1590573,
-      "yt_total_pt": 1439443,
-      "nc_total_pt": 151130,
+      "total_pt": 1590337,
+      "yt_total_pt": 1439232,
+      "nc_total_pt": 151105,
       "raw": {
-        "yt_views": 376993,
-        "yt_likes": 19963,
+        "yt_views": 376882,
+        "yt_likes": 19961,
         "yt_comments": 643,
-        "nc_views": 20820,
+        "nc_views": 20815,
         "nc_mylist": 437,
         "nc_comments": 333
       },
       "pts": {
-        "yt_views": 376993,
-        "yt_likes": 998150,
+        "yt_views": 376882,
+        "yt_likes": 998050,
         "yt_comments": 64300,
-        "nc_views": 104100,
+        "nc_views": 104075,
         "nc_mylist": 43700,
         "nc_comments": 3330
       },
       "prevRank": "NEW",
       "commentary": "",
-      "rank": 8
+      "rank": 7
     },
     {
       "song_id": "song_sm45739389",
@@ -259,11 +229,11 @@
       "vocal": "初音ミク",
       "youtube_id": "icBDYkfxpMs",
       "niconico_id": "sm45739389",
-      "total_pt": 1561503,
-      "yt_total_pt": 1445983,
+      "total_pt": 1561544,
+      "yt_total_pt": 1446024,
       "nc_total_pt": 115520,
       "raw": {
-        "yt_views": 951783,
+        "yt_views": 951824,
         "yt_likes": 9542,
         "yt_comments": 171,
         "nc_views": 22194,
@@ -271,7 +241,7 @@
         "nc_comments": 35
       },
       "pts": {
-        "yt_views": 951783,
+        "yt_views": 951824,
         "yt_likes": 477100,
         "yt_comments": 17100,
         "nc_views": 110970,
@@ -280,7 +250,7 @@
       },
       "prevRank": "NEW",
       "commentary": "",
-      "rank": 9
+      "rank": 8
     },
     {
       "song_id": "song_sm46855974",
@@ -289,28 +259,28 @@
       "vocal": "初音ミク",
       "youtube_id": "7qUq1yOjoPM",
       "niconico_id": "sm46855974",
-      "total_pt": 1496368,
-      "yt_total_pt": 1403653,
-      "nc_total_pt": 92715,
+      "total_pt": 1496081,
+      "yt_total_pt": 1403396,
+      "nc_total_pt": 92685,
       "raw": {
-        "yt_views": 507853,
-        "yt_likes": 17074,
+        "yt_views": 507846,
+        "yt_likes": 17069,
         "yt_comments": 421,
-        "nc_views": 16097,
+        "nc_views": 16091,
         "nc_mylist": 118,
         "nc_comments": 43
       },
       "pts": {
-        "yt_views": 507853,
-        "yt_likes": 853700,
+        "yt_views": 507846,
+        "yt_likes": 853450,
         "yt_comments": 42100,
-        "nc_views": 80485,
+        "nc_views": 80455,
         "nc_mylist": 11800,
         "nc_comments": 430
       },
       "prevRank": "NEW",
       "commentary": "",
-      "rank": 10
+      "rank": 9
     },
     {
       "song_id": "song_sm46705438",
@@ -319,28 +289,28 @@
       "vocal": "VOCALOID",
       "youtube_id": "7O9PFfabVkk",
       "niconico_id": "sm46705438",
-      "total_pt": 1361166,
-      "yt_total_pt": 1173511,
-      "nc_total_pt": 187655,
+      "total_pt": 1361190,
+      "yt_total_pt": 1173530,
+      "nc_total_pt": 187660,
       "raw": {
-        "yt_views": 547511,
+        "yt_views": 547530,
         "yt_likes": 12100,
         "yt_comments": 210,
-        "nc_views": 33807,
+        "nc_views": 33808,
         "nc_mylist": 143,
         "nc_comments": 432
       },
       "pts": {
-        "yt_views": 547511,
+        "yt_views": 547530,
         "yt_likes": 605000,
         "yt_comments": 21000,
-        "nc_views": 169035,
+        "nc_views": 169040,
         "nc_mylist": 14300,
         "nc_comments": 4320
       },
       "prevRank": "NEW",
       "commentary": "",
-      "rank": 11
+      "rank": 10
     },
     {
       "song_id": "song_sm46875283",
@@ -349,28 +319,28 @@
       "vocal": "重音テト",
       "youtube_id": "sQCn62k1ycs",
       "niconico_id": "sm46875283",
-      "total_pt": 1322778,
-      "yt_total_pt": 1232158,
-      "nc_total_pt": 90620,
+      "total_pt": 1322735,
+      "yt_total_pt": 1232015,
+      "nc_total_pt": 90720,
       "raw": {
-        "yt_views": 242458,
-        "yt_likes": 18388,
+        "yt_views": 242515,
+        "yt_likes": 18384,
         "yt_comments": 703,
-        "nc_views": 15570,
+        "nc_views": 15590,
         "nc_mylist": 120,
         "nc_comments": 77
       },
       "pts": {
-        "yt_views": 242458,
-        "yt_likes": 919400,
+        "yt_views": 242515,
+        "yt_likes": 919200,
         "yt_comments": 70300,
-        "nc_views": 77850,
+        "nc_views": 77950,
         "nc_mylist": 12000,
         "nc_comments": 770
       },
       "prevRank": "NEW",
       "commentary": "",
-      "rank": 12
+      "rank": 11
     },
     {
       "song_id": "song_sm46537381",
@@ -379,28 +349,28 @@
       "vocal": "重音テト",
       "youtube_id": "UsjsYMo3O1Q",
       "niconico_id": "sm46537381",
-      "total_pt": 1210672,
-      "yt_total_pt": 1160767,
-      "nc_total_pt": 49905,
+      "total_pt": 1210708,
+      "yt_total_pt": 1160798,
+      "nc_total_pt": 49910,
       "raw": {
-        "yt_views": 736717,
+        "yt_views": 736748,
         "yt_likes": 8161,
         "yt_comments": 160,
-        "nc_views": 8807,
+        "nc_views": 8808,
         "nc_mylist": 55,
         "nc_comments": 37
       },
       "pts": {
-        "yt_views": 736717,
+        "yt_views": 736748,
         "yt_likes": 408050,
         "yt_comments": 16000,
-        "nc_views": 44035,
+        "nc_views": 44040,
         "nc_mylist": 5500,
         "nc_comments": 370
       },
       "prevRank": "NEW",
       "commentary": "",
-      "rank": 13
+      "rank": 12
     },
     {
       "song_id": "song_sm45241713",
@@ -409,11 +379,11 @@
       "vocal": "初音ミク",
       "youtube_id": "3iUgKH8c7p4",
       "niconico_id": "sm45241713",
-      "total_pt": 1120634,
-      "yt_total_pt": 1004459,
+      "total_pt": 1120645,
+      "yt_total_pt": 1004470,
       "nc_total_pt": 116175,
       "raw": {
-        "yt_views": 701109,
+        "yt_views": 701120,
         "yt_likes": 5749,
         "yt_comments": 159,
         "nc_views": 22199,
@@ -421,7 +391,7 @@
         "nc_comments": 58
       },
       "pts": {
-        "yt_views": 701109,
+        "yt_views": 701120,
         "yt_likes": 287450,
         "yt_comments": 15900,
         "nc_views": 110995,
@@ -430,7 +400,7 @@
       },
       "prevRank": "NEW",
       "commentary": "",
-      "rank": 14
+      "rank": 13
     },
     {
       "song_id": "song_sm44317852",
@@ -439,11 +409,11 @@
       "vocal": "初音ミク",
       "youtube_id": "kbNdx0yqbZE",
       "niconico_id": "sm44317852",
-      "total_pt": 1115298,
-      "yt_total_pt": 972238,
+      "total_pt": 1115302,
+      "yt_total_pt": 972242,
       "nc_total_pt": 143060,
       "raw": {
-        "yt_views": 718988,
+        "yt_views": 718992,
         "yt_likes": 4901,
         "yt_comments": 82,
         "nc_views": 27268,
@@ -451,7 +421,7 @@
         "nc_comments": 42
       },
       "pts": {
-        "yt_views": 718988,
+        "yt_views": 718992,
         "yt_likes": 245050,
         "yt_comments": 8200,
         "nc_views": 136340,
@@ -460,7 +430,7 @@
       },
       "prevRank": "NEW",
       "commentary": "",
-      "rank": 15
+      "rank": 14
     },
     {
       "song_id": "song_sm46613085",
@@ -469,24 +439,54 @@
       "vocal": "初音ミク",
       "youtube_id": "TzH5BsJj81Y",
       "niconico_id": "sm46613085",
-      "total_pt": 1055146,
-      "yt_total_pt": 994296,
-      "nc_total_pt": 60850,
+      "total_pt": 1055281,
+      "yt_total_pt": 994426,
+      "nc_total_pt": 60855,
       "raw": {
-        "yt_views": 612446,
-        "yt_likes": 7119,
+        "yt_views": 612526,
+        "yt_likes": 7120,
         "yt_comments": 259,
-        "nc_views": 11442,
+        "nc_views": 11443,
         "nc_mylist": 33,
         "nc_comments": 34
       },
       "pts": {
-        "yt_views": 612446,
-        "yt_likes": 355950,
+        "yt_views": 612526,
+        "yt_likes": 356000,
         "yt_comments": 25900,
-        "nc_views": 57210,
+        "nc_views": 57215,
         "nc_mylist": 3300,
         "nc_comments": 340
+      },
+      "prevRank": "NEW",
+      "commentary": "",
+      "rank": 15
+    },
+    {
+      "song_id": "song_sm44301514",
+      "title": "テトリス",
+      "producer": "柊マグネタイト",
+      "vocal": "重音テト",
+      "youtube_id": "Soy4jGPHr3g",
+      "niconico_id": "sm44301514",
+      "total_pt": 1039468,
+      "yt_total_pt": 895123,
+      "nc_total_pt": 144345,
+      "raw": {
+        "yt_views": 703673,
+        "yt_likes": 3653,
+        "yt_comments": 88,
+        "nc_views": 27463,
+        "nc_mylist": 65,
+        "nc_comments": 53
+      },
+      "pts": {
+        "yt_views": 703673,
+        "yt_likes": 182650,
+        "yt_comments": 8800,
+        "nc_views": 137315,
+        "nc_mylist": 6500,
+        "nc_comments": 530
       },
       "prevRank": "NEW",
       "commentary": "",
@@ -499,22 +499,22 @@
       "vocal": "初音ミク",
       "youtube_id": "BBCRBlHT_Go",
       "niconico_id": "sm46887855",
-      "total_pt": 1039807,
-      "yt_total_pt": 870267,
-      "nc_total_pt": 169540,
+      "total_pt": 1039459,
+      "yt_total_pt": 869954,
+      "nc_total_pt": 169505,
       "raw": {
-        "yt_views": 265617,
-        "yt_likes": 11503,
+        "yt_views": 265554,
+        "yt_likes": 11498,
         "yt_comments": 295,
-        "nc_views": 26170,
+        "nc_views": 26163,
         "nc_mylist": 372,
         "nc_comments": 149
       },
       "pts": {
-        "yt_views": 265617,
-        "yt_likes": 575150,
+        "yt_views": 265554,
+        "yt_likes": 574900,
         "yt_comments": 29500,
-        "nc_views": 130850,
+        "nc_views": 130815,
         "nc_mylist": 37200,
         "nc_comments": 1490
       },
@@ -523,47 +523,17 @@
       "rank": 17
     },
     {
-      "song_id": "song_sm44301514",
-      "title": "テトリス",
-      "producer": "柊マグネタイト",
-      "vocal": "重音テト",
-      "youtube_id": "Soy4jGPHr3g",
-      "niconico_id": "sm44301514",
-      "total_pt": 1039465,
-      "yt_total_pt": 895120,
-      "nc_total_pt": 144345,
-      "raw": {
-        "yt_views": 703670,
-        "yt_likes": 3653,
-        "yt_comments": 88,
-        "nc_views": 27463,
-        "nc_mylist": 65,
-        "nc_comments": 53
-      },
-      "pts": {
-        "yt_views": 703670,
-        "yt_likes": 182650,
-        "yt_comments": 8800,
-        "nc_views": 137315,
-        "nc_mylist": 6500,
-        "nc_comments": 530
-      },
-      "prevRank": "NEW",
-      "commentary": "",
-      "rank": 18
-    },
-    {
       "song_id": "song_sm45964915",
       "title": "처형박수",
       "producer": "TRAP CHICK",
       "vocal": "重音テト",
       "youtube_id": "YcxhmHEykPg",
       "niconico_id": "sm45964915",
-      "total_pt": 1007907,
-      "yt_total_pt": 993697,
+      "total_pt": 1007918,
+      "yt_total_pt": 993708,
       "nc_total_pt": 14210,
       "raw": {
-        "yt_views": 674097,
+        "yt_views": 674108,
         "yt_likes": 5906,
         "yt_comments": 243,
         "nc_views": 2660,
@@ -571,7 +541,7 @@
         "nc_comments": 11
       },
       "pts": {
-        "yt_views": 674097,
+        "yt_views": 674108,
         "yt_likes": 295300,
         "yt_comments": 24300,
         "nc_views": 13300,
@@ -580,7 +550,7 @@
       },
       "prevRank": "NEW",
       "commentary": "",
-      "rank": 19
+      "rank": 18
     },
     {
       "song_id": "song_sm45768297",
@@ -589,11 +559,11 @@
       "vocal": "初音ミク・重音テト・亞北ネル",
       "youtube_id": "Dz5rALpx06M",
       "niconico_id": "sm45768297",
-      "total_pt": 888301,
-      "yt_total_pt": 845296,
+      "total_pt": 888321,
+      "yt_total_pt": 845316,
       "nc_total_pt": 43005,
       "raw": {
-        "yt_views": 591446,
+        "yt_views": 591466,
         "yt_likes": 4647,
         "yt_comments": 215,
         "nc_views": 8111,
@@ -601,12 +571,42 @@
         "nc_comments": 25
       },
       "pts": {
-        "yt_views": 591446,
+        "yt_views": 591466,
         "yt_likes": 232350,
         "yt_comments": 21500,
         "nc_views": 40555,
         "nc_mylist": 2200,
         "nc_comments": 250
+      },
+      "prevRank": "NEW",
+      "commentary": "",
+      "rank": 19
+    },
+    {
+      "song_id": "song_sm46374656",
+      "title": "승인해주세요 지니님!",
+      "producer": "트랩칙",
+      "vocal": "重音テト・音街ウナ",
+      "youtube_id": "XKZIQlqVjjk",
+      "niconico_id": "sm46374656",
+      "total_pt": 815081,
+      "yt_total_pt": 808301,
+      "nc_total_pt": 6780,
+      "raw": {
+        "yt_views": 535451,
+        "yt_likes": 5033,
+        "yt_comments": 212,
+        "nc_views": 1238,
+        "nc_mylist": 5,
+        "nc_comments": 9
+      },
+      "pts": {
+        "yt_views": 535451,
+        "yt_likes": 251650,
+        "yt_comments": 21200,
+        "nc_views": 6190,
+        "nc_mylist": 500,
+        "nc_comments": 90
       },
       "prevRank": "NEW",
       "commentary": "",
