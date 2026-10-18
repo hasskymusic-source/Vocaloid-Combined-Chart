@@ -3180,7 +3180,7 @@
     "title": "メテオラヴ/重音テト",
     "producer": "Jelly______",
     "vocal": "重音テト",
-    "youtube_id": "",
+    "youtube_id": "mrn5ePlvrug",
     "niconico_id": "sm46928401"
   },
   {
@@ -3277,6 +3277,54 @@
     "producer": "VIDEOMANCER",
     "vocal": "重音テト",
     "youtube_id": "NQt0HVyI-P0",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_sm23954284",
+    "title": "on the rocks",
+    "producer": "OSTER project",
+    "vocal": "MEIKO・KAITO",
+    "youtube_id": "LXt1jo57rKI",
+    "niconico_id": "sm23954284"
+  },
+  {
+    "song_id": "song_sm46936915",
+    "title": "秋足らず陽炎",
+    "producer": "myou",
+    "vocal": "重音テト",
+    "youtube_id": "",
+    "niconico_id": "sm46936915"
+  },
+  {
+    "song_id": "song_sm46769353",
+    "title": "アデニウム",
+    "producer": "カウロ",
+    "vocal": "初音ミク",
+    "youtube_id": "r8wZWBO0ngY",
+    "niconico_id": "sm46769353"
+  },
+  {
+    "song_id": "song_Qnyl4ktbc_A",
+    "title": "ループザルーム",
+    "producer": "現実逃避 - XUE",
+    "vocal": "初音ミク",
+    "youtube_id": "Qnyl4ktbc_A",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_Iq8UZTlaC9k",
+    "title": "いけたらいく",
+    "producer": "天野ハマル",
+    "vocal": "ずんだもん・重音テト",
+    "youtube_id": "Iq8UZTlaC9k",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_QmSGtY_aGy8",
+    "title": "憂鬱だね！/重音テト",
+    "producer": "そーる。-ボカロP",
+    "vocal": "重音テト",
+    "youtube_id": "QmSGtY_aGy8",
     "niconico_id": ""
   },
   {
@@ -3390,6 +3438,14 @@
     "vocal": "音街ウナ",
     "youtube_id": "LiKnXreq4JI",
     "niconico_id": ""
+  },
+  {
+    "song_id": "song_sm46936677",
+    "title": "待って！！！！うさぎ",
+    "producer": "クラッドインザラストライン",
+    "vocal": "VOCALOID",
+    "youtube_id": "HhzSCUJNHjY",
+    "niconico_id": "sm46936677"
   },
   {
     "song_id": "song_Ivjz6bKrFJk",
@@ -3640,20 +3696,20 @@
     "niconico_id": "sm46694295"
   },
   {
-    "song_id": "song_UKWmOb6iHBs",
-    "title": "Bengue Fengue",
-    "producer": "めめんともり-P",
-    "vocal": "VOCALOID",
-    "youtube_id": "UKWmOb6iHBs",
-    "niconico_id": ""
-  },
-  {
     "song_id": "song_sm46647939",
     "title": "スターダストレイン",
     "producer": "捨て垢",
     "vocal": "初音ミク",
     "youtube_id": "RIItBfZ6S3Q",
     "niconico_id": "sm46647939"
+  },
+  {
+    "song_id": "song_UKWmOb6iHBs",
+    "title": "Bengue Fengue",
+    "producer": "めめんともり-P",
+    "vocal": "VOCALOID",
+    "youtube_id": "UKWmOb6iHBs",
+    "niconico_id": ""
   },
   {
     "song_id": "song_V4HdD2Fu_64",
@@ -3944,12 +4000,20 @@
     "niconico_id": "sm46933839"
   },
   {
-    "song_id": "song_sm23954284",
-    "title": "on the rocks",
-    "producer": "OSTER project",
-    "vocal": "MEIKO・KAITO",
-    "youtube_id": "LXt1jo57rKI",
-    "niconico_id": "sm23954284"
+    "song_id": "song_sm46936223",
+    "title": "裏通りワンダーグランド",
+    "producer": "n0n0hara / ののはら",
+    "vocal": "裏命",
+    "youtube_id": "",
+    "niconico_id": "sm46936223"
+  },
+  {
+    "song_id": "song_sm46935395",
+    "title": "落園 (feat. 裏命)",
+    "producer": "_Asagi",
+    "vocal": "裏命",
+    "youtube_id": "CZTeGMKtDq0",
+    "niconico_id": "sm46935395"
   },
   {
     "song_id": "song_sm17520775",
@@ -3968,14 +4032,6 @@
     "niconico_id": "sm15751190"
   },
   {
-    "song_id": "song_sm46934320",
-    "title": "ヴィラン",
-    "producer": "れり",
-    "vocal": "初音ミク",
-    "youtube_id": "Xr6SjgoarYo",
-    "niconico_id": "sm46934320"
-  },
-  {
     "song_id": "song_sm38835941",
     "title": "偽物人間40号",
     "producer": "¿?shimon",
@@ -3984,12 +4040,28 @@
     "niconico_id": "sm38835941"
   },
   {
-    "song_id": "song_sm46936915",
-    "title": "秋足らず陽炎",
-    "producer": "myou",
-    "vocal": "重音テト",
+    "song_id": "song_sm46934320",
+    "title": "ヴィラン",
+    "producer": "れり",
+    "vocal": "初音ミク",
+    "youtube_id": "Xr6SjgoarYo",
+    "niconico_id": "sm46934320"
+  },
+  {
+    "song_id": "song_sm45571052",
+    "title": "ワルツ・ロサ・テスタロッサ",
+    "producer": "nyanyannya",
+    "vocal": "神威がくぽ",
+    "youtube_id": "403XN7xT9ZA",
+    "niconico_id": "sm45571052"
+  },
+  {
+    "song_id": "song_sm46935820",
+    "title": "FLostBite",
+    "producer": "Imi°",
+    "vocal": "GUMI",
     "youtube_id": "",
-    "niconico_id": "sm46936915"
+    "niconico_id": "sm46935820"
   },
   {
     "song_id": "song_sm32906820",
@@ -4008,22 +4080,6 @@
     "niconico_id": "sm46907113"
   },
   {
-    "song_id": "song_sm45571052",
-    "title": "ワルツ・ロサ・テスタロッサ",
-    "producer": "nyanyannya",
-    "vocal": "神威がくぽ",
-    "youtube_id": "403XN7xT9ZA",
-    "niconico_id": "sm45571052"
-  },
-  {
-    "song_id": "song_sm46769353",
-    "title": "アデニウム",
-    "producer": "カウロ",
-    "vocal": "初音ミク",
-    "youtube_id": "r8wZWBO0ngY",
-    "niconico_id": "sm46769353"
-  },
-  {
     "song_id": "song_sm40700016",
     "title": "海のサーチライト",
     "producer": "子牛",
@@ -4040,14 +4096,6 @@
     "niconico_id": "sm39374094"
   },
   {
-    "song_id": "song_sm31791630",
-    "title": "アンノウン・マザーグース",
-    "producer": "wowaka, ヒトリエ",
-    "vocal": "初音ミク",
-    "youtube_id": "P_CSdxSGfaA",
-    "niconico_id": "sm31791630"
-  },
-  {
     "song_id": "song_sm46933442",
     "title": "Day by Day",
     "producer": "さんま",
@@ -4056,20 +4104,36 @@
     "niconico_id": "sm46933442"
   },
   {
-    "song_id": "song_sm46843617",
-    "title": "Desktop♡Princess",
-    "producer": "きさら",
+    "song_id": "song_sm44044139",
+    "title": "echo",
+    "producer": "higma, Terufumi Miyazaki",
     "vocal": "初音ミク",
-    "youtube_id": "mZxDjbWrTbw",
-    "niconico_id": "sm46843617"
+    "youtube_id": "86LKuj-DK04",
+    "niconico_id": "sm44044139"
   },
   {
-    "song_id": "song_sm46253942",
-    "title": "magnet -recall-",
-    "producer": "湊貴大",
-    "vocal": "初音ミク・巡音ルカ",
-    "youtube_id": "cf1ryWClGpU",
-    "niconico_id": "sm46253942"
+    "song_id": "song_sm31791630",
+    "title": "アンノウン・マザーグース",
+    "producer": "wowaka, ヒトリエ",
+    "vocal": "初音ミク",
+    "youtube_id": "P_CSdxSGfaA",
+    "niconico_id": "sm31791630"
+  },
+  {
+    "song_id": "song_sm46935252",
+    "title": "音速ポメfeat.重音テト",
+    "producer": "たるぱたゃ",
+    "vocal": "重音テト",
+    "youtube_id": "",
+    "niconico_id": "sm46935252"
+  },
+  {
+    "song_id": "song_sm46936268",
+    "title": "floweragain (Lyricvideo)",
+    "producer": "黒木　まと",
+    "vocal": "初音ミク・重音テト・v_flower",
+    "youtube_id": "",
+    "niconico_id": "sm46936268"
   },
   {
     "song_id": "song_sm46932833",
@@ -4080,36 +4144,12 @@
     "niconico_id": "sm46932833"
   },
   {
-    "song_id": "song_Qnyl4ktbc_A",
-    "title": "ループザルーム",
-    "producer": "現実逃避 - XUE",
-    "vocal": "初音ミク",
-    "youtube_id": "Qnyl4ktbc_A",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_Iq8UZTlaC9k",
-    "title": "いけたらいく",
-    "producer": "天野ハマル",
-    "vocal": "ずんだもん・重音テト",
-    "youtube_id": "Iq8UZTlaC9k",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_QmSGtY_aGy8",
-    "title": "憂鬱だね！/重音テト",
-    "producer": "そーる。-ボカロP",
-    "vocal": "重音テト",
-    "youtube_id": "QmSGtY_aGy8",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_sm45315722",
-    "title": "見つかんない！",
-    "producer": "柏木カレキ",
-    "vocal": "重音テト・知声",
-    "youtube_id": "zYaIsSwG2RU",
-    "niconico_id": "sm45315722"
+    "song_id": "song_sm46936753",
+    "title": "宮舞モカ",
+    "producer": "Yocha2K",
+    "vocal": "宮舞モカ",
+    "youtube_id": "-GM4vNiz_Ho",
+    "niconico_id": "sm46936753"
   },
   {
     "song_id": "song_sm44677326",
@@ -4136,11 +4176,51 @@
     "niconico_id": "sm46712665"
   },
   {
-    "song_id": "song_sm46119643",
-    "title": "Cứ Thế (What Can I Say)",
-    "producer": "Anh Duy",
+    "song_id": "song_0j1-8vQ0IBM",
+    "title": "a chud like me",
+    "producer": "Pizza-P!",
     "vocal": "重音テト",
-    "youtube_id": "2G05MJETKkc",
-    "niconico_id": "sm46119643"
+    "youtube_id": "0j1-8vQ0IBM",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_kzeYu8qM4gc",
+    "title": "Never Wanted Love",
+    "producer": "Aku P",
+    "vocal": "VOCALOID",
+    "youtube_id": "kzeYu8qM4gc",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_fDbKfJ5bLSw",
+    "title": "BAD@ENGLISH",
+    "producer": "Ani Meida",
+    "vocal": "鏡音リン",
+    "youtube_id": "fDbKfJ5bLSw",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_pCBsTpu23Xc",
+    "title": "LITTLE MORE",
+    "producer": "OOyster",
+    "vocal": "重音テト",
+    "youtube_id": "pCBsTpu23Xc",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_pQ934-3zEyo",
+    "title": "Catch You",
+    "producer": "Zoofles",
+    "vocal": "足立レイ",
+    "youtube_id": "pQ934-3zEyo",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_O8uA0HpZ4xE",
+    "title": "パパのオープンカー feat.歌愛ユキ",
+    "producer": "せなすけ",
+    "vocal": "歌愛ユキ",
+    "youtube_id": "O8uA0HpZ4xE",
+    "niconico_id": ""
   }
 ]
