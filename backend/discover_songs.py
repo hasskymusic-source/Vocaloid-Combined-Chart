@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, timezone
 from googleapiclient.discovery import build
 from config import MASTER_FILE, LATEST_SNAPSHOT
 
-USER_AGENT = "Mozilla/5.0 (compatible; VocaloidCombinedChartBot/6.0)"
+USER_AGENT = "Mozilla/5.0 (compatible; VocaloidCombinedChartBot/7.0)"
 
 VOCAL_SYNONYMS = {
     "初音ミク": ["初音ミク", "하츠네 미쿠", "hatsune miku", "miku"],
@@ -33,7 +33,9 @@ VOCAL_SYNONYMS = {
     "UNI": ["uni", "유니"]
 }
 
+# 【防衛ロック1】非楽曲コンテンツ（旅行・車載・トーク・実況・料理・MMD・Shorts等）を完全排除するNGワード
 NG_KEYWORDS = [
+    # 歌ってみた・二次創作・Shorts
     "歌ってみた", "踊ってみた", "演奏してみた", "叩いてみた", "弾いてみた",
     "切り抜き", "まとめ", "メドレー", "カラオケ", "off vocal", "instrumental",
     "reaction", "リアクション", "プロセカ", "プロジェクトセカイ", "譜面",
@@ -42,7 +44,26 @@ NG_KEYWORDS = [
     "マイクラ", "マインクラフト", "minecraft", "再現", "レッドストーン", "音ブロック",
     "同時視聴", "初見", "配信", "live", "ライブ", "チャンネル登録", "万人ありがとう",
     "#shorts", "shorts", "ショート", "tiktok", "違い", "感性プレイ", "ホロドリ", "藤井風",
-    "cover", "covered by", "커버", "불러보았다", "piano tutorial", "sheet music"
+    "cover", "covered by", "커버", "불러보았다", "piano tutorial", "sheet music",
+    # 合成音声トーク・旅行・車載・実況・劇場系（今回の「歩道」のような動画を100%遮断）
+    "旅行", "車載", "散歩", "ツーリング", "ドライブ", "鉄道", "夜景", "ゲートブリッジ",
+    "行ってみた", "行ってみない", "食べてみた", "作ってみた", "描いてみた", "買ってみた",
+    "ソフトウェアトーク", "voiceroid", "voicepeak", "a.i.voice", "ボイロ", "ゆっくり",
+    "実況", "プレイ動画", "ゲーム実況", "料理", "キッチン", "劇場", "茶番", "ラジオ", "雑談",
+    "重音テトが行く", "講座", "検証", "紹介", "レビュー", "ニュース"
+]
+
+# 【防衛ロック2】ニコニコ動画で「ボカロ楽曲」と認めるための必須音楽タグ群
+# （単なる「重音テト」等のキャラ名タグしかない旅行・トーク動画はここで100%弾かれる）
+REQUIRED_MUSIC_INDICATORS = [
+    "vocaloid", "ボカロ", "보컬로이드", "ボカロオリジナル曲", "オリジナル曲",
+    "synthesizerv", "synthesizer_v", "synthesizer v", "synthv",
+    "synthesizervオリジナル曲", "utauオリジナル曲", "cevioオリジナル曲", "voicevoxオリジナル曲",
+    "ミクオリジナル曲", "テトオリジナル曲", "重音テトsv", "可不オリジナル曲", "gumiオリジナル曲",
+    "リンオリジナル曲", "レンオリジナル曲", "ルカオリジナル曲", "flowerオリジナル曲",
+    "ユキオリジナル曲", "レイオリジナル曲", "ウナオリジナル曲", "ゆかりオリジナル曲",
+    "vocarock", "ボカコレ", "vocacolle", "vocaloid新曲リンク", "vocaloid殿堂入り", "vocaloid伝説入り",
+    "music video", "official mv", "【mv】", "[mv]"
 ]
 
 META_BRACKET_RE = re.compile(
@@ -74,31 +95,58 @@ def detect_vocals(text: str) -> str:
                 break
     return "・".join(dict.fromkeys(found))[:25] if found else "VOCALOID"
 
-def is_valid_vocaloid_mv(title: str, description: str = "", tags: str = "", duration_sec: int = 180) -> bool:
+def is_valid_vocaloid_mv(
+    title: str,
+    description: str = "",
+    tags: str = "",
+    duration_sec: int = 180,
+    is_niconico: bool = False,
+    yt_category_id: str = "10"
+) -> bool:
+    """
+    ボーカロイド楽曲（オリジナルMV）かどうかを厳格に判定するシステム
+    """
+    # 1. 再生時間チェック（90秒未満のShorts・ジングル、420秒超のトーク・配信・まとめを除外）
     if duration_sec < 90 or duration_sec > 420:
         return False
+
     t_low = title.lower()
     d_low = description.lower()
     tags_low = tags.lower()
 
+    # 2. タイトル・タグに非楽曲ワード（旅行・車載・トーク・実況・MMD・カバー等）があれば即除外
     for ng in NG_KEYWORDS:
         if ng in t_low or ng in tags_low:
             return False
+
     if "#shorts" in d_low or "mikumikudance" in d_low or "yyb式" in d_low or "tda式" in d_low:
         return False
 
+    # 3. ニコニコ動画の場合：キャラ名だけでなく「ボカロ音楽系タグ」の含有を必須とする
+    title_and_tags_low = f"{t_low} {tags_low}"
+    if is_niconico:
+        has_music_tag = any(ind in title_and_tags_low for ind in REQUIRED_MUSIC_INDICATORS)
+        if not has_music_tag:
+            return False
+
+    # 4. YouTubeの場合：ゲーム実況(20)・ブログ(22)・旅行(19)・エンタメ雑談等で音楽指標がないものを除外
+    if not is_niconico and yt_category_id not in ["10", ""]:
+        if not any(ind in f"{t_low} {tags_low} {d_low[:200]}" for ind in REQUIRED_MUSIC_INDICATORS):
+            return False
+
+    # 5. 合成音声キャラクターまたは歌声合成エンジンの存在確認
     combined_low = f"{title} {tags} {description[:300]}".lower()
     has_vocal = any(
         syn.lower() in combined_low
         for syns in VOCAL_SYNONYMS.values()
         for syn in syns
     ) or any(
-        k in combined_low for k in ["vocaloid", "ボカロ", "보컬로이드", "synthesizer v", "synthv", "cevio", "utau", "voicevox"]
+        k in combined_low for k in ["vocaloid", "ボカロ", "보컬로이드", "synthesizer v", "synthv", "cevio", "utau"]
     )
     return has_vocal
 
 def normalize_compare_str(s: str) -> str:
-    return re.sub(r"[\s\*\-\_・／/!！?？'\"pPチャンネルchannelofficialmv]", "", s.lower())
+    return re.sub(r"[\s\*\-\_・／/!！?？'\"「」『』【】\[\]()（）pPチャンネルchannelofficialmvpv]", "", s.lower())
 
 def clean_song_title(raw_title: str, producer: str = "") -> str:
     t = raw_title.strip()
@@ -118,10 +166,13 @@ def clean_song_title(raw_title: str, producer: str = "") -> str:
         return f" 「{inner}」 "
 
     t = re.sub(r"[『「]([^』」]+)[』」]", replace_quotes, t)
+
+    # カギ括弧の抽出は「ハチ MV「砂の惑星」」のように括弧以外の残り文字が短い（ボカロP名やMV表記のみの）場合だけに限定
     quoted_titles = re.findall(r"「([^」]+)」", t)
     if len(quoted_titles) == 1 and len(quoted_titles[0]) >= 2:
         cand = quoted_titles[0].strip()
-        if not META_BRACKET_RE.match(cand):
+        outside = re.sub(r"「[^」]+」", "", t).strip()
+        if len(outside) <= 12 and not META_BRACKET_RE.match(cand):
             return cand
 
     t = t.replace("「", "").replace("」", "")
@@ -150,14 +201,11 @@ def clean_song_title(raw_title: str, producer: str = "") -> str:
     t = re.sub(r"\s*(?:オリジナル曲PV|オリジナル曲|オリジナルPV|Official\s*MV|Music\s*Video|MV|PV)$", "", t, flags=re.IGNORECASE)
     return t.strip() or raw_title.strip()
 
-# =====================================================================
-# クォータ消費ゼロのマルチソース探索＆双方向ID解決関数群
-# =====================================================================
-
 def extract_vocadb_song_info(data: dict) -> dict:
     if not data or not isinstance(data, dict):
         return {}
-    if data.get("songType", "") not in ["Original", "Remaster", "Remix", ""]:
+    # カバーやドラマPV等を弾き、純粋なオリジナル曲のみに限定
+    if data.get("songType", "") not in ["Original", "Remaster", "Remix"]:
         return {}
 
     yt_id = ""
@@ -198,15 +246,9 @@ def lookup_vocadb_by_pv(service: str, pv_id: str) -> dict:
     return {}
 
 def crawl_vocadb_global_and_domestic() -> list:
-    """
-    【コレクター1】VocaDB APIから直近14日・45日・120日・365日・全期間で
-    高評価を得ている全世界（日・韓・英・中等）のボカロオリジナル曲を一括取得（クォータ消費0）
-    """
     results = []
     now = datetime.now(timezone.utc)
-    windows = [14, 45, 120, 365, 1800]
-
-    for days in windows:
+    for days in [14, 45, 120, 365, 1800]:
         after_str = (now - timedelta(days=days)).strftime("%Y-%m-%dT00:00:00Z")
         params = {
             "songTypes": "Original",
@@ -224,8 +266,7 @@ def crawl_vocadb_global_and_domestic() -> list:
                 timeout=12
             )
             if res.status_code == 200:
-                items = res.json().get("items", [])
-                for item in items:
+                for item in res.json().get("items", []):
                     info = extract_vocadb_song_info(item)
                     if info and (info.get("youtube_id") or info.get("niconico_id")):
                         results.append(info)
@@ -236,20 +277,18 @@ def crawl_vocadb_global_and_domestic() -> list:
     return results
 
 def crawl_niconico_comprehensive() -> list:
-    """
-    【コレクター2】ニコニコ動画スナップショットAPI & RSSから
-    直近7日・14日・30日・90日・全期間の急上昇ボカロ曲を網羅取得
-    """
+    """音楽・ボカロオリジナル曲タグに厳格限定してニコ動トレンドを収集"""
     nc_ids = []
     headers = {"User-Agent": USER_AGENT}
 
+    # 単なる「重音テト」タグ（旅行・トーク動画が混じる）を廃止し、音楽タグのみを巡回
     rss_urls = [
         "https://www.nicovideo.jp/tag/VOCALOID?sort=h&rss=2.0&lang=ja-jp",
         "https://www.nicovideo.jp/tag/VOCALOID?sort=m&order=d&rss=2.0&lang=ja-jp",
         "https://www.nicovideo.jp/tag/%E3%83%9C%E3%82%AB%E3%83%AD%E3%82%AA%E3%83%AA%E3%82%B8%E3%83%8A%E3%83%AB%E6%9B%B2?sort=h&rss=2.0&lang=ja-jp",
-        "https://www.nicovideo.jp/tag/%E5%88%9D%E9%9F%B3%E3%83%9F%E3%82%AF?sort=h&rss=2.0&lang=ja-jp",
-        "https://www.nicovideo.jp/tag/%E9%87%8D%E9%9F%B3%E3%83%86%E3%83%88?sort=h&rss=2.0&lang=ja-jp",
-        "https://www.nicovideo.jp/tag/SynthesizerV?sort=h&rss=2.0&lang=ja-jp"
+        "https://www.nicovideo.jp/tag/%E3%83%9F%E3%82%AF%E3%82%AA%E3%83%AA%E3%82%B8%E3%83%8A%E3%83%AB%E6%9B%B2?sort=h&rss=2.0&lang=ja-jp",
+        "https://www.nicovideo.jp/tag/%E3%83%86%E3%83%88%E3%82%AA%E3%83%AA%E3%82%B8%E3%83%8A%E3%83%AB%E6%9B%B2?sort=h&rss=2.0&lang=ja-jp",
+        "https://www.nicovideo.jp/tag/SynthesizerV%E3%82%AA%E3%83%AA%E3%82%B8%E3%83%8A%E3%83%AB%E6%9B%B2?sort=h&rss=2.0&lang=ja-jp"
     ]
     for r_url in rss_urls:
         try:
@@ -274,12 +313,11 @@ def crawl_niconico_comprehensive() -> list:
         {"_sort": "-mylistCounter", "filters[startTime][gte]": d14, "_limit": 50},
         {"_sort": "-viewCounter", "filters[startTime][gte]": d35, "_limit": 50},
         {"_sort": "-viewCounter", "filters[startTime][gte]": d120, "_limit": 50},
-        {"_sort": "-viewCounter", "_limit": 50}
     ]
     for sp in snap_plans:
         params = {
-            "q": "VOCALOID OR 初音ミク OR 重音テト OR SynthesizerV OR 可不",
-            "targets": "tags",
+            "q": "VOCALOID OR ボカロオリジナル曲 OR SynthesizerVオリジナル曲 OR テトオリジナル曲",
+            "targets": "tagsExact",
             "fields": "contentId",
             "_context": "VocaloidCombinedChartBot",
             **sp
@@ -297,41 +335,48 @@ def crawl_niconico_comprehensive() -> list:
     print(f"ニコニコ動画 マルチ期間トレンド収集: {len(nc_ids)} 件取得")
     return nc_ids[:160]
 
-def search_youtube_id_web_zero_quota(query: str, target_title: str = "") -> str:
+def search_youtube_id_web_strict(target_title: str, target_producer: str, existing_yt_ids: set) -> str:
     """
-    【クォータ消費ゼロ】YouTubeのWeb検索結果(ytInitialData)から直接videoIdを抽出する。
-    YouTube Data APIのsearch.list(100ユニット)を使わずに無制限に公式MVのIDを特定可能。
+    【防衛ロック3】無条件フォールバック(matches[0][0])を完全撤廃。
+    タイトルとボカロP名が厳密に整合し、かつ他曲で使われていないYouTube IDのみを返す。
     """
+    norm_title = normalize_compare_str(target_title)
+    norm_prod = normalize_compare_str(target_producer)
+    if len(norm_title) < 2:
+        return ""
+
     url = "https://www.youtube.com/results"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         "Accept-Language": "ja-JP,ja;q=0.9,en-US;q=0.8,en;q=0.7"
     }
+    query = f'"{target_title}" {target_producer} MV'
     try:
         res = requests.get(url, params={"search_query": query}, headers=headers, timeout=10)
         if res.status_code == 200:
-            # videoRendererブロックから videoId と title を抽出
             matches = re.findall(
                 r'"videoRenderer":\{"videoId":"([A-Za-z0-9_-]{11})".*?"title":\{"runs":\[\{"text":"([^"]+)"',
                 res.text
             )
-            norm_target = normalize_compare_str(target_title) if target_title else ""
             for vid, vtitle in matches[:5]:
-                v_low = vtitle.lower()
-                if any(ng in v_low for ng in ["歌ってみた", "cover", "カラオケ", "#shorts", "mmd", "マイクラ", "1 hour", "耐久"]):
+                # すでに他の曲に登録されているYouTube IDは絶対に割り当てない（肆足歩行ハイジャック防止）
+                if vid in existing_yt_ids:
                     continue
-                if not norm_target or norm_target in normalize_compare_str(vtitle) or normalize_compare_str(vtitle) in norm_target:
+                v_low = vtitle.lower()
+                if any(ng in v_low for ng in NG_KEYWORDS):
+                    continue
+                norm_vtitle = normalize_compare_str(vtitle)
+                # 曲名が動画タイトルに完全に含まれていることを必須化
+                if norm_title in norm_vtitle:
+                    # 2文字以下の短い曲名の場合は、ボカロP名もタイトルに含まれていることを必須化
+                    if len(norm_title) <= 2 and norm_prod and norm_prod not in norm_vtitle:
+                        continue
                     return vid
-            if matches:
-                return matches[0][0]
     except Exception:
         pass
     return ""
 
 def crawl_youtube_multilingual_zero_quota() -> list:
-    """
-    【コレクター3】日・韓・英の多言語キーワードでYouTube Web検索から急上昇ボカロMVのvideoIdを直接収集
-    """
     queries = [
         "初音ミク Official MV -歌ってみた -cover -shorts",
         "重音テト Official MV -歌ってみた -cover -shorts",
@@ -351,7 +396,6 @@ def crawl_youtube_multilingual_zero_quota() -> list:
     yt_ids = []
     for q in queries:
         try:
-            # sp=CAMSAhAB はYouTubeの「視聴回数順・動画のみ」フィルタでも動作するが標準検索と併用
             res = requests.get("https://www.youtube.com/results", params={"search_query": q}, headers=headers, timeout=10)
             if res.status_code == 200:
                 vids = re.findall(r'"videoRenderer":\{"videoId":"([A-Za-z0-9_-]{11})"', res.text)
@@ -390,28 +434,66 @@ def get_niconico_thumbinfo(nc_id: str) -> dict:
         pass
     return {}
 
-def search_niconico_by_title(title: str, producer: str) -> str:
-    headers = {"User-Agent": USER_AGENT}
-    try:
-        q_enc = urllib.parse.quote(f"{title} {producer}".strip())
-        res = requests.get(
-            f"https://www.nicovideo.jp/search/{q_enc}",
-            params={"sort": "v", "order": "d", "rss": "2.0"},
-            headers=headers,
-            timeout=8
-        )
-        if res.status_code == 200:
-            root = ET.fromstring(res.text)
-            for item in root.findall("./channel/item")[:3]:
-                t_cand = item.findtext("title", "")
-                link = item.findtext("link", "")
-                if normalize_compare_str(title) in normalize_compare_str(t_cand):
-                    m = NC_ID_PATTERN.search(link)
-                    if m:
-                        return m.group(1)
-    except Exception:
-        pass
-    return ""
+def verify_and_purge_existing_pool(youtube, raw_items: list) -> list:
+    """
+    【防衛ロック5】既存データの総点検＆汚染データ自動パージ
+    1. ニコ動IDを持つ曲は getthumbinfo でタグを再検証し、旅行動画・トーク動画等を完全削除
+    2. 同じ youtube_id が複数の曲に重複割り当てされている場合、タイトルが一致しない偽物を削除
+    """
+    yt_ids = list(dict.fromkeys([x.get("youtube_id") for x in raw_items if x.get("youtube_id")]))
+    yt_meta = {}
+    for i in range(0, len(yt_ids), 50):
+        chunk = yt_ids[i:i+50]
+        try:
+            res = youtube.videos().list(part="snippet,contentDetails", id=",".join(chunk)).execute()
+            for item in res.get("items", []):
+                yt_meta[item["id"]] = item
+        except Exception:
+            pass
+
+    verified = []
+    for item in raw_items:
+        yid = (item.get("youtube_id") or "").strip()
+        nid = (item.get("niconico_id") or "").strip()
+        title = item.get("title", "")
+
+        # ニコ動側の再検証（旅行動画「歩道」などはここで音楽タグ不在＆NGワードにより確実に削除される）
+        if nid:
+            nc_info = get_niconico_thumbinfo(nid)
+            if nc_info:
+                if not is_valid_vocaloid_mv(
+                    nc_info["title"], nc_info["description"], nc_info["tags"],
+                    nc_info["duration_sec"], is_niconico=True
+                ):
+                    print(f"非楽曲ニコ動エントリをパージしました: {nc_info['title']} ({nid})")
+                    continue
+
+        # YouTube側の再検証（カテゴリ・動画尺・タイトル整合性チェック）
+        if yid and yid in yt_meta:
+            y_item = yt_meta[yid]
+            snippet = y_item.get("snippet", {})
+            dur_sec = parse_iso_duration_seconds(y_item.get("contentDetails", {}).get("duration", ""))
+            cat_id = snippet.get("categoryId", "10")
+            y_title = snippet.get("title", "")
+            y_desc = snippet.get("description", "")
+            y_tags = " ".join(snippet.get("tags", []))
+
+            if not is_valid_vocaloid_mv(y_title, y_desc, y_tags, dur_sec, is_niconico=False, yt_category_id=cat_id):
+                print(f"非楽曲YouTubeエントリをパージしました: {y_title} ({yid})")
+                continue
+
+            # もしニコ動曲なのにYouTubeタイトルと曲名が全くかすりもしない（誤結合）ならYouTube IDを剥奪
+            if nid and title:
+                norm_t = normalize_compare_str(title)
+                norm_yt = normalize_compare_str(y_title)
+                if len(norm_t) >= 2 and norm_t not in norm_yt and norm_yt not in norm_t:
+                    vdb = lookup_vocadb_by_pv("NicoNicoDouga", nid)
+                    if vdb.get("youtube_id") != yid:
+                        print(f"不正なYouTube紐付けを解除しました: {title} != {y_title}")
+                        item["youtube_id"] = ""
+
+        verified.append(item)
+    return verified
 
 def main():
     api_key = os.environ.get("YOUTUBE_API_KEY")
@@ -421,17 +503,25 @@ def main():
 
     youtube = build("youtube", "v3", developerKey=api_key)
 
-    # =================================================================
-    # Step 1: 既存マスター＆過去スナップショットからの「非破壊読み込み」
-    # （過去に一度でも取得できた youtube_id / niconico_id を絶対に失わない）
-    # =================================================================
+    raw_loaded = []
+    for path in [MASTER_FILE, LATEST_SNAPSHOT]:
+        if path.exists():
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    raw_loaded.extend(json.load(f))
+            except Exception:
+                pass
+
+    # Step 1: 既存プールの汚染データ（「歩道」等の非楽曲や重複ID）を自動パージ
+    verified_existing = verify_and_purge_existing_pool(youtube, raw_loaded)
+
     pool = []
     by_yt = {}
     by_nc = {}
     by_tp = {}
 
     def upsert_song(entry: dict):
-        """非破壊マージ関数：既存の非空IDを絶対に空文字で上書きしない"""
+        """【防衛ロック4】ID一意性制約付きマージ：他曲で使用済みのYouTube IDの横取りを完全防止"""
         yid = (entry.get("youtube_id") or "").strip()
         nid = (entry.get("niconico_id") or "").strip()
         title = clean_song_title(entry.get("title", ""), entry.get("producer", ""))
@@ -451,17 +541,25 @@ def main():
             target = by_tp[tp_key]
 
         if target is not None:
-            # 既存エントリに欠けているIDがあれば補完（すでにあるIDは絶対に消さない）
-            if yid and not target.get("youtube_id"):
+            # 他の曲で使われていないIDのみを補完
+            if yid and not target.get("youtube_id") and yid not in by_yt:
                 target["youtube_id"] = yid
                 by_yt[yid] = target
-            if nid and not target.get("niconico_id"):
+            if nid and not target.get("niconico_id") and nid not in by_nc:
                 target["niconico_id"] = nid
                 by_nc[nid] = target
             if title and (not target.get("title") or target["title"] == target.get("producer")):
                 target["title"] = title
             if producer and producer != "ボカロP" and target.get("producer") == "ボカロP":
                 target["producer"] = producer
+            return
+
+        # 新規追加時、もし yid が既に別曲で使われていたら yid を無効化
+        if yid and yid in by_yt:
+            yid = ""
+        if nid and nid in by_nc:
+            nid = ""
+        if not yid and not nid:
             return
 
         new_item = {
@@ -480,29 +578,21 @@ def main():
         if tp_key:
             by_tp[tp_key] = new_item
 
-    # 既存の songs_master.json と latest_monday.json の両方からID資産を復元
-    for path in [MASTER_FILE, LATEST_SNAPSHOT]:
-        if path.exists():
-            try:
-                with open(path, "r", encoding="utf-8") as f:
-                    for item in json.load(f):
-                        upsert_song(item)
-            except Exception:
-                pass
+    for item in verified_existing:
+        upsert_song(item)
 
-    # =================================================================
-    # Step 2: 3大コレクターから国内外のトレンド候補曲を網羅収集
-    # =================================================================
-    # コレクター1: VocaDB グローバル＆国内トレンド
+    # Step 2: 3大コレクターから収集
     for v_item in crawl_vocadb_global_and_domestic():
         upsert_song(v_item)
 
-    # コレクター2: ニコニコ動画 マルチ期間トレンド
     nc_candidates = crawl_niconico_comprehensive()
     new_nc_ids = [cid for cid in nc_candidates if cid not in by_nc]
     for cid in new_nc_ids:
         nc_info = get_niconico_thumbinfo(cid)
-        if not nc_info or not is_valid_vocaloid_mv(nc_info["title"], nc_info["description"], nc_info["tags"], nc_info["duration_sec"]):
+        if not nc_info or not is_valid_vocaloid_mv(
+            nc_info["title"], nc_info["description"], nc_info["tags"],
+            nc_info["duration_sec"], is_niconico=True
+        ):
             continue
         vdb = lookup_vocadb_by_pv("NicoNicoDouga", cid)
         producer = vdb.get("producer") or nc_info["producer"] or "ボカロP"
@@ -523,7 +613,6 @@ def main():
             "niconico_id": cid
         })
 
-    # コレクター3: YouTube 日・韓・英マルチリンガル探索（50件ずつ videos.list で検証、1回1ユニット）
     yt_candidates = crawl_youtube_multilingual_zero_quota()
     new_yt_ids = [vid for vid in yt_candidates if vid not in by_yt]
     for i in range(0, len(new_yt_ids), 50):
@@ -534,12 +623,13 @@ def main():
                 vid = item["id"]
                 snippet = item.get("snippet", {})
                 dur_sec = parse_iso_duration_seconds(item.get("contentDetails", {}).get("duration", ""))
+                cat_id = snippet.get("categoryId", "10")
                 raw_title = snippet.get("title", "")
                 desc = snippet.get("description", "")
                 tags = " ".join(snippet.get("tags", []))
                 channel = snippet.get("channelTitle", "ボカロP")
 
-                if not is_valid_vocaloid_mv(raw_title, desc, tags, dur_sec):
+                if not is_valid_vocaloid_mv(raw_title, desc, tags, dur_sec, is_niconico=False, yt_category_id=cat_id):
                     continue
 
                 vdb = lookup_vocadb_by_pv("Youtube", vid)
@@ -563,39 +653,34 @@ def main():
         except Exception as e:
             print(f"YouTube multilingual batch check error: {e}")
 
-    # =================================================================
-    # Step 3: プール内の「片側ID未特定曲」をクォータ消費ゼロで徹底補完
-    # （『ご主人様、ロックのお時間にございます』等のYouTube ID欠損を100%解消）
-    # =================================================================
+    # Step 3: 片側IDの厳格補完（重複ID割り当て禁止＆タイトル一致必須）
     repaired_count = 0
     for song in pool:
         yid = song.get("youtube_id", "")
         nid = song.get("niconico_id", "")
 
-        # ニコ動IDはあるがYouTube IDが空欄の場合 -> VocaDB -> 説明文 -> Web検索で確実に特定
         if nid and not yid:
             vdb = lookup_vocadb_by_pv("NicoNicoDouga", nid)
-            yid = vdb.get("youtube_id", "")
-            if not yid:
+            cand_yid = vdb.get("youtube_id", "")
+            if not cand_yid:
                 nc_info = get_niconico_thumbinfo(nid)
                 if nc_info:
                     m = YT_ID_PATTERN.search(nc_info["description"])
                     if m:
-                        yid = m.group(1)
-            if not yid and song.get("title"):
-                yid = search_youtube_id_web_zero_quota(f"{song['title']} {song['producer']} MV", song["title"])
-            if yid:
-                song["youtube_id"] = yid
-                by_yt[yid] = song
+                        cand_yid = m.group(1)
+            if not cand_yid and song.get("title"):
+                cand_yid = search_youtube_id_web_strict(song["title"], song["producer"], set(by_yt.keys()))
+            if cand_yid and cand_yid not in by_yt:
+                song["youtube_id"] = cand_yid
+                by_yt[cand_yid] = song
                 repaired_count += 1
 
-        # YouTube IDはあるがニコ動IDが空欄の場合 -> VocaDB照会
         elif yid and not nid:
             vdb = lookup_vocadb_by_pv("Youtube", yid)
-            nid = vdb.get("niconico_id", "")
-            if nid:
-                song["niconico_id"] = nid
-                by_nc[nid] = song
+            cand_nid = vdb.get("niconico_id", "")
+            if cand_nid and cand_nid not in by_nc:
+                song["niconico_id"] = cand_nid
+                by_nc[cand_nid] = song
                 repaired_count += 1
 
     MASTER_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -603,7 +688,7 @@ def main():
         json.dump(pool, f, ensure_ascii=False, indent=2)
 
     both_paired = sum(1 for s in pool if s.get("youtube_id") and s.get("niconico_id"))
-    print(f"網羅トラッキングプール更新完了: 全 {len(pool)} 曲 (うち両サイトID特定済: {both_paired} 曲 / 今回自動修復: {repaired_count} 曲)")
+    print(f"厳格検証プール更新完了: 全 {len(pool)} 曲 (両サイトペア済: {both_paired} 曲 / 新規補完: {repaired_count} 曲)")
 
 if __name__ == "__main__":
     main()

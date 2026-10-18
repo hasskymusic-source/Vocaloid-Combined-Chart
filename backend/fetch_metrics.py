@@ -6,10 +6,10 @@ import xml.etree.ElementTree as ET
 import requests
 from datetime import datetime, timedelta
 from config import MASTER_FILE, PREV_SNAPSHOT, LATEST_SNAPSHOT
-from discover_songs import clean_song_title, search_youtube_id_web_zero_quota
+from discover_songs import clean_song_title, search_youtube_id_web_strict
 from googleapiclient.discovery import build
 
-USER_AGENT = "Mozilla/5.0 (compatible; VocaloidCombinedChartBot/6.0)"
+USER_AGENT = "Mozilla/5.0 (compatible; VocaloidCombinedChartBot/7.0)"
 
 def rotate_snapshots_if_needed():
     if not LATEST_SNAPSHOT.exists():
@@ -29,7 +29,6 @@ def rotate_snapshots_if_needed():
         print(f"Snapshot rotation check skipped: {e}")
 
 def fetch_youtube_stats_batch(youtube_ids: list, api_key: str) -> dict:
-    """50曲ずつまとめて1ユニットでYouTube統計を取得（リトライ機構付き）"""
     result = {}
     if not api_key or not youtube_ids:
         return result
@@ -64,7 +63,6 @@ def fetch_youtube_stats_batch(youtube_ids: list, api_key: str) -> dict:
     return result
 
 def fetch_niconico_thumbinfo(niconico_id: str) -> dict:
-    """個別XML APIからのリアルタイム取得（2回リトライ付き）"""
     if not niconico_id:
         return {}
     url = f"https://ext.nicovideo.jp/api/getthumbinfo/{niconico_id}"
@@ -87,7 +85,6 @@ def fetch_niconico_thumbinfo(niconico_id: str) -> dict:
     return {}
 
 def fetch_niconico_stats_hybrid(niconico_ids: list) -> dict:
-    """スナップショットAPIの一括取得＋getthumbinfo個別取得のハイブリッドで確実・高速に取得"""
     result = {}
     valid_ids = list(dict.fromkeys([nid for nid in niconico_ids if nid]))
     if not valid_ids:
@@ -124,7 +121,6 @@ def fetch_niconico_stats_hybrid(niconico_ids: list) -> dict:
         except Exception:
             pass
 
-    # スナップショットに未反映の新曲や取得漏れは getthumbinfo で1曲ずつ確実に補完
     for cid in valid_ids:
         if cid not in result or result[cid]["nc_views"] == 0:
             info = fetch_niconico_thumbinfo(cid)
@@ -139,32 +135,10 @@ def main():
         print("エラー: YOUTUBE_API_KEY が設定されていません。")
         return
 
-    # 既存スナップショットをキャッシュとして保持（通信失敗やID欠損時の自動保護用）
-    prev_cache = {}
-    for snap_path in [LATEST_SNAPSHOT, PREV_SNAPSHOT]:
-        if snap_path.exists():
-            try:
-                with open(snap_path, "r", encoding="utf-8") as f:
-                    for item in json.load(f):
-                        sid = item.get("song_id")
-                        if sid and sid not in prev_cache:
-                            prev_cache[sid] = item
-            except Exception:
-                pass
-
     rotate_snapshots_if_needed()
 
     with open(MASTER_FILE, "r", encoding="utf-8") as f:
         songs = json.load(f)
-
-    # もし master 側で youtube_id が空でも、過去キャッシュに youtube_id があれば自動復元
-    for song in songs:
-        sid = song["song_id"]
-        cached = prev_cache.get(sid, {})
-        if not song.get("youtube_id") and cached.get("youtube_id"):
-            song["youtube_id"] = cached["youtube_id"]
-        if not song.get("niconico_id") and cached.get("niconico_id"):
-            song["niconico_id"] = cached["niconico_id"]
 
     yt_ids = [s.get("youtube_id") for s in songs if s.get("youtube_id")]
     nc_ids = [s.get("niconico_id") for s in songs if s.get("niconico_id")]
@@ -172,16 +146,17 @@ def main():
     yt_map = fetch_youtube_stats_batch(yt_ids, api_key)
     nc_map = fetch_niconico_stats_hybrid(nc_ids)
 
-    # 万が一 YouTube データが取れていない注目曲（ニコ動1万再生以上）があれば、その場でWeb検索からIDを特定して即時再取得
+    used_yt_ids = set(yt_ids)
     rescue_yt_ids = []
     for song in songs:
         yid = song.get("youtube_id", "")
         nid = song.get("niconico_id", "")
         nc_v = nc_map.get(nid, {}).get("nc_views", 0)
         if (not yid or yid not in yt_map) and nc_v >= 10000:
-            found_yid = search_youtube_id_web_zero_quota(f"{song['title']} {song['producer']} MV", song["title"])
-            if found_yid:
+            found_yid = search_youtube_id_web_strict(song["title"], song["producer"], used_yt_ids)
+            if found_yid and found_yid not in used_yt_ids:
                 song["youtube_id"] = found_yid
+                used_yt_ids.add(found_yid)
                 rescue_yt_ids.append(found_yid)
 
     if rescue_yt_ids:
@@ -190,23 +165,32 @@ def main():
             json.dump(songs, f, ensure_ascii=False, indent=2)
 
     snapshots = []
+    seen_yt = set()
+    seen_nc = set()
+
     for song in songs:
         sid = song["song_id"]
         yid = song.get("youtube_id", "")
         nid = song.get("niconico_id", "")
-        cached = prev_cache.get(sid, {})
+
+        # 同一YouTube IDまたは同一ニコ動IDの二重計上を物理的にブロック
+        if (yid and yid in seen_yt) or (nid and nid in seen_nc):
+            continue
+        if yid:
+            seen_yt.add(yid)
+        if nid:
+            seen_nc.add(nid)
 
         yt_stats = yt_map.get(yid, {})
         nc_stats = nc_map.get(nid, {})
 
-        # APIの一時エラーで0になった場合は前回キャッシュ値で下支えして急落バグを防止
-        yt_views = yt_stats.get("yt_views", 0) or cached.get("yt_views", 0)
-        yt_likes = yt_stats.get("yt_likes", 0) or cached.get("yt_likes", 0)
-        yt_comments = yt_stats.get("yt_comments", 0) or cached.get("yt_comments", 0)
+        yt_views = yt_stats.get("yt_views", 0)
+        yt_likes = yt_stats.get("yt_likes", 0)
+        yt_comments = yt_stats.get("yt_comments", 0)
 
-        nc_views = nc_stats.get("nc_views", 0) or cached.get("nc_views", 0)
-        nc_mylist = nc_stats.get("nc_mylist", 0) or cached.get("nc_mylist", 0)
-        nc_comments = nc_stats.get("nc_comments", 0) or cached.get("nc_comments", 0)
+        nc_views = nc_stats.get("nc_views", 0)
+        nc_mylist = nc_stats.get("nc_mylist", 0)
+        nc_comments = nc_stats.get("nc_comments", 0)
 
         if yt_views == 0 and nc_views == 0:
             continue
@@ -224,8 +208,8 @@ def main():
             "vocal": song.get("vocal", "VOCALOID"),
             "youtube_id": yid,
             "niconico_id": nid,
-            "yt_published_at": yt_stats.get("yt_published_at") or cached.get("yt_published_at", ""),
-            "nc_published_at": nc_stats.get("nc_published_at") or cached.get("nc_published_at", ""),
+            "yt_published_at": yt_stats.get("yt_published_at", ""),
+            "nc_published_at": nc_stats.get("nc_published_at", ""),
             "yt_views": yt_views,
             "yt_likes": yt_likes,
             "yt_comments": yt_comments,
