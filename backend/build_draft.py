@@ -1,9 +1,10 @@
 import json
 from datetime import datetime, timedelta, timezone
-from config import WEIGHTS, PREV_SNAPSHOT, LATEST_SNAPSHOT, DRAFT_FILE, PUBLIC_LATEST
+from config import WEIGHTS, PREV_SNAPSHOT, LATEST_SNAPSHOT, DRAFT_FILE, ARCHIVE_DIR
 
 TOP_N = 20
 JST = timezone(timedelta(hours=9))
+FIRST_ISSUE_ARCHIVE_ID = "2026-10-14"  # 記念すべき初回公開日（この週は全曲NEW表示）
 
 def parse_iso_dt(dt_str: str):
     if not dt_str:
@@ -45,13 +46,32 @@ def compute_chart_window():
         f"{last_monday_date.strftime('%Y-%m-%d')} 〜 {last_sunday_date.strftime('%Y-%m-%d')}"
     )
 
+def load_previous_week_ranks(current_archive_id: str) -> dict:
+    """
+    初回公開(2026-10-14)の場合は空辞書を返し、全曲を「NEW」にする。
+    第2回以降は、今週より前の日付の最新アーカイブファイルのみを参照する（同一週の修正前データとは絶対に比較しない）。
+    """
+    if current_archive_id <= FIRST_ISSUE_ARCHIVE_ID or not ARCHIVE_DIR.exists():
+        return {}
+
+    past_files = sorted(
+        [p for p in ARCHIVE_DIR.glob("*.json") if p.stem < current_archive_id and p.stem >= FIRST_ISSUE_ARCHIVE_ID],
+        key=lambda x: x.stem,
+        reverse=True
+    )
+    if not past_files:
+        return {}
+
+    try:
+        with open(past_files[0], "r", encoding="utf-8") as f:
+            past_data = json.load(f)
+            return {s["song_id"]: s["rank"] for s in past_data.get("songs", [])}
+    except Exception:
+        return {}
+
 def calc_window_fraction(pub_dt, window_start, window_end, now_dt) -> tuple:
-    """
-    指定された7日間ウィンドウ [window_start, window_end] の獲得シェアを算出。
-    """
     if pub_dt is None:
         return 0.0, 0.0
-
     if pub_dt > window_end:
         return 0.0, 0.0
 
@@ -68,7 +88,6 @@ def calc_window_fraction(pub_dt, window_start, window_end, now_dt) -> tuple:
     share_views = ((t_end ** alpha_views) - (t_start ** alpha_views)) / (t_now ** alpha_views)
     share_engage = ((t_end ** alpha_engage) - (t_start ** alpha_engage)) / (t_now ** alpha_engage)
 
-    # 公開から2年(730日)以上経過した旧譜カタログは定常減衰係数を適用し、直近1年のバイラル曲・新譜の精度を高める
     if t_now > 730.0:
         share_views *= 0.45
         share_engage *= 0.35
@@ -97,14 +116,8 @@ def main():
     with open(LATEST_SNAPSHOT, "r", encoding="utf-8") as f:
         latest_list = json.load(f)
 
-    prev_ranks = {}
-    if PUBLIC_LATEST.exists():
-        try:
-            with open(PUBLIC_LATEST, "r", encoding="utf-8") as f:
-                pub_data = json.load(f)
-                prev_ranks = {s["song_id"]: s["rank"] for s in pub_data.get("songs", [])}
-        except json.JSONDecodeError:
-            pass
+    # 初回は空辞書（全曲 "NEW"）になる
+    prev_ranks = load_previous_week_ranks(archive_id)
 
     ranked_songs = []
     rebuilt_prev_snapshots = []
@@ -123,7 +136,6 @@ def main():
         nc_total = pts["nc_views"] + pts["nc_mylist"] + pts["nc_comments"]
         total_pt = yt_total + nc_total
 
-        # 両サイト必須フィルタを撤廃：YouTube単体の海外ボカロP曲や片側先行の新譜も全てフェアに評価
         if total_pt <= 0:
             continue
 
@@ -158,7 +170,7 @@ def main():
         "archiveId": archive_id,
         "period": period_str,
         "weeklySummary": (
-            f"集計期間（{period_str}）の週間VOCALOID複合ランキングTOP 20。"
+            f"集計期間（{period_str}）の週間VOCALOID複合ランキングTOP 20（初回公開）。"
             f"日本国内のボカロ新譜から韓国・英語圏をはじめとするグローバルボカロPのヒット曲まで、"
             f"YouTubeとニコニコ動画の6指標を横断集計した結果、"
             f"{top1['producer']}「{top1['title']}」が週間 {top1['total_pt']:,} pt で総合1位を獲得した。"
@@ -171,7 +183,7 @@ def main():
     with open(DRAFT_FILE, "w", encoding="utf-8") as f:
         json.dump(draft_payload, f, ensure_ascii=False, indent=2)
 
-    print(f"グローバル対応 TOP {len(top_songs)} ランキングを生成しました。")
+    print(f"TOP {len(top_songs)} ランキングを生成しました（全曲NEW表示リセット対応済）。")
 
 if __name__ == "__main__":
     main()

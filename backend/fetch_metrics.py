@@ -6,10 +6,10 @@ import xml.etree.ElementTree as ET
 import requests
 from datetime import datetime, timedelta
 from config import MASTER_FILE, PREV_SNAPSHOT, LATEST_SNAPSHOT
-from discover_songs import clean_song_title, search_youtube_id_web_strict
+from discover_songs import clean_song_title, detect_vocals, search_youtube_id_web_strict
 from googleapiclient.discovery import build
 
-USER_AGENT = "Mozilla/5.0 (compatible; VocaloidCombinedChartBot/7.0)"
+USER_AGENT = "Mozilla/5.0 (compatible; VocaloidCombinedChartBot/8.0)"
 
 def rotate_snapshots_if_needed():
     if not LATEST_SNAPSHOT.exists():
@@ -50,6 +50,8 @@ def fetch_youtube_stats_batch(youtube_ids: list, api_key: str) -> dict:
                     snippet = item.get("snippet", {})
                     result[vid] = {
                         "yt_title": snippet.get("title", ""),
+                        "yt_desc": snippet.get("description", "")[:400],
+                        "yt_tags": " ".join(snippet.get("tags", [])),
                         "yt_views": int(stats.get("viewCount", 0)),
                         "yt_likes": int(stats.get("likeCount", 0)),
                         "yt_comments": int(stats.get("commentCount", 0)),
@@ -72,8 +74,11 @@ def fetch_niconico_thumbinfo(niconico_id: str) -> dict:
             root = ET.fromstring(res.text)
             if root.attrib.get("status") == "ok":
                 thumb = root.find("thumb")
+                tags = " ".join([t.text for t in thumb.findall("tags/tag") if t.text])
                 return {
                     "nc_title": thumb.findtext("title", ""),
+                    "nc_desc": (thumb.findtext("description", "") or "")[:400],
+                    "nc_tags": tags,
                     "nc_views": int(thumb.findtext("view_counter", "0")),
                     "nc_mylist": int(thumb.findtext("mylist_counter", "0")),
                     "nc_comments": int(thumb.findtext("comment_num", "0")),
@@ -98,7 +103,7 @@ def fetch_niconico_stats_hybrid(niconico_ids: list) -> dict:
         params = {
             "q": "",
             "targets": "",
-            "fields": "contentId,title,viewCounter,mylistCounter,commentCounter,startTime",
+            "fields": "contentId,title,description,tags,viewCounter,mylistCounter,commentCounter,startTime",
             "_sort": "-viewCounter",
             "_limit": len(chunk),
             "_context": "VocaloidCombinedChartBot"
@@ -112,6 +117,8 @@ def fetch_niconico_stats_hybrid(niconico_ids: list) -> dict:
                     cid = item.get("contentId")
                     result[cid] = {
                         "nc_title": item.get("title", ""),
+                        "nc_desc": (item.get("description") or "")[:400],
+                        "nc_tags": item.get("tags", ""),
                         "nc_views": int(item.get("viewCounter", 0)),
                         "nc_mylist": int(item.get("mylistCounter", 0)),
                         "nc_comments": int(item.get("commentCounter", 0)),
@@ -173,7 +180,6 @@ def main():
         yid = song.get("youtube_id", "")
         nid = song.get("niconico_id", "")
 
-        # 同一YouTube IDまたは同一ニコ動IDの二重計上を物理的にブロック
         if (yid and yid in seen_yt) or (nid and nid in seen_nc):
             continue
         if yid:
@@ -201,11 +207,22 @@ def main():
             raw_t = yt_stats.get("yt_title") or nc_stats.get("nc_title") or song["title"]
             title = clean_song_title(raw_t, producer)
 
+        # YouTubeとニコ動のタイトル・タグ・概要欄から派生キャラ（亞北ネル・弱音ハク等）を含めて正確にボーカルを判定
+        video_meta_text = " ".join([
+            yt_stats.get("yt_title", ""),
+            yt_stats.get("yt_tags", ""),
+            yt_stats.get("yt_desc", ""),
+            nc_stats.get("nc_title", ""),
+            nc_stats.get("nc_tags", ""),
+            nc_stats.get("nc_desc", "")
+        ]).strip()
+        vocal = detect_vocals(video_meta_text, song.get("vocal", ""))
+
         snapshots.append({
             "song_id": sid,
             "title": title,
             "producer": producer,
-            "vocal": song.get("vocal", "VOCALOID"),
+            "vocal": vocal,
             "youtube_id": yid,
             "niconico_id": nid,
             "yt_published_at": yt_stats.get("yt_published_at", ""),
