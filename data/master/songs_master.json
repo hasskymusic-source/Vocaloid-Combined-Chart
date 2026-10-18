@@ -3456,14 +3456,6 @@
     "niconico_id": "sm46935011"
   },
   {
-    "song_id": "song_sm46928401",
-    "title": "メテオラヴ/重音テト",
-    "producer": "Jelly______",
-    "vocal": "重音テト",
-    "youtube_id": "mrn5ePlvrug",
-    "niconico_id": "sm46928401"
-  },
-  {
     "song_id": "song_sm44886341",
     "title": "聖人君子でありたい",
     "producer": "しゃいと",
@@ -4197,6 +4189,30 @@
     "producer": "幽波 / yu-nami",
     "vocal": "初音ミク",
     "youtube_id": "Lm92Ntt7vvU",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_sm46762254",
+    "title": "リヴェラル",
+    "producer": "すけありーぐりむ",
+    "vocal": "花隈千冬",
+    "youtube_id": "",
+    "niconico_id": "sm46762254"
+  },
+  {
+    "song_id": "song_O1pQE5H0Zlg",
+    "title": "劣情／乳酸菌",
+    "producer": "生きて腸まで届かないタイプの乳酸菌",
+    "vocal": "足立レイ",
+    "youtube_id": "O1pQE5H0Zlg",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_fvtEY5RfkDI",
+    "title": "U_Ų",
+    "producer": "ゐねよ",
+    "vocal": "星界・ナースロボ＿タイプＴ",
+    "youtube_id": "fvtEY5RfkDI",
     "niconico_id": ""
   },
   {
@@ -4984,12 +5000,68 @@
     "niconico_id": "sm45317076"
   },
   {
-    "song_id": "song_sm46762254",
-    "title": "リヴェラル",
-    "producer": "すけありーぐりむ",
-    "vocal": "花隈千冬",
-    "youtube_id": "",
-    "niconico_id": "sm46762254"
+    "song_id": "song_PkN5Ho5FK-g",
+    "title": "愛言葉  中文字幕",
+    "producer": "pika1978100",
+    "vocal": "初音ミク",
+    "youtube_id": "PkN5Ho5FK-g",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_T1pHH9cWzt0",
+    "title": "Celluloid   日本語歌詞  English Sub",
+    "producer": "Auvamiku",
+    "vocal": "初音ミク",
+    "youtube_id": "T1pHH9cWzt0",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_sm46485089",
+    "title": "サクラハルシネーション",
+    "producer": "ビッグリーン",
+    "vocal": "初音ミク",
+    "youtube_id": "oYLK_vHM_cI",
+    "niconico_id": "sm46485089"
+  },
+  {
+    "song_id": "song_sm29864115",
+    "title": "アイカギ",
+    "producer": "けーだっしゅ",
+    "vocal": "初音ミク",
+    "youtube_id": "Fv05cJ2_374",
+    "niconico_id": "sm29864115"
+  },
+  {
+    "song_id": "song_sm46578647",
+    "title": "未来",
+    "producer": "神様うさぎ",
+    "vocal": "初音ミク",
+    "youtube_id": "fdgwPD-oqIY",
+    "niconico_id": "sm46578647"
+  },
+  {
+    "song_id": "song_so45163660",
+    "title": "プリズム",
+    "producer": "ろじ",
+    "vocal": "初音ミク",
+    "youtube_id": "OZyXoM_azhw",
+    "niconico_id": "so45163660"
+  },
+  {
+    "song_id": "song_lPar_7mzPg8",
+    "title": "バナナの謎",
+    "producer": "せなすけ",
+    "vocal": "初音ミク",
+    "youtube_id": "lPar_7mzPg8",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_D5ERo7mbGy8",
+    "title": "病み病み病み病み病み病み病み病み",
+    "producer": "なむうさぎ",
+    "vocal": "重音テト",
+    "youtube_id": "D5ERo7mbGy8",
+    "niconico_id": ""
   },
   {
     "song_id": "song_sm44677326",
@@ -5014,21 +5086,5 @@
     "vocal": "足立レイ",
     "youtube_id": "Ewmq-TVbNj4",
     "niconico_id": "sm46712665"
-  },
-  {
-    "song_id": "song_O1pQE5H0Zlg",
-    "title": "劣情／乳酸菌",
-    "producer": "生きて腸まで届かないタイプの乳酸菌",
-    "vocal": "足立レイ",
-    "youtube_id": "O1pQE5H0Zlg",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_fvtEY5RfkDI",
-    "title": "U_Ų",
-    "producer": "ゐねよ",
-    "vocal": "星界・ナースロボ＿タイプＴ",
-    "youtube_id": "fvtEY5RfkDI",
-    "niconico_id": ""
   }
 ]
