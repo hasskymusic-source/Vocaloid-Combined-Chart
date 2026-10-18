@@ -4,6 +4,7 @@ import webbrowser
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from config import DRAFT_FILE
 from export_blog import generate_markdown_from_data, export_markdown_file
+from publish_chart import main as publish_to_public_site
 
 PORT = 8765
 BACKUP_FILE = DRAFT_FILE.parent / "weekly_draft.backup.json"
@@ -139,7 +140,6 @@ EDITOR_HTML = """<!DOCTYPE html>
       justify-content: space-between;
     }
 
-    /* Markdownモーダル */
     .modal-backdrop {
       display: none;
       position: fixed;
@@ -184,16 +184,16 @@ EDITOR_HTML = """<!DOCTYPE html>
       <span id="period-label">読み込み中...</span>
     </div>
     <div class="actions">
-      <span id="toast" class="status-toast">✅ 保存＆Markdown出力完了！</span>
+      <span id="toast" class="status-toast">✅ サイト反映＆Markdown保存完了！</span>
       <button type="button" class="btn-md" onclick="openMarkdownModal()">📝 ブログ用Markdownを表示・コピー</button>
-      <button type="button" class="btn-save" onclick="saveDraft()">💾 下書きJSONを安全に保存 (Ctrl+S)</button>
+      <button type="button" class="btn-save" onclick="saveDraft()">💾 保存してサイトに反映 (Ctrl+S)</button>
     </div>
   </header>
 
   <main>
     <div class="summary-card">
-      <h2>📈 今週のチャート総括（weeklySummary）</h2>
-      <div class="helper">※「上位楽曲解説・トレンド分析」タブの先頭や、ブログ記事の導入に表示される全体総括です。改行や「"」「,」も自由に使えます。</div>
+      <h2>📈 今週のチャート総括（3つ目のタブ「今週のチャート総括」に反映されます）</h2>
+      <div class="helper">※「上位楽曲解説・トレンド分析」タブの先頭およびブログ記事の導入に表示される全体総括です。改行もそのまま反映されます。</div>
       <textarea id="weekly-summary" rows="4" placeholder="今週のチャート全体の傾向や1位楽曲のポイントなどを入力..."></textarea>
     </div>
 
@@ -270,7 +270,7 @@ EDITOR_HTML = """<!DOCTYPE html>
 
           <div>
             <div class="field-label">
-              <span>【指標動向・楽曲解説】（空欄の場合は自動でポイント構成比の標準解説が表示されます）</span>
+              <span>【指標動向・楽曲解説】（各曲の「詳細を見る」内 ＆ 3つ目のタブ「上位楽曲解説・トレンド分析」に反映されます）</span>
               <span id="char-count-${idx}">${(s.commentary || '').length} 文字</span>
             </div>
             <textarea rows="3" data-idx="${idx}" data-field="commentary"
@@ -332,7 +332,7 @@ EDITOR_HTML = """<!DOCTYPE html>
       const textarea = document.getElementById('md-preview');
       textarea.select();
       await navigator.clipboard.writeText(textarea.value);
-      alert('ブログ用Markdownをクリップボードにコピーしました！noteやはてなブログにそのまま貼り付けられます。');
+      alert('ブログ用Markdownをクリップボードにコピーしました！');
     }
 
     window.addEventListener('keydown', (e) => {
@@ -350,7 +350,7 @@ EDITOR_HTML = """<!DOCTYPE html>
 
 class EditorHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
-        pass  # ターミナル出力を 깔끔 に保つ
+        pass
 
     def do_GET(self):
         if self.path == "/" or self.path.startswith("/index"):
@@ -386,17 +386,19 @@ class EditorHandler(BaseHTTPRequestHandler):
             raw_body = self.rfile.read(length).decode("utf-8")
             new_data = json.loads(raw_body)
 
-            # 直前のファイルをバックアップ
             if DRAFT_FILE.exists():
                 shutil.copyfile(DRAFT_FILE, BACKUP_FILE)
 
-            # 安全なJSONフォーマットで保存
+            # 1. 下書きファイル(weekly_draft.json)を更新
             with open(DRAFT_FILE, "w", encoding="utf-8") as f:
                 json.dump(new_data, f, ensure_ascii=False, indent=2)
 
-            # 同時にMarkdownファイルも自動更新
+            # 2. 本番サイト用ファイル(public/data/latest_ranking.json と archives/)にも同時反映
+            publish_to_public_site()
+
+            # 3. ブログ用Markdownファイルも自動更新
             md_path = export_markdown_file()
-            print(f"[保存完了] weekly_draft.json と {md_path.name} を更新しました。")
+            print(f"[保存＆サイト反映完了] latest_ranking.json と {md_path.name} を更新しました。")
 
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -412,7 +414,8 @@ def main():
     url = f"http://localhost:{PORT}"
     print("=" * 60)
     print(f" ✍️ 執筆スタジオを起動しました: {url}")
-    print(" ブラウザが自動で開きます。終了する時は Ctrl + C を押してください。")
+    print(" 保存すると public/data/latest_ranking.json にも即時反映されます。")
+    print(" 終了する時は Ctrl + C を押してください。")
     print("=" * 60)
     webbrowser.open(url)
 

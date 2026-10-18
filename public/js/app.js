@@ -69,6 +69,14 @@ async function loadChartData(jsonPath) {
   renderTop5InsightChart(data);
 }
 
+function formatTextWithBreaks(text) {
+  return String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br>');
+}
+
 function calcSongPoints(song, weights) {
   const w = weights || DEFAULT_WEIGHTS;
   const raw = song.raw || {};
@@ -114,8 +122,8 @@ function renderRankingView(data) {
   document.getElementById('chart-title').textContent =
     `${data.publishDate || ''} 公開（集計期間：${data.period || ''}）`;
 
-  document.getElementById('weekly-summary-text').textContent =
-    data.weeklySummary || '今週のYouTube・ニコニコ動画6指標による複合ランキング結果です。';
+  document.getElementById('weekly-summary-text').innerHTML =
+    formatTextWithBreaks(data.weeklySummary || '今週のYouTube・ニコニコ動画6指標による複合ランキング結果です。');
 
   const container = document.getElementById('ranking-container');
   const analysisContainer = document.getElementById('analysis-container');
@@ -127,9 +135,10 @@ function renderRankingView(data) {
   songs.forEach(song => {
     const c = calcSongPoints(song, data.weights);
     const rankClass = song.rank <= 3 ? `rank-${song.rank}` : '';
-    const commentaryText = song.commentary && song.commentary.trim() !== ''
+    const commentaryRaw = song.commentary && song.commentary.trim() !== ''
       ? song.commentary
       : `YouTube指標 ${c.yt_share}%（${c.yt_total.toLocaleString()}pt）、ニコニコ動画指標 ${c.nc_share}%（${c.nc_total.toLocaleString()}pt）を獲得し総合${song.rank}位にランクイン。`;
+    const commentaryHtml = formatTextWithBreaks(commentaryRaw);
 
     const ytLink = song.youtube_id
       ? `<a class="ext-btn yt" href="https://www.youtube.com/watch?v=${song.youtube_id}" target="_blank" rel="noopener">▶ YouTubeで視聴</a>`
@@ -138,7 +147,6 @@ function renderRankingView(data) {
       ? `<a class="ext-btn nc" href="https://www.nicovideo.jp/watch/${song.niconico_id}" target="_blank" rel="noopener">▶ ニコニコ動画で視聴</a>`
       : '';
 
-    // YouTubeサムネイル（1つのみ表示、高画質maxresdefaultがない場合はhqdefaultへ自動フォールバック）
     const ytThumbHtml = song.youtube_id
       ? `
         <div class="yt-thumb-wrap">
@@ -196,7 +204,6 @@ function renderRankingView(data) {
       </div>
 
       <div class="detail-panel">
-        <!-- 1. ポイント数の内訳 -->
         <div class="metrics-grid">
           <div class="metric-box" style="border-left-color: var(--c-yt-views)">
             <div class="metric-name">YouTube 週間再生 (×1)</div>
@@ -230,15 +237,11 @@ function renderRankingView(data) {
           </div>
         </div>
 
-        <!-- 2. YouTube / ニコニコ動画 視聴ボタン（ポイント内訳の下） -->
         <div class="ext-links">${ytLink}${ncLink}</div>
-
-        <!-- 3. YouTube動画のサムネイル（視聴ボタンの下） -->
         ${ytThumbHtml}
 
-        <!-- 4. 解説テキスト -->
         <div class="commentary-box">
-          <strong>【指標動向・楽曲解説】</strong> ${commentaryText}
+          <strong>【指標動向・楽曲解説】</strong><br>${commentaryHtml}
         </div>
       </div>
     `;
@@ -253,7 +256,7 @@ function renderRankingView(data) {
 
     analysisContainer.innerHTML += `
       <h2>${song.rank}位：${song.producer}「${song.title}」（${c.total.toLocaleString()} pt）</h2>
-      <p>${commentaryText}</p>
+      <p>${commentaryHtml}</p>
       <p style="font-size:0.85rem; color:#94a3b8;">
         内訳：YT再生 ${c.pts.yt_views.toLocaleString()}pt / YT高評価 ${c.pts.yt_likes.toLocaleString()}pt / YTコメ ${c.pts.yt_comments.toLocaleString()}pt / ニコ動再生 ${c.pts.nc_views.toLocaleString()}pt / ニコ動マイリス ${c.pts.nc_mylist.toLocaleString()}pt / ニコ動コメ ${c.pts.nc_comments.toLocaleString()}pt
       </p>
