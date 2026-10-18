@@ -138,6 +138,24 @@ function renderRankingView(data) {
       ? `<a class="ext-btn nc" href="https://www.nicovideo.jp/watch/${song.niconico_id}" target="_blank" rel="noopener">▶ ニコニコ動画で視聴</a>`
       : '';
 
+    // YouTubeサムネイル（1つのみ表示、高画質maxresdefaultがない場合はhqdefaultへ自動フォールバック）
+    const ytThumbHtml = song.youtube_id
+      ? `
+        <div class="yt-thumb-wrap">
+          <a class="yt-thumb-link" href="https://www.youtube.com/watch?v=${song.youtube_id}" target="_blank" rel="noopener" title="YouTubeで「${song.title}」を視聴">
+            <img
+              class="yt-thumb-img"
+              src="https://i.ytimg.com/vi/${song.youtube_id}/maxresdefault.jpg"
+              alt="${song.title} サムネイル"
+              loading="lazy"
+              onload="if(this.naturalWidth <= 120) this.src='https://i.ytimg.com/vi/${song.youtube_id}/hqdefault.jpg';"
+              onerror="this.onerror=null; this.src='https://i.ytimg.com/vi/${song.youtube_id}/hqdefault.jpg';"
+            >
+          </a>
+        </div>
+      `
+      : '';
+
     const card = document.createElement('div');
     card.className = 'rank-card';
 
@@ -178,7 +196,7 @@ function renderRankingView(data) {
       </div>
 
       <div class="detail-panel">
-        <div class="ext-links">${ytLink}${ncLink}</div>
+        <!-- 1. ポイント数の内訳 -->
         <div class="metrics-grid">
           <div class="metric-box" style="border-left-color: var(--c-yt-views)">
             <div class="metric-name">YouTube 週間再生 (×1)</div>
@@ -211,13 +229,20 @@ function renderRankingView(data) {
             <div class="metric-pt">${c.pts.nc_comments.toLocaleString()} pt</div>
           </div>
         </div>
+
+        <!-- 2. YouTube / ニコニコ動画 視聴ボタン（ポイント内訳の下） -->
+        <div class="ext-links">${ytLink}${ncLink}</div>
+
+        <!-- 3. YouTube動画のサムネイル（視聴ボタンの下） -->
+        ${ytThumbHtml}
+
+        <!-- 4. 解説テキスト -->
         <div class="commentary-box">
           <strong>【指標動向・楽曲解説】</strong> ${commentaryText}
         </div>
       </div>
     `;
 
-    // 「詳細を見る」ボタンのクリックイベントを設定
     const detailBtn = card.querySelector('.detail-toggle-btn');
     detailBtn.addEventListener('click', () => {
       const isOpen = card.classList.toggle('open');

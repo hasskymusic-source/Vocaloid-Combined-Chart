@@ -135,7 +135,6 @@ main {
   cursor: pointer;
 }
 
-/* ランキングカード（カード自体はクリック不可にし、詳細ボタンのみで開閉） */
 .ranking-list { display: flex; flex-direction: column; gap: 16px; }
 .rank-card {
   background: var(--bg-card);
@@ -171,7 +170,6 @@ main {
 .diff-down { color: #f87171; }
 .diff-new { color: #38bdf8; }
 
-/* 楽曲タイトル＆「詳細を見る」ボタンの横並びレイアウト */
 .song-title-row {
   display: flex;
   align-items: center;
@@ -226,7 +224,6 @@ main {
   margin-left: 4px;
 }
 
-/* 6指標構成比バー */
 .share-bar-wrap { margin-top: 16px; }
 .share-bar {
   height: 12px;
@@ -250,7 +247,6 @@ main {
   margin-top: 8px;
 }
 
-/* インサイトタブのグラフ領域 */
 .chart-visual-box {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -267,7 +263,7 @@ main {
   height: 360px;
 }
 
-/* 詳細展開パネル */
+/* 詳細展開パネル（ポイント内訳 -> 視聴ボタン -> YouTubeサムネイル -> 解説） */
 .detail-panel {
   display: none;
   margin-top: 18px;
@@ -275,11 +271,12 @@ main {
   border-top: 1px dashed var(--border);
 }
 .rank-card.open .detail-panel { display: block; }
+
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 10px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 .metric-box {
   background: rgba(15, 23, 42, 0.6);
@@ -294,23 +291,50 @@ main {
 .ext-links {
   display: flex;
   gap: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   flex-wrap: wrap;
 }
 .ext-btn {
   text-decoration: none;
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 700;
-  padding: 7px 14px;
+  padding: 8px 16px;
   border-radius: 6px;
   color: #fff;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  transition: opacity 0.2s;
 }
 .ext-btn.yt { background: #dc2626; }
 .ext-btn.nc { background: #2563eb; }
-.ext-btn:hover { opacity: 0.9; }
+.ext-btn:hover { opacity: 0.88; }
+
+/* YouTubeサムネイル表示ボックス */
+.yt-thumb-wrap {
+  margin-bottom: 16px;
+}
+.yt-thumb-link {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: #0f172a;
+}
+.yt-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.25s ease;
+}
+.yt-thumb-link:hover .yt-thumb-img {
+  transform: scale(1.03);
+}
 
 .commentary-box {
   background: rgba(56, 189, 248, 0.08);
@@ -351,4 +375,5 @@ main {
 @media (max-width: 640px) {
   .rank-header { grid-template-columns: 50px 1fr; }
   .point-box { grid-column: 2; text-align: left; }
+  .yt-thumb-link { max-width: 100%; }
 }

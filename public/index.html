@@ -1,9 +1,27 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" prefix="og: https://ogp.me/ns#">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>週刊VOCALOID複合ランキング | YouTube×ニコ動 6指標チャート</title>
+  <meta name="description" content="YouTubeとニコニコ動画の6指標（週間再生・高評価・マイリスト・コメント）を統合し、国内外のボーカロイド音楽シーンの今を可視化する週間TOP 20チャート。毎週水曜13:00更新。">
+
+  <!-- OGP (Open Graph Protocol) 設定 -->
+  <meta property="og:title" content="週刊VOCALOID複合ランキング TOP 20">
+  <meta property="og:description" content="YouTubeとニコニコ動画の6指標を統合・ポイント化。国内外のボカロシーンの熱量を可視化する週間複合チャート（毎週水曜13:00更新）。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://weekly-vocaloid-combined-chart.com/">
+  <meta property="og:site_name" content="週刊VOCALOID複合ランキング">
+  <meta property="og:image" content="https://weekly-vocaloid-combined-chart.com/ogp.png">
+  <meta property="og:locale" content="ja_JP">
+
+  <!-- X (Twitter) Card 設定 -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="週刊VOCALOID複合ランキング TOP 20">
+  <meta name="twitter:description" content="YouTube×ニコニコ動画の6指標で算出する週間VOCALOID複合チャート。毎週水曜13:00更新。">
+  <meta name="twitter:image" content="https://weekly-vocaloid-combined-chart.com/ogp.png">
+
+  <link rel="canonical" href="https://weekly-vocaloid-combined-chart.com/">
   <link rel="stylesheet" href="./css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
@@ -32,7 +50,7 @@
     <div class="chart-meta">
       <div>
         <strong id="chart-title">データ読み込み中...</strong>
-        <div class="meta-note">※各楽曲タイトルの横にある「詳細を見る」ボタンを押すと6指標の内訳・動画リンクが開きます</div>
+        <div class="meta-note">※各楽曲タイトルの横にある「詳細を見る」ボタンを押すと6指標の内訳・動画リンク・サムネイルが開きます</div>
       </div>
       <div class="archive-control">
         <label for="archive-select">📅 過去チャート切替:</label>
