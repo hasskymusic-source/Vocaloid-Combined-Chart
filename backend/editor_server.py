@@ -13,10 +13,6 @@ BACKUP_FILE = DRAFT_FILE.parent / "weekly_draft.backup.json"
 
 
 def rescue_from_backup_if_needed():
-    """
-    weekly_draft.backup.json に執筆済みの解説文や総括が残っており、
-    現在の weekly_draft.json 側が未記入の場合は自動的に救出・マージして本番ファイルへも反映する。
-    """
     if not DRAFT_FILE.exists() or not BACKUP_FILE.exists():
         return
 
@@ -28,14 +24,12 @@ def rescue_from_backup_if_needed():
 
         rescued = False
 
-        # 全体総括の救出
         b_sum = (backup.get("weeklySummary") or "").strip()
         c_sum = (current.get("weeklySummary") or "").strip()
         if b_sum and b_sum != c_sum and "初回公開）。日本国内のボカロ新譜から" in c_sum:
             current["weeklySummary"] = b_sum
             rescued = True
 
-        # 各楽曲の解説文(commentary)の救出
         backup_map = {}
         for s in backup.get("songs", []):
             key = s.get("song_id") or s.get("title")
@@ -69,20 +63,31 @@ def find_free_port(start_port: int) -> int:
 
 
 def git_push_changes() -> tuple:
-    """ローカルで保存した変更をGitHubへ自動プッシュする"""
+    """ローカルで保存した変更をGitHubへ自動プッシュする（Rebaseによる競合回避付き）"""
     try:
         subprocess.run(["git", "add", "."], cwd=BASE_DIR, check=True, capture_output=True, text=True)
         status = subprocess.run(["git", "status", "--porcelain"], cwd=BASE_DIR, capture_output=True, text=True)
-        if not status.stdout.strip():
-            return True, "変更はすでに最新状態でプッシュ済みです。"
+        
+        # 変更があればコミット
+        if status.stdout.strip():
+            subprocess.run(
+                ["git", "commit", "-m", "執筆スタジオから解説記事を更新・公開"],
+                cwd=BASE_DIR,
+                check=True,
+                capture_output=True,
+                text=True
+            )
 
+        # ★【追加】プッシュの前に、必ずリモート（クラウド側）の最新状態を自動で取り込む
         subprocess.run(
-            ["git", "commit", "-m", "執筆スタジオから解説記事を更新・公開"],
+            ["git", "pull", "--rebase", "origin", "main"],
             cwd=BASE_DIR,
             check=True,
             capture_output=True,
             text=True
         )
+
+        # その後、プッシュを実行
         subprocess.run(["git", "push", "origin", "main"], cwd=BASE_DIR, check=True, capture_output=True, text=True)
         return True, "GitHubへのプッシュが完了しました！約1分でCloudflare Pages / 本番サイトに反映されます。"
     except subprocess.CalledProcessError as e:
@@ -483,7 +488,6 @@ class EditorHandler(BaseHTTPRequestHandler):
             raw_body = self.rfile.read(length).decode("utf-8")
             req_json = json.loads(raw_body)
 
-            # 旧形式・新形式どちらのリクエストにも対応
             if "data" in req_json and "songs" in req_json["data"]:
                 new_data = req_json["data"]
                 do_push = bool(req_json.get("push", False))
@@ -494,19 +498,15 @@ class EditorHandler(BaseHTTPRequestHandler):
             if DRAFT_FILE.exists():
                 shutil.copyfile(DRAFT_FILE, BACKUP_FILE)
 
-            # 1. 下書きファイル(weekly_draft.json)を更新
             with open(DRAFT_FILE, "w", encoding="utf-8") as f:
                 json.dump(new_data, f, ensure_ascii=False, indent=2)
 
-            # 2. 本番サイト用ファイル(public/data/latest_ranking.json と archives/)を確実に上書き更新
             publish_to_public_site()
             shutil.copyfile(DRAFT_FILE, PUBLIC_LATEST)
 
-            # 3. ブログ用Markdownファイルも自動更新
             md_path = export_markdown_file()
             print(f"[保存完了] public/data/latest_ranking.json と {md_path.name} を更新しました。")
 
-            # 4. 「保存して本番Webサイトへ公開」ボタンが押された場合は自動で git push まで実行
             msg = "保存が完了しました。"
             status_str = "ok"
             if do_push:
@@ -527,7 +527,6 @@ def main():
         print(f"エラー: {DRAFT_FILE} が見つかりません。先に git pull を行ってください。")
         return
 
-    # 起動時に backup.json から原稿を自動救出して本番ファイルへ反映
     rescue_from_backup_if_needed()
 
     port = find_free_port(START_PORT)
