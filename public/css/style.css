@@ -95,7 +95,7 @@ body {
 .archive-box {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 3px;
   padding: 0.5rem 0.9rem;
   display: flex;
   flex-direction: column;
@@ -195,7 +195,7 @@ body {
 .rank-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 10px;
+  border-radius: 3px;
   overflow: hidden;
   transition: border-color 0.2s;
 }
@@ -264,7 +264,6 @@ body {
   width: 112px;
   height: 63px;
   object-fit: cover;
-  border-radius: 6px;
   border: 1px solid var(--border-color);
   display: block;
 }
@@ -293,7 +292,6 @@ body {
   background: rgba(0, 210, 255, 0.1);
   color: var(--accent-cyan);
   border: 1px solid rgba(0, 210, 255, 0.35);
-  border-radius: 6px;
   padding: 0.15rem 0.6rem;
   font-size: 0.75rem;
   font-weight: 700;
@@ -403,7 +401,7 @@ body {
 .detail-box {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 3px;
   padding: 1rem;
 }
 
@@ -450,7 +448,7 @@ body {
   font-weight: 700;
   text-decoration: none;
   padding: 0.4rem 0.8rem;
-  border-radius: 6px;
+  border-radius: 3px;
 }
 
 .yt-link {
@@ -470,7 +468,6 @@ body {
   background: rgba(0, 210, 255, 0.06);
   border-left: 3px solid var(--accent-cyan);
   padding: 0.85rem 1rem;
-  border-radius: 4px;
 }
 
 .commentary-box h5 {
@@ -483,7 +480,7 @@ body {
 .insight-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: 6px;
   padding: 1.75rem;
   margin-bottom: 1.75rem;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
@@ -552,7 +549,6 @@ body {
 .fallback-chart-bar-track {
   height: 18px;
   background: #0b1120;
-  border-radius: 6px;
   overflow: hidden;
 }
 
@@ -662,7 +658,6 @@ body {
   color: var(--accent-cyan);
   border: 1px solid rgba(0, 210, 255, 0.4);
   background: rgba(0, 210, 255, 0.1);
-  border-radius: 4px;
 }
 
 .col-chart-in {
@@ -722,7 +717,7 @@ body {
 
 .commentary-card {
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 3px;
   padding: 1.1rem;
   background: #121b2d;
 }
@@ -741,7 +736,6 @@ body {
   font-weight: 800;
   font-size: 0.8rem;
   padding: 0.15rem 0.55rem;
-  border-radius: 4px;
 }
 
 .commentary-song-title {
