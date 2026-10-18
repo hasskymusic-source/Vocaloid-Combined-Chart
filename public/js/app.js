@@ -1,352 +1,577 @@
-let chartInstance = null;
-let currentData = null;
+let insightChartInstance = null;
+let currentChartData = null;
+let archiveHistoryCache = [];
 
-const DEFAULT_WEIGHTS = {
+const WEIGHTS = {
   yt_views: 1,
   yt_likes: 50,
   yt_comments: 100,
   nc_views: 5,
-  nc_mylist: 100,
-  nc_comments: 10
+  nc_mylists: 100,
+  nc_comments: 10,
 };
 
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    btn.classList.add('active');
-    const tabName = btn.getAttribute('data-tab');
-    document.getElementById(`tab-${tabName}`).classList.add('active');
-
-    if (tabName === 'insight' && currentData) {
-      renderTop5InsightChart(currentData);
-    }
-  });
+document.addEventListener("DOMContentLoaded", () => {
+  initTabs();
+  initChartApp();
 });
 
-async function initApp() {
-  try {
-    const indexRes = await fetch(`./data/archive_index.json?t=${Date.now()}`);
-    if (indexRes.ok) {
-      const archiveList = await indexRes.json();
-      if (Array.isArray(archiveList) && archiveList.length > 0) {
-        renderArchiveSelector(archiveList);
+function initTabs() {
+  const tabButtons = document.querySelectorAll(".tab-btn");
+  const tabContents = document.querySelectorAll(".tab-content");
+
+  tabButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const targetId = btn.getAttribute("data-tab");
+      tabButtons.forEach((b) => b.classList.remove("active"));
+      tabContents.forEach((c) => c.classList.remove("active"));
+
+      btn.classList.add("active");
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        targetEl.classList.add("active");
       }
-    }
-    await loadChartData('./data/latest_ranking.json');
-  } catch (err) {
-    console.error('データの読み込みに失敗しました:', err);
-  }
-}
 
-function renderArchiveSelector(archiveList) {
-  const select = document.getElementById('archive-select');
-  if (!select) return;
-
-  select.innerHTML = archiveList.map((item, idx) => {
-    const path = idx === 0
-      ? './data/latest_ranking.json'
-      : `./data/archives/${item.archiveId}.json`;
-    return `<option value="${path}">${item.label}</option>`;
-  }).join('');
-
-  select.addEventListener('change', (e) => {
-    loadChartData(e.target.value);
+      if (targetId === "tab-insight" && currentChartData) {
+        renderTop5InsightChart(currentChartData.ranking || []);
+      }
+    });
   });
 }
 
-async function loadChartData(jsonPath) {
-  const res = await fetch(`${jsonPath}?t=${Date.now()}`);
-  const data = await res.json();
+async function fetchJsonWithFallback(urls) {
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, { cache: "no-store" });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (_) {
+      // 次の候補URLを試行
+    }
+  }
+  return null;
+}
 
-  if (!data || !data.songs || data.songs.length === 0) {
-    document.getElementById('chart-title').textContent = '現在集計データがありません';
+function getSongIdentityKeys(song) {
+  const keys = [];
+  if (song.song_id) keys.push(`id:${song.song_id}`);
+  if (song.id) keys.push(`id:${song.id}`);
+  if (song.youtube_id) keys.push(`yt:${song.youtube_id}`);
+  if (song.niconico_id) keys.push(`nc:${song.niconico_id}`);
+  if (song.title && song.producer) keys.push(`tp:${song.title}__${song.producer}`);
+  return keys;
+}
+
+async function loadArchiveHistory() {
+  const indexData = await fetchJsonWithFallback([
+    "data/archives/archive_index.json",
+    "public/data/archives/archive_index.json",
+    "data/archive_index.json",
+  ]);
+
+  const selectEl = document.getElementById("archive-select");
+  if (!indexData || !Array.isArray(indexData.archives)) {
     return;
   }
 
-  currentData = data;
-  renderRankingView(data);
-  renderTop5InsightChart(data);
-}
-
-function formatTextWithBreaks(text) {
-  return String(text || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/\n/g, '<br>');
-}
-
-function calcSongPoints(song, weights) {
-  const w = weights || DEFAULT_WEIGHTS;
-  const raw = song.raw || {};
-  const pts = song.pts || {
-    yt_views: (raw.yt_views || 0) * w.yt_views,
-    yt_likes: (raw.yt_likes || 0) * w.yt_likes,
-    yt_comments: (raw.yt_comments || 0) * w.yt_comments,
-    nc_views: (raw.nc_views || 0) * w.nc_views,
-    nc_mylist: (raw.nc_mylist || 0) * w.nc_mylist,
-    nc_comments: (raw.nc_comments || 0) * w.nc_comments
-  };
-  const yt_total = pts.yt_views + pts.yt_likes + pts.yt_comments;
-  const nc_total = pts.nc_views + pts.nc_mylist + pts.nc_comments;
-  const total = yt_total + nc_total || 1;
-
-  return {
-    pts,
-    yt_total,
-    nc_total,
-    total: song.total_pt || (yt_total + nc_total),
-    yt_share: ((yt_total / total) * 100).toFixed(1),
-    nc_share: ((nc_total / total) * 100).toFixed(1),
-    seg: {
-      yt_views: ((pts.yt_views / total) * 100).toFixed(2),
-      yt_likes: ((pts.yt_likes / total) * 100).toFixed(2),
-      yt_comments: ((pts.yt_comments / total) * 100).toFixed(2),
-      nc_views: ((pts.nc_views / total) * 100).toFixed(2),
-      nc_mylist: ((pts.nc_mylist / total) * 100).toFixed(2),
-      nc_comments: ((pts.nc_comments / total) * 100).toFixed(2)
-    }
-  };
-}
-
-function formatDiff(rank, prev) {
-  if (!prev || prev === "NEW") return `<div class="rank-diff diff-new">NEW</div>`;
-  const diff = prev - rank;
-  if (diff > 0) return `<div class="rank-diff diff-up">▲${diff}</div>`;
-  if (diff < 0) return `<div class="rank-diff diff-down">▼${Math.abs(diff)}</div>`;
-  return `<div class="rank-diff" style="color:#94a3b8;">→</div>`;
-}
-
-function renderRankingView(data) {
-  document.getElementById('chart-title').textContent =
-    `${data.publishDate || ''} 公開（集計期間：${data.period || ''}）`;
-
-  document.getElementById('weekly-summary-text').innerHTML =
-    formatTextWithBreaks(data.weeklySummary || '今週のYouTube・ニコニコ動画6指標による複合ランキング結果です。');
-
-  const container = document.getElementById('ranking-container');
-  const analysisContainer = document.getElementById('analysis-container');
-  container.innerHTML = '';
-  analysisContainer.innerHTML = '';
-
-  const songs = data.songs.slice(0, 20);
-
-  songs.forEach(song => {
-    const c = calcSongPoints(song, data.weights);
-    const rankClass = song.rank <= 3 ? `rank-${song.rank}` : '';
-    const commentaryRaw = song.commentary && song.commentary.trim() !== ''
-      ? song.commentary
-      : `YouTube指標 ${c.yt_share}%（${c.yt_total.toLocaleString()}pt）、ニコニコ動画指標 ${c.nc_share}%（${c.nc_total.toLocaleString()}pt）を獲得し総合${song.rank}位にランクイン。`;
-    const commentaryHtml = formatTextWithBreaks(commentaryRaw);
-
-    const ytLink = song.youtube_id
-      ? `<a class="ext-btn yt" href="https://www.youtube.com/watch?v=${song.youtube_id}" target="_blank" rel="noopener">▶ YouTubeで視聴</a>`
-      : '';
-    const ncLink = song.niconico_id
-      ? `<a class="ext-btn nc" href="https://www.nicovideo.jp/watch/${song.niconico_id}" target="_blank" rel="noopener">▶ ニコニコ動画で視聴</a>`
-      : '';
-
-    const ytThumbHtml = song.youtube_id
-      ? `
-        <div class="yt-thumb-wrap">
-          <a class="yt-thumb-link" href="https://www.youtube.com/watch?v=${song.youtube_id}" target="_blank" rel="noopener" title="YouTubeで「${song.title}」を視聴">
-            <img
-              class="yt-thumb-img"
-              src="https://i.ytimg.com/vi/${song.youtube_id}/maxresdefault.jpg"
-              alt="${song.title} サムネイル"
-              loading="lazy"
-              onload="if(this.naturalWidth <= 120) this.src='https://i.ytimg.com/vi/${song.youtube_id}/hqdefault.jpg';"
-              onerror="this.onerror=null; this.src='https://i.ytimg.com/vi/${song.youtube_id}/hqdefault.jpg';"
-            >
-          </a>
-        </div>
-      `
-      : '';
-
-    const card = document.createElement('div');
-    card.className = 'rank-card';
-
-    card.innerHTML = `
-      <div class="rank-header">
-        <div class="rank-num-box">
-          <div class="rank-num ${rankClass}">${song.rank}</div>
-          ${formatDiff(song.rank, song.prevRank)}
-        </div>
-        <div class="song-info">
-          <div class="song-title-row">
-            <h3>${song.title}</h3>
-            <button type="button" class="detail-toggle-btn">詳細を見る ▾</button>
-          </div>
-          <div class="song-meta">
-            <span>P: <strong>${song.producer}</strong></span>
-            <span>Vocal: ${song.vocal || '-'}</span>
-          </div>
-        </div>
-        <div class="point-box">
-          <div class="total-pt">${c.total.toLocaleString()}<span>pt</span></div>
-        </div>
-      </div>
-
-      <div class="share-bar-wrap">
-        <div class="share-bar">
-          <div class="seg-yt-views" style="width:${c.seg.yt_views}%" title="YT再生: ${c.pts.yt_views.toLocaleString()}pt"></div>
-          <div class="seg-yt-likes" style="width:${c.seg.yt_likes}%" title="YT高評価: ${c.pts.yt_likes.toLocaleString()}pt"></div>
-          <div class="seg-yt-comments" style="width:${c.seg.yt_comments}%" title="YTコメント: ${c.pts.yt_comments.toLocaleString()}pt"></div>
-          <div class="seg-nc-views" style="width:${c.seg.nc_views}%" title="ニコ動再生: ${c.pts.nc_views.toLocaleString()}pt"></div>
-          <div class="seg-nc-mylist" style="width:${c.seg.nc_mylist}%" title="ニコ動マイリス: ${c.pts.nc_mylist.toLocaleString()}pt"></div>
-          <div class="seg-nc-comments" style="width:${c.seg.nc_comments}%" title="ニコ動コメント: ${c.pts.nc_comments.toLocaleString()}pt"></div>
-        </div>
-        <div class="share-labels">
-          <span>YouTube計: ${c.yt_share}% (${c.yt_total.toLocaleString()} pt)</span>
-          <span>ニコ動計: ${c.nc_share}% (${c.nc_total.toLocaleString()} pt)</span>
-        </div>
-      </div>
-
-      <div class="detail-panel">
-        <div class="metrics-grid">
-          <div class="metric-box" style="border-left-color: var(--c-yt-views)">
-            <div class="metric-name">YouTube 週間再生 (×1)</div>
-            <div class="metric-raw">+${(song.raw.yt_views || 0).toLocaleString()}回</div>
-            <div class="metric-pt">${c.pts.yt_views.toLocaleString()} pt</div>
-          </div>
-          <div class="metric-box" style="border-left-color: var(--c-yt-likes)">
-            <div class="metric-name">YouTube 週間高評価 (×50)</div>
-            <div class="metric-raw">+${(song.raw.yt_likes || 0).toLocaleString()}件</div>
-            <div class="metric-pt">${c.pts.yt_likes.toLocaleString()} pt</div>
-          </div>
-          <div class="metric-box" style="border-left-color: var(--c-yt-comments)">
-            <div class="metric-name">YouTube 週間コメント (×100)</div>
-            <div class="metric-raw">+${(song.raw.yt_comments || 0).toLocaleString()}件</div>
-            <div class="metric-pt">${c.pts.yt_comments.toLocaleString()} pt</div>
-          </div>
-          <div class="metric-box" style="border-left-color: var(--c-nc-views)">
-            <div class="metric-name">ニコ動 週間再生 (×5)</div>
-            <div class="metric-raw">+${(song.raw.nc_views || 0).toLocaleString()}回</div>
-            <div class="metric-pt">${c.pts.nc_views.toLocaleString()} pt</div>
-          </div>
-          <div class="metric-box" style="border-left-color: var(--c-nc-mylist)">
-            <div class="metric-name">ニコ動 週間マイリス (×100)</div>
-            <div class="metric-raw">+${(song.raw.nc_mylist || 0).toLocaleString()}件</div>
-            <div class="metric-pt">${c.pts.nc_mylist.toLocaleString()} pt</div>
-          </div>
-          <div class="metric-box" style="border-left-color: var(--c-nc-comments)">
-            <div class="metric-name">ニコ動 週間コメント (×10)</div>
-            <div class="metric-raw">+${(song.raw.nc_comments || 0).toLocaleString()}件</div>
-            <div class="metric-pt">${c.pts.nc_comments.toLocaleString()} pt</div>
-          </div>
-        </div>
-
-        <div class="ext-links">${ytLink}${ncLink}</div>
-        ${ytThumbHtml}
-
-        <div class="commentary-box">
-          <strong>【指標動向・楽曲解説】</strong><br>${commentaryHtml}
-        </div>
-      </div>
-    `;
-
-    const detailBtn = card.querySelector('.detail-toggle-btn');
-    detailBtn.addEventListener('click', () => {
-      const isOpen = card.classList.toggle('open');
-      detailBtn.textContent = isOpen ? '詳細を閉じる ▴' : '詳細を見る ▾';
+  // アーカイブプルダウンの構築
+  if (selectEl) {
+    indexData.archives.forEach((item) => {
+      const opt = document.createElement("option");
+      opt.value = item.file || item.path || item.id;
+      opt.textContent = item.label || item.period || item.id;
+      selectEl.appendChild(opt);
     });
 
-    container.appendChild(card);
+    selectEl.addEventListener("change", async (e) => {
+      const val = e.target.value;
+      if (val === "latest") {
+        await loadAndRenderChart();
+      } else {
+        const archiveData = await fetchJsonWithFallback([
+          `data/archives/${val}`,
+          `public/data/archives/${val}`,
+          val,
+        ]);
+        if (archiveData) {
+          enrichWithHistory(archiveData);
+          currentChartData = archiveData;
+          renderAllViews(archiveData);
+        }
+      }
+    });
+  }
 
-    analysisContainer.innerHTML += `
-      <h2>${song.rank}位：${song.producer}「${song.title}」（${c.total.toLocaleString()} pt）</h2>
-      <p>${commentaryHtml}</p>
-      <p style="font-size:0.85rem; color:#94a3b8;">
-        内訳：YT再生 ${c.pts.yt_views.toLocaleString()}pt / YT高評価 ${c.pts.yt_likes.toLocaleString()}pt / YTコメ ${c.pts.yt_comments.toLocaleString()}pt / ニコ動再生 ${c.pts.nc_views.toLocaleString()}pt / ニコ動マイリス ${c.pts.nc_mylist.toLocaleString()}pt / ニコ動コメ ${c.pts.nc_comments.toLocaleString()}pt
-      </p>
-    `;
+  // 過去アーカイブを読み込んでチャートイン回数・前週比のフロントエンド補完用キャッシュを作成
+  const loadedArchives = [];
+  for (const item of indexData.archives) {
+    const file = item.file || item.path || item.id;
+    if (!file) continue;
+    const data = await fetchJsonWithFallback([
+      `data/archives/${file}`,
+      `public/data/archives/${file}`,
+      file,
+    ]);
+    if (data && Array.isArray(data.ranking)) {
+      loadedArchives.push(data);
+    }
+  }
+  archiveHistoryCache = loadedArchives;
+}
+
+function enrichWithHistory(chartData) {
+  if (!chartData || !Array.isArray(chartData.ranking)) return;
+
+  // 過去アーカイブキャッシュがある場合は通算回数と前週ポイントを補完
+  const targetPeriod = chartData.period || chartData.updated_at || "";
+  const olderCharts = archiveHistoryCache.filter((c) => {
+    const p = c.period || c.updated_at || "";
+    return p && targetPeriod ? p < targetPeriod : false;
+  });
+
+  const prevChart = olderCharts.length > 0 ? olderCharts[olderCharts.length - 1] : null;
+
+  chartData.ranking.forEach((song) => {
+    const keys = getSongIdentityKeys(song);
+
+    // 1. チャートイン回数の補完（JSONに chart_in_count があればそれを優先、なければ履歴から算出）
+    if (typeof song.chart_in_count !== "number" || song.chart_in_count < 1) {
+      let count = 1;
+      olderCharts.forEach((past) => {
+        const matched = (past.ranking || []).slice(0, 20).some((ps) => {
+          const pKeys = getSongIdentityKeys(ps);
+          return keys.some((k) => pKeys.includes(k));
+        });
+        if (matched) count += 1;
+      });
+      song.chart_in_count = count;
+    }
+
+    // 2. 前週ポイント・ポイント前週比率の補完
+    if (song.prev_total_pt === undefined && prevChart) {
+      const prevSong = (prevChart.ranking || []).find((ps) => {
+        const pKeys = getSongIdentityKeys(ps);
+        return keys.some((k) => pKeys.includes(k));
+      });
+      if (prevSong && typeof prevSong.total_pt === "number") {
+        song.prev_total_pt = prevSong.total_pt;
+      }
+    }
+
+    if (
+      (song.pt_ratio === undefined || song.pt_ratio === null) &&
+      typeof song.prev_total_pt === "number" &&
+      song.prev_total_pt > 0
+    ) {
+      song.pt_ratio = Math.round((song.total_pt / song.prev_total_pt) * 100);
+    }
   });
 }
 
-function renderTop5InsightChart(data) {
-  const canvas = document.getElementById('top5Chart');
-  const tableContainer = document.getElementById('insight-table-container');
-  if (!canvas || typeof Chart === 'undefined') return;
+async function initChartApp() {
+  await loadArchiveHistory();
+  await loadAndRenderChart();
+}
 
-  const top5 = data.songs.slice(0, 5);
+async function loadAndRenderChart() {
+  const data = await fetchJsonWithFallback([
+    "data/latest_ranking.json",
+    "public/data/latest_ranking.json",
+    "data/drafts/weekly_draft.json",
+    "weekly_draft.json",
+    "latest_ranking.json",
+  ]);
 
-  if (chartInstance) {
-    chartInstance.destroy();
+  if (!data) {
+    const container = document.getElementById("ranking-container");
+    if (container) {
+      container.innerHTML = `<div class="error-state">ランキングデータの読み込みに失敗しました。</div>`;
+    }
+    return;
   }
 
-  const labels = top5.map(s => `${s.rank}位: ${s.title}`);
-  const calcList = top5.map(s => calcSongPoints(s, data.weights));
+  enrichWithHistory(data);
+  currentChartData = data;
+  renderAllViews(data);
+}
 
-  chartInstance = new Chart(canvas, {
-    type: 'bar',
+function renderAllViews(data) {
+  const periodEl = document.getElementById("chart-period");
+  if (periodEl) {
+    periodEl.textContent = data.period || data.updated_at || "最新チャート";
+  }
+
+  const ranking = Array.isArray(data.ranking) ? data.ranking : [];
+  renderRankingView(ranking);
+  renderTop5InsightChart(ranking);
+  renderInsightTable(ranking);
+  renderCommentaryView(data, ranking);
+}
+
+function getPointsBreakdown(song) {
+  const raw = song.raw || {};
+  const pts = song.pts || {};
+
+  const yt_views = pts.yt_views !== undefined ? pts.yt_views : (raw.yt_views || 0) * WEIGHTS.yt_views;
+  const yt_likes = pts.yt_likes !== undefined ? pts.yt_likes : (raw.yt_likes || 0) * WEIGHTS.yt_likes;
+  const yt_comments = pts.yt_comments !== undefined ? pts.yt_comments : (raw.yt_comments || 0) * WEIGHTS.yt_comments;
+
+  const nc_views = pts.nc_views !== undefined ? pts.nc_views : (raw.nc_views || 0) * WEIGHTS.nc_views;
+  const nc_mylists = pts.nc_mylists !== undefined ? pts.nc_mylists : (raw.nc_mylists || 0) * WEIGHTS.nc_mylists;
+  const nc_comments = pts.nc_comments !== undefined ? pts.nc_comments : (raw.nc_comments || 0) * WEIGHTS.nc_comments;
+
+  const yt_total = pts.yt_total !== undefined ? pts.yt_total : yt_views + yt_likes + yt_comments;
+  const nc_total = pts.nc_total !== undefined ? pts.nc_total : nc_views + nc_mylists + nc_comments;
+  const total_pt = song.total_pt !== undefined ? song.total_pt : yt_total + nc_total;
+
+  return {
+    yt_views,
+    yt_likes,
+    yt_comments,
+    nc_views,
+    nc_mylists,
+    nc_comments,
+    yt_total,
+    nc_total,
+    total_pt,
+  };
+}
+
+function formatRankDiffBadge(song) {
+  const prev = song.prev_rank;
+  const curr = song.rank;
+  if (!prev || prev === null) {
+    return `<span class="rank-diff diff-new">NEW</span>`;
+  }
+  if (prev > curr) {
+    return `<span class="rank-diff diff-up">▲${prev - curr} (前週${prev}位)</span>`;
+  }
+  if (prev < curr) {
+    return `<span class="rank-diff diff-down">▼${curr - prev} (前週${prev}位)</span>`;
+  }
+  return `<span class="rank-diff diff-stay">→ KEEP (前週${prev}位)</span>`;
+}
+
+/**
+ * ポイント前週比率のフォーマット
+ * 例: 2,000,000pt -> 3,000,000pt の場合は緑色で「∧150%」
+ * ポイントが下がっていた場合は赤色で「∨75%」
+ */
+function formatPointRatioHTML(song) {
+  let ratio = song.pt_ratio;
+  if (
+    (ratio === undefined || ratio === null) &&
+    typeof song.prev_total_pt === "number" &&
+    song.prev_total_pt > 0
+  ) {
+    ratio = Math.round((song.total_pt / song.prev_total_pt) * 100);
+  }
+
+  if (ratio === undefined || ratio === null || isNaN(ratio)) {
+    return `<span class="pt-ratio-new">NEW</span>`;
+  }
+
+  const roundedRatio = Math.round(ratio);
+  const isUp =
+    typeof song.prev_total_pt === "number"
+      ? song.total_pt > song.prev_total_pt
+      : roundedRatio > 100;
+  const isDown =
+    typeof song.prev_total_pt === "number"
+      ? song.total_pt < song.prev_total_pt
+      : roundedRatio < 100;
+
+  if (isUp) {
+    return `<span class="pt-ratio-up">∧${roundedRatio}%</span>`;
+  } else if (isDown) {
+    return `<span class="pt-ratio-down">∨${roundedRatio}%</span>`;
+  } else {
+    return `<span class="pt-ratio-stay">→${roundedRatio}%</span>`;
+  }
+}
+
+function renderRankingView(ranking) {
+  const container = document.getElementById("ranking-container");
+  if (!container) return;
+
+  if (!ranking.length) {
+    container.innerHTML = `<div class="empty-state">表示できるランキングデータがありません。</div>`;
+    return;
+  }
+
+  container.innerHTML = ranking
+    .slice(0, 20)
+    .map((song) => {
+      const bd = getPointsBreakdown(song);
+      const raw = song.raw || {};
+      const ytPercent = bd.total_pt > 0 ? ((bd.yt_total / bd.total_pt) * 100).toFixed(1) : "0.0";
+      const ncPercent = bd.total_pt > 0 ? ((bd.nc_total / bd.total_pt) * 100).toFixed(1) : "0.0";
+      const chartInCount = song.chart_in_count || 1;
+      const thumbUrl =
+        song.thumbnail ||
+        (song.youtube_id ? `https://i.ytimg.com/vi/${song.youtube_id}/mqdefault.jpg` : "");
+
+      return `
+      <article class="rank-card rank-${song.rank}" data-rank="${song.rank}">
+        <div class="rank-card-summary" onclick="toggleRankDetail(${song.rank})">
+          <div class="rank-number-col">
+            <span class="rank-number">${song.rank}<small>位</small></span>
+            ${formatRankDiffBadge(song)}
+            <span class="chart-in-mini">${chartInCount}週目</span>
+          </div>
+
+          ${
+            thumbUrl
+              ? `<div class="rank-thumb-col">
+                   <img src="${escapeHtml(thumbUrl)}" alt="${escapeHtml(song.title)}" class="rank-thumb" loading="lazy" />
+                 </div>`
+              : ""
+          }
+
+          <div class="rank-info-col">
+            <h3 class="song-title">${escapeHtml(song.title)}</h3>
+            <div class="song-meta">
+              <span class="song-producer">${escapeHtml(song.producer)}</span>
+              ${song.vocal ? `<span class="song-vocal">feat. ${escapeHtml(song.vocal)}</span>` : ""}
+            </div>
+            <div class="platform-bar">
+              <div class="platform-bar-yt" style="width: ${ytPercent}%" title="YouTube ${ytPercent}%"></div>
+              <div class="platform-bar-nc" style="width: ${ncPercent}%" title="ニコニコ動画 ${ncPercent}%"></div>
+            </div>
+          </div>
+
+          <div class="rank-points-col">
+            <div class="total-points">${Number(bd.total_pt).toLocaleString()} <small>pt</small></div>
+            <div class="points-sub-row">
+              <span>前週比: ${formatPointRatioHTML(song)}</span>
+              <span class="platform-split-text">YT ${ytPercent}% / NC ${ncPercent}%</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="detail-panel-${song.rank}" class="rank-detail-panel">
+          <div class="detail-grid">
+            <div class="detail-box yt-detail-box">
+              <h4>YouTube 指標内訳 (${Number(bd.yt_total).toLocaleString()} pt / ${ytPercent}%)</h4>
+              <ul>
+                <li><span>週間再生数:</span> <strong>+${Number(raw.yt_views || 0).toLocaleString()}</strong> (${Number(bd.yt_views).toLocaleString()} pt)</li>
+                <li><span>週間高評価数:</span> <strong>+${Number(raw.yt_likes || 0).toLocaleString()}</strong> (${Number(bd.yt_likes).toLocaleString()} pt)</li>
+                <li><span>週間コメント数:</span> <strong>+${Number(raw.yt_comments || 0).toLocaleString()}</strong> (${Number(bd.yt_comments).toLocaleString()} pt)</li>
+              </ul>
+              ${
+                song.youtube_id
+                  ? `<a href="https://www.youtube.com/watch?v=${encodeURIComponent(song.youtube_id)}" target="_blank" rel="noopener noreferrer" class="video-link yt-link">▶ YouTubeで視聴する</a>`
+                  : ""
+              }
+            </div>
+
+            <div class="detail-box nc-detail-box">
+              <h4>ニコニコ動画 指標内訳 (${Number(bd.nc_total).toLocaleString()} pt / ${ncPercent}%)</h4>
+              <ul>
+                <li><span>週間再生数:</span> <strong>+${Number(raw.nc_views || 0).toLocaleString()}</strong> (${Number(bd.nc_views).toLocaleString()} pt)</li>
+                <li><span>週間マイリスト数:</span> <strong>+${Number(raw.nc_mylists || 0).toLocaleString()}</strong> (${Number(bd.nc_mylists).toLocaleString()} pt)</li>
+                <li><span>週間コメント数:</span> <strong>+${Number(raw.nc_comments || 0).toLocaleString()}</strong> (${Number(bd.nc_comments).toLocaleString()} pt)</li>
+              </ul>
+              ${
+                song.niconico_id
+                  ? `<a href="https://www.nicovideo.jp/watch/${encodeURIComponent(song.niconico_id)}" target="_blank" rel="noopener noreferrer" class="video-link nc-link">▶ ニコニコ動画で視聴する</a>`
+                  : ""
+              }
+            </div>
+          </div>
+
+          ${
+            song.commentary
+              ? `<div class="commentary-box">
+                   <h5>楽曲解説・チャート分析</h5>
+                   <p>${escapeHtml(song.commentary).replace(/\n/g, "<br>")}</p>
+                 </div>`
+              : ""
+          }
+        </div>
+      </article>
+      `;
+    })
+    .join("");
+}
+
+window.toggleRankDetail = function (rank) {
+  const panel = document.getElementById(`detail-panel-${rank}`);
+  if (panel) {
+    panel.classList.toggle("open");
+  }
+};
+
+/**
+ * ランキングインサイト：TOP 10 の積み上げ棒グラフを描画
+ */
+function renderTop5InsightChart(ranking) {
+  const canvas = document.getElementById("top5Chart");
+  if (!canvas || typeof Chart === "undefined") return;
+
+  const top10 = ranking.slice(0, 10);
+  const labels = top10.map((s) => `${s.rank}位: ${s.title}`);
+  const breakdowns = top10.map((s) => getPointsBreakdown(s));
+
+  if (insightChartInstance) {
+    insightChartInstance.destroy();
+  }
+
+  const ctx = canvas.getContext("2d");
+  insightChartInstance = new Chart(ctx, {
+    type: "bar",
     data: {
       labels,
       datasets: [
-        { label: 'YT再生(×1)', data: calcList.map(c => c.pts.yt_views), backgroundColor: '#ef4444' },
-        { label: 'YT高評価(×50)', data: calcList.map(c => c.pts.yt_likes), backgroundColor: '#f97316' },
-        { label: 'YTコメ(×100)', data: calcList.map(c => c.pts.yt_comments), backgroundColor: '#eab308' },
-        { label: 'ニコ再生(×5)', data: calcList.map(c => c.pts.nc_views), backgroundColor: '#3b82f6' },
-        { label: 'ニコマイリス(×100)', data: calcList.map(c => c.pts.nc_mylist), backgroundColor: '#06b6d4' },
-        { label: 'ニココメ(×10)', data: calcList.map(c => c.pts.nc_comments), backgroundColor: '#8b5cf6' }
-      ]
+        {
+          label: "YouTube 再生",
+          data: breakdowns.map((b) => b.yt_views),
+          backgroundColor: "#ef4444",
+        },
+        {
+          label: "YouTube 高評価",
+          data: breakdowns.map((b) => b.yt_likes),
+          backgroundColor: "#f87171",
+        },
+        {
+          label: "YouTube コメント",
+          data: breakdowns.map((b) => b.yt_comments),
+          backgroundColor: "#fca5a5",
+        },
+        {
+          label: "ニコ動 再生",
+          data: breakdowns.map((b) => b.nc_views),
+          backgroundColor: "#2563eb",
+        },
+        {
+          label: "ニコ動 マイリス",
+          data: breakdowns.map((b) => b.nc_mylists),
+          backgroundColor: "#60a5fa",
+        },
+        {
+          label: "ニコ動 コメント",
+          data: breakdowns.map((b) => b.nc_comments),
+          backgroundColor: "#93c5fd",
+        },
+      ],
     },
     options: {
-      indexAxis: 'y',
+      indexAxis: "y",
       responsive: true,
       maintainAspectRatio: false,
       scales: {
         x: {
           stacked: true,
-          ticks: { color: '#94a3b8' },
-          grid: { color: 'rgba(148, 163, 184, 0.15)' }
+          ticks: { color: "#94a3b8" },
+          grid: { color: "rgba(148, 163, 184, 0.12)" },
         },
         y: {
           stacked: true,
-          ticks: { color: '#f8fafc', font: { size: 13, weight: 'bold' } },
-          grid: { display: false }
-        }
+          ticks: { color: "#f8fafc", font: { weight: "600" } },
+          grid: { display: false },
+        },
       },
       plugins: {
-        legend: { labels: { color: '#f8fafc' } },
+        legend: {
+          labels: { color: "#e2e8f0" },
+        },
         tooltip: {
           callbacks: {
-            label: (ctx) => `${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString()} pt`
-          }
-        }
-      }
-    }
+            label: function (context) {
+              const val = Number(context.raw || 0).toLocaleString();
+              return `${context.dataset.label}: ${val} pt`;
+            },
+          },
+        },
+      },
+    },
   });
-
-  if (tableContainer) {
-    const rows = top5.map((s, idx) => {
-      const c = calcList[idx];
-      return `
-        <tr>
-          <td><strong>${s.rank}位</strong></td>
-          <td>${s.title} <span style="color:#94a3b8;font-size:0.8rem;">(${s.producer})</span></td>
-          <td><strong>${c.total.toLocaleString()} pt</strong></td>
-          <td style="color:#f87171;">${c.yt_share}% (${c.yt_total.toLocaleString()} pt)</td>
-          <td style="color:#60a5fa;">${c.nc_share}% (${c.nc_total.toLocaleString()} pt)</td>
-        </tr>
-      `;
-    }).join('');
-
-    tableContainer.innerHTML = `
-      <table class="rule-table">
-        <thead>
-          <tr>
-            <th>順位</th>
-            <th>楽曲名 (ボカロP)</th>
-            <th>総合ポイント</th>
-            <th>YouTube比率 (獲得pt)</th>
-            <th>ニコニコ動画比率 (獲得pt)</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    `;
-  }
 }
 
-document.addEventListener('DOMContentLoaded', initApp);
+/**
+ * ランキングインサイト：TOP 10 プラットフォーム別・指標構成比データ テーブルを描画
+ * 列構成: 順位 | 楽曲名 (ボカロP) | 総合ポイント | ポイント前週比率 | チャートイン回数 | YouTube比率 (獲得pt) | ニコニコ動画比率 (獲得pt)
+ */
+function renderInsightTable(ranking) {
+  const tbody =
+    document.getElementById("insight-table-body") ||
+    document.querySelector("#insight-table-container tbody");
+  if (!tbody) return;
+
+  const top10 = ranking.slice(0, 10);
+  if (!top10.length) {
+    tbody.innerHTML = `<tr><td colspan="7" class="loading-cell">データがありません。</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = top10
+    .map((song) => {
+      const bd = getPointsBreakdown(song);
+      const ytRatio = bd.total_pt > 0 ? ((bd.yt_total / bd.total_pt) * 100).toFixed(1) : "0.0";
+      const ncRatio = bd.total_pt > 0 ? ((bd.nc_total / bd.total_pt) * 100).toFixed(1) : "0.0";
+      const chartInCount = song.chart_in_count || 1;
+
+      return `
+        <tr>
+          <td class="col-rank">${song.rank}位</td>
+          <td class="col-song">
+            <span class="insight-song-title">${escapeHtml(song.title)}</span>
+            <span class="insight-song-producer">(${escapeHtml(song.producer)})</span>
+          </td>
+          <td class="col-total-pt">${Number(bd.total_pt).toLocaleString()} pt</td>
+          <td class="col-pt-ratio">${formatPointRatioHTML(song)}</td>
+          <td class="col-chart-in">${chartInCount}回</td>
+          <td class="col-yt-ratio">${ytRatio}% (${Number(bd.yt_total).toLocaleString()} pt)</td>
+          <td class="col-nc-ratio">${ncRatio}% (${Number(bd.nc_total).toLocaleString()} pt)</td>
+        </tr>
+      `;
+    })
+    .join("");
+}
+
+function renderCommentaryView(data, ranking) {
+  const overallEl = document.getElementById("overall-commentary");
+  if (overallEl) {
+    const overallText = data.overall_commentary || data.trend_analysis || "";
+    overallEl.innerHTML = overallText
+      ? `<p>${escapeHtml(overallText).replace(/\n/g, "<br>")}</p>`
+      : `<p class="muted-text">今週の全体総評はまだ登録されていません。</p>`;
+  }
+
+  const listEl = document.getElementById("commentary-container");
+  if (!listEl) return;
+
+  const commentedSongs = ranking.filter((s) => s.commentary && String(s.commentary).trim() !== "");
+  if (!commentedSongs.length) {
+    listEl.innerHTML = `<div class="empty-state">楽曲別の解説はまだ登録されていません。</div>`;
+    return;
+  }
+
+  listEl.innerHTML = commentedSongs
+    .map(
+      (song) => `
+      <div class="commentary-card">
+        <div class="commentary-card-header">
+          <span class="commentary-rank-badge">${song.rank}位</span>
+          <h3 class="commentary-song-title">${escapeHtml(song.title)} <small>/ ${escapeHtml(song.producer)}</small></h3>
+          <span class="commentary-song-pt">${Number(song.total_pt || 0).toLocaleString()} pt</span>
+        </div>
+        <div class="commentary-card-body">
+          ${escapeHtml(song.commentary).replace(/\n/g, "<br>")}
+        </div>
+      </div>
+    `
+    )
+    .join("");
+}
+
+function escapeHtml(str) {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}

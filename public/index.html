@@ -1,158 +1,171 @@
 <!DOCTYPE html>
-<html lang="ja" prefix="og: https://ogp.me/ns#">
+<html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>週刊VOCALOID複合ランキング | YouTube×ニコ動 6指標チャート</title>
-  <meta name="description" content="YouTubeとニコニコ動画の6指標（週間再生・高評価・マイリスト・コメント）を統合し、国内外のボーカロイド音楽シーンの今を可視化する週間TOP 20チャート。毎週水曜13:00更新。">
-
-  <!-- OGP (Open Graph Protocol) 設定 -->
-  <meta property="og:title" content="週刊VOCALOID複合ランキング TOP 20">
-  <meta property="og:description" content="YouTubeとニコニコ動画の6指標を統合・ポイント化。国内外のボカロシーンの熱量を可視化する週間複合チャート（毎週水曜13:00更新）。">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://weekly-vocaloid-combined-chart.com/">
-  <meta property="og:site_name" content="週刊VOCALOID複合ランキング">
-  <meta property="og:image" content="https://weekly-vocaloid-combined-chart.com/ogp.png">
-  <meta property="og:locale" content="ja_JP">
-
-  <!-- X (Twitter) Card 設定 -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="週刊VOCALOID複合ランキング TOP 20">
-  <meta name="twitter:description" content="YouTube×ニコニコ動画の6指標で算出する週間VOCALOID複合チャート。毎週水曜13:00更新。">
-  <meta name="twitter:image" content="https://weekly-vocaloid-combined-chart.com/ogp.png">
-
-  <link rel="canonical" href="https://weekly-vocaloid-combined-chart.com/">
-  <link rel="stylesheet" href="./css/style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>週刊VOCALOID複合ランキング</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-
-  <header>
+  <header class="site-header">
     <div class="header-inner">
-      <div class="site-title">
-        <span>週刊VOCALOID複合ランキング</span>
-        <span class="badge">TOP 20</span>
+      <div class="brand-area">
+        <span class="brand-badge">WEEKLY VOCALOID COMPOSITE CHART</span>
+        <h1 class="site-title">週刊VOCALOID複合ランキング</h1>
+        <p class="site-subtitle">YouTube × ニコニコ動画 6指標統合ボカロチャート</p>
       </div>
-      <div class="update-schedule">
-        集計: <strong>月曜 0:00 〜 日曜 23:59</strong> ｜ 更新: <strong>毎週水曜 13:00</strong>
+      <div class="header-controls">
+        <div class="period-box">
+          <span class="period-label">集計期間 / 更新日</span>
+          <span id="chart-period" class="period-value">読み込み中...</span>
+        </div>
+        <div class="archive-box">
+          <label for="archive-select" class="archive-label">アーカイブ切替</label>
+          <select id="archive-select" class="archive-select">
+            <option value="latest">最新ランキング</option>
+          </select>
+        </div>
       </div>
     </div>
+
+    <nav class="tab-nav" aria-label="メインナビゲーション">
+      <button class="tab-btn active" data-tab="tab-ranking">週間ランキング TOP 20</button>
+      <button class="tab-btn" data-tab="tab-insight">ランキングインサイト</button>
+      <button class="tab-btn" data-tab="tab-analysis">上位楽曲解説・トレンド分析</button>
+      <button class="tab-btn" data-tab="tab-method">ランキングについて</button>
+    </nav>
   </header>
 
-  <nav class="nav-tabs">
-    <button class="tab-btn active" data-tab="ranking">週間ランキング TOP 20</button>
-    <button class="tab-btn" data-tab="insight">ランキングインサイト</button>
-    <button class="tab-btn" data-tab="analysis">上位楽曲解説・トレンド分析</button>
-    <button class="tab-btn" data-tab="method">ランキングについて</button>
-  </nav>
-
-  <main>
-    <div class="chart-meta">
-      <div>
-        <strong id="chart-title">データ読み込み中...</strong>
-        <div class="meta-note">※各楽曲タイトルの横にある「詳細を見る」ボタンを押すと6指標の内訳・動画リンク・サムネイルが開きます</div>
-      </div>
-      <div class="archive-control">
-        <label for="archive-select">📅 過去チャート切替:</label>
-        <select id="archive-select" class="archive-select">
-          <option value="./data/latest_ranking.json">最新チャート</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- TAB 1: 週間ランキング TOP 20 -->
+  <main class="main-container">
+    <!-- タブ1: 週間ランキング TOP 20 -->
     <section id="tab-ranking" class="tab-content active">
-      <div id="ranking-container" class="ranking-list"></div>
+      <div class="section-header">
+        <h2 class="section-title">週間ランキング TOP 20</h2>
+        <p class="section-desc">カードをクリックすると、6指標の獲得内訳・動画リンク・解説の詳細パネルが開きます。</p>
+      </div>
+      <div id="ranking-container" class="ranking-list">
+        <div class="loading-state">ランキングデータを読み込んでいます...</div>
+      </div>
     </section>
 
-    <!-- TAB 2: ランキングインサイト -->
+    <!-- タブ2: ランキングインサイト（TOP 10 に拡大） -->
     <section id="tab-insight" class="tab-content">
-      <div class="chart-visual-box">
-        <div class="visual-header">
-          <h2>📊 TOP 5 ポイント構成比グラフ（6指標積み上げ）</h2>
-          <p class="visual-sub">上位5曲がどのプラットフォーム・指標からポイントを獲得しているかの構造比較</p>
-        </div>
-        <div id="chart-canvas-wrap" class="canvas-wrap">
+      <div class="insight-card">
+        <h2 class="insight-section-title">TOP 10 ポイント構成比（6指標内訳）</h2>
+        <p class="insight-section-desc">上位10曲の総合ポイントにおけるYouTube（赤系）とニコニコ動画（青系）の各指標構成比です。</p>
+        <div class="chart-wrapper">
           <canvas id="top5Chart"></canvas>
         </div>
       </div>
 
-      <div class="article-box">
-        <h2>TOP 5 プラットフォーム別・指標構成比データ</h2>
-        <div id="insight-table-container"></div>
+      <div class="insight-card">
+        <h2 class="insight-section-title">TOP 10 プラットフォーム別・指標構成比データ</h2>
+        <div id="insight-table-container" class="table-responsive">
+          <table class="insight-table">
+            <thead>
+              <tr>
+                <th>順位</th>
+                <th>楽曲名 (ボカロP)</th>
+                <th>総合ポイント</th>
+                <th>ポイント前週比率</th>
+                <th>チャートイン回数</th>
+                <th>YouTube比率 (獲得pt)</th>
+                <th>ニコニコ動画比率 (獲得pt)</th>
+              </tr>
+            </thead>
+            <tbody id="insight-table-body">
+              <tr>
+                <td colspan="7" class="loading-cell">データを読み込んでいます...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
 
-    <!-- TAB 3: 上位楽曲解説・トレンド分析 -->
+    <!-- タブ3: 上位楽曲解説・トレンド分析 -->
     <section id="tab-analysis" class="tab-content">
-      <div class="article-box">
-        <h2>今週のチャート総括</h2>
-        <p id="weekly-summary-text">データ読み込み中...</p>
-        <div id="analysis-container"></div>
+      <div class="insight-card">
+        <h2 class="insight-section-title">今週のトレンド総評</h2>
+        <div id="overall-commentary" class="overall-commentary-box">
+          解説データを読み込んでいます...
+        </div>
+      </div>
+
+      <div class="insight-card">
+        <h2 class="insight-section-title">ピックアップ・上位楽曲解説</h2>
+        <div id="commentary-container" class="commentary-list">
+          <div class="loading-state">楽曲解説を読み込んでいます...</div>
+        </div>
       </div>
     </section>
 
-    <!-- TAB 4: ランキングについて -->
+    <!-- タブ4: ランキングについて -->
     <section id="tab-method" class="tab-content">
-      <div class="article-box">
-        <h2>本チャートの前提と問題意識</h2>
-        <p>現在のボーカロイド（合成音声）音楽シーンは、かつてのニコニコ動画単一コミュニティから、YouTubeやグローバルプラットフォームへと大きく拡大している。クリエイター・リスナー双方が国境を越える一方、単一プラットフォームのみを参照する既存チャートではシーンの全体像を捉えきれないという課題がある。</p>
-        <p>当サイト『週刊VOCALOID複合ランキング』では、YouTubeとニコニコ動画の6指標を統合・ポイント化し、毎週水曜日13:00に最新TOP 20チャートを公開する。</p>
-
-        <h2>ランキング作成方法（6指標と補正係数）</h2>
-        <p>毎週月曜日0:00から日曜日23:59までの7日間における各指標の純増数を取得し、以下の補正係数を乗じて合算した総合ポイント順で上位20曲（TOP 20）を算出する。</p>
-        <table class="rule-table">
-          <thead>
-            <tr>
-              <th>プラットフォーム</th>
-              <th>対象指標</th>
-              <th>補正係数</th>
-              <th>制定根拠・位置づけ</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>YouTube</td>
-              <td>週間再生回数</td>
-              <td><strong>× 1</strong></td>
-              <td>基準値。再生開始即カウント仕様によるスケール感を基準（1pt）に設定。</td>
-            </tr>
-            <tr>
-              <td>YouTube</td>
-              <td>週間高評価数</td>
-              <td><strong>× 50</strong></td>
-              <td>MVの平均高評価率（約2〜3%＝30〜50再生に1回）に基づき、支持の深さを反映。</td>
-            </tr>
-            <tr>
-              <td>YouTube</td>
-              <td>週間コメント数</td>
-              <td><strong>× 100</strong></td>
-              <td>希少性の高い視聴者エンゲージメントを評価しつつ、スパム影響を抑える係数に設定。</td>
-            </tr>
-            <tr>
-              <td>ニコニコ動画</td>
-              <td>週間再生回数</td>
-              <td><strong>× 5</strong></td>
-              <td>同一ユーザーの連続再生制限が厳格なニコ動の1再生の重みを考慮し5倍に設定。</td>
-            </tr>
-            <tr>
-              <td>ニコニコ動画</td>
-              <td>週間マイリスト数</td>
-              <td><strong>× 100</strong></td>
-              <td>ボカロ文化のコア指標。「ニコ動再生数×5」に伝統的なマイリスト倍率20倍を掛け合わせた最重要指標。</td>
-            </tr>
-            <tr>
-              <td>ニコニコ動画</td>
-              <td>週間コメント数</td>
-              <td><strong>× 10</strong></td>
-              <td>コミュニティの熱量を評価しつつ、1ユーザーによる弾幕連投のノイズを抑制。</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="insight-card">
+        <h2 class="insight-section-title">集計方法・ポイント計算式について</h2>
+        <p class="method-lead">
+          「週刊VOCALOID複合ランキング」は、YouTubeとニコニコ動画の2大プラットフォームにおける週間純増数を取得し、ボカロリスナーの視聴・支持行動を多角的に反映して算出する複合チャートです。
+        </p>
+        <div class="table-responsive">
+          <table class="insight-table method-table">
+            <thead>
+              <tr>
+                <th>プラットフォーム</th>
+                <th>指標</th>
+                <th>補正係数（重み付け）</th>
+                <th>算出ルール</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>YouTube</td>
+                <td>週間再生数</td>
+                <td>× 1 pt</td>
+                <td>期間内の再生数純増 × 1</td>
+              </tr>
+              <tr>
+                <td>YouTube</td>
+                <td>週間高評価数</td>
+                <td>× 50 pt</td>
+                <td>期間内の高評価数純増 × 50</td>
+              </tr>
+              <tr>
+                <td>YouTube</td>
+                <td>週間コメント数</td>
+                <td>× 100 pt</td>
+                <td>期間内のコメント数純増 × 100</td>
+              </tr>
+              <tr>
+                <td>ニコニコ動画</td>
+                <td>週間再生数</td>
+                <td>× 5 pt</td>
+                <td>期間内の再生数純増 × 5</td>
+              </tr>
+              <tr>
+                <td>ニコニコ動画</td>
+                <td>週間マイリスト数（いいね含む）</td>
+                <td>× 100 pt</td>
+                <td>期間内のマイリスト純増 × 100</td>
+              </tr>
+              <tr>
+                <td>ニコニコ動画</td>
+                <td>週間コメント数</td>
+                <td>× 10 pt</td>
+                <td>期間内のコメント数純増 × 10</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   </main>
 
-  <script src="./js/app.js"></script>
+  <footer class="site-footer">
+    <p>&copy; 週刊VOCALOID複合ランキング All Rights Reserved.</p>
+  </footer>
+
+  <script src="app.js"></script>
 </body>
 </html>
