@@ -3764,7 +3764,7 @@
     "title": "アノヒノミチ",
     "producer": "ふりふぁん！",
     "vocal": "重音テト",
-    "youtube_id": "",
+    "youtube_id": "LE2Ny3dEoxA",
     "niconico_id": "sm46925659"
   },
   {
@@ -3904,11 +3904,35 @@
     "niconico_id": ""
   },
   {
-    "song_id": "song_lRorblWIgi4",
-    "title": "VOCALOID7 AI Megpoid ボイスタイプ紹介 デモ",
-    "producer": "Unknown producer(s), SingerSongWriterjp",
-    "vocal": "GUMI",
-    "youtube_id": "lRorblWIgi4",
+    "song_id": "song_CeNuh44tGEQ",
+    "title": "のだ(Noda)",
+    "producer": "瑠美奈的娃娃(歌詞翻譯頻道)",
+    "vocal": "ずんだもん・初音ミク・重音テト",
+    "youtube_id": "CeNuh44tGEQ",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_sm45968000",
+    "title": "CLVTCH",
+    "producer": "よよよ",
+    "vocal": "重音テト",
+    "youtube_id": "jdpqpmrkAYA",
+    "niconico_id": "sm45968000"
+  },
+  {
+    "song_id": "song_WOXqJMFQfls",
+    "title": "🌊  한글화 오리지널",
+    "producer": "Kanon의 영상공방",
+    "vocal": "初音ミク・重音テト",
+    "youtube_id": "WOXqJMFQfls",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_r4JnO-uZ918",
+    "title": "Ragebait",
+    "producer": "Zynthesiren",
+    "vocal": "重音テト",
+    "youtube_id": "r4JnO-uZ918",
     "niconico_id": ""
   },
   {
@@ -3918,6 +3942,14 @@
     "vocal": "重音テト",
     "youtube_id": "PcgK_r4tYhM",
     "niconico_id": "sm46934360"
+  },
+  {
+    "song_id": "song_lRorblWIgi4",
+    "title": "VOCALOID7 AI Megpoid ボイスタイプ紹介 デモ",
+    "producer": "Unknown producer(s), SingerSongWriterjp",
+    "vocal": "GUMI",
+    "youtube_id": "lRorblWIgi4",
+    "niconico_id": ""
   },
   {
     "song_id": "song_eK6NGi-zS8Q",
@@ -4588,8 +4620,24 @@
     "title": "Beyond",
     "producer": "たまねぎ",
     "vocal": "音街ウナ",
-    "youtube_id": "GIi22krJwps",
+    "youtube_id": "",
     "niconico_id": "sm46933839"
+  },
+  {
+    "song_id": "song_sm40700016",
+    "title": "海のサーチライト",
+    "producer": "子牛",
+    "vocal": "初音ミク",
+    "youtube_id": "ySerm68hC1A",
+    "niconico_id": "sm40700016"
+  },
+  {
+    "song_id": "song_sm39374094",
+    "title": "秋の未確認生物(long ver)",
+    "producer": "子牛",
+    "vocal": "音街ウナ",
+    "youtube_id": "qXkkhP0d_iM",
+    "niconico_id": "sm39374094"
   },
   {
     "song_id": "song_sm17520775",
@@ -4632,20 +4680,12 @@
     "niconico_id": "sm46875504"
   },
   {
-    "song_id": "song_sm40700016",
-    "title": "海のサーチライト",
-    "producer": "子牛",
-    "vocal": "初音ミク",
-    "youtube_id": "ySerm68hC1A",
-    "niconico_id": "sm40700016"
-  },
-  {
-    "song_id": "song_sm39374094",
-    "title": "秋の未確認生物(long ver)",
-    "producer": "子牛",
-    "vocal": "音街ウナ",
-    "youtube_id": "qXkkhP0d_iM",
-    "niconico_id": "sm39374094"
+    "song_id": "song_sm45571052",
+    "title": "ワルツ・ロサ・テスタロッサ",
+    "producer": "nyanyannya",
+    "vocal": "神威がくぽ",
+    "youtube_id": "403XN7xT9ZA",
+    "niconico_id": "sm45571052"
   },
   {
     "song_id": "song_sm31791630",
@@ -4680,20 +4720,52 @@
     "niconico_id": "sm44044139"
   },
   {
-    "song_id": "song_CeNuh44tGEQ",
-    "title": "のだ(Noda)",
-    "producer": "瑠美奈的娃娃(歌詞翻譯頻道)",
-    "vocal": "ずんだもん・初音ミク・重音テト",
-    "youtube_id": "CeNuh44tGEQ",
+    "song_id": "song_sm46197396",
+    "title": "VT",
+    "producer": "火燵",
+    "vocal": "重音テト",
+    "youtube_id": "bQCES-piXmM",
+    "niconico_id": "sm46197396"
+  },
+  {
+    "song_id": "song_sm44691205",
+    "title": "イガク",
+    "producer": "ほいっぷ",
+    "vocal": "重音テト",
+    "youtube_id": "ySw1ZIRmR78",
+    "niconico_id": "sm44691205"
+  },
+  {
+    "song_id": "song_0u3jrv-8y_k",
+    "title": "ジェンガ",
+    "producer": "Ren",
+    "vocal": "重音テト",
+    "youtube_id": "0u3jrv-8y_k",
     "niconico_id": ""
   },
   {
-    "song_id": "song_sm45968000",
-    "title": "CLVTCH",
-    "producer": "よよよ",
+    "song_id": "song_-arPgA7YYN0",
+    "title": "キノウノナミダ",
+    "producer": "hatabow333",
     "vocal": "重音テト",
-    "youtube_id": "jdpqpmrkAYA",
-    "niconico_id": "sm45968000"
+    "youtube_id": "-arPgA7YYN0",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_k-QJPv_5b5k",
+    "title": "無色透迷",
+    "producer": "Wazca / わずか",
+    "vocal": "重音テト",
+    "youtube_id": "k-QJPv_5b5k",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_M1WrRtLXiXI",
+    "title": "TEOTATAKE",
+    "producer": "ンアシ (Nashi)",
+    "vocal": "VOCALOID",
+    "youtube_id": "M1WrRtLXiXI",
+    "niconico_id": ""
   },
   {
     "song_id": "song_sm44677326",
@@ -4712,43 +4784,35 @@
     "niconico_id": "sm44669739"
   },
   {
+    "song_id": "song_9SrPqOm4oRI",
+    "title": "置いてきやがった",
+    "producer": "Lauria",
+    "vocal": "可不",
+    "youtube_id": "9SrPqOm4oRI",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_ODqAYjyJ2HU",
+    "title": "水平線",
+    "producer": "アマノケイ",
+    "vocal": "可不",
+    "youtube_id": "ODqAYjyJ2HU",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_sm39309892",
+    "title": "プラスティック・レイディ",
+    "producer": "rukaku",
+    "vocal": "可不",
+    "youtube_id": "CuuG6368V20",
+    "niconico_id": "sm39309892"
+  },
+  {
     "song_id": "song_sm46712665",
     "title": "オールター",
     "producer": "Negusare",
     "vocal": "足立レイ",
     "youtube_id": "Ewmq-TVbNj4",
     "niconico_id": "sm46712665"
-  },
-  {
-    "song_id": "song_sm44669868",
-    "title": "生命",
-    "producer": "オヨイダキビス",
-    "vocal": "足立レイ",
-    "youtube_id": "wysR1-SDn4Y",
-    "niconico_id": "sm44669868"
-  },
-  {
-    "song_id": "song_sm46700474",
-    "title": "어딘가의 너에게",
-    "producer": "츠키유메, DID",
-    "vocal": "重音テト",
-    "youtube_id": "ZUowh5-9AtQ",
-    "niconico_id": "sm46700474"
-  },
-  {
-    "song_id": "song_WOXqJMFQfls",
-    "title": "🌊  한글화 오리지널",
-    "producer": "Kanon의 영상공방",
-    "vocal": "初音ミク・重音テト",
-    "youtube_id": "WOXqJMFQfls",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_r4JnO-uZ918",
-    "title": "Ragebait",
-    "producer": "Zynthesiren",
-    "vocal": "重音テト",
-    "youtube_id": "r4JnO-uZ918",
-    "niconico_id": ""
   }
 ]
