@@ -3280,14 +3280,6 @@
     "niconico_id": "sm23954284"
   },
   {
-    "song_id": "song_sm46936915",
-    "title": "秋足らず陽炎",
-    "producer": "myou",
-    "vocal": "重音テト",
-    "youtube_id": "6iwI4G9yFnM",
-    "niconico_id": "sm46936915"
-  },
-  {
     "song_id": "song_sm46769353",
     "title": "アデニウム",
     "producer": "カウロ",
@@ -3936,14 +3928,6 @@
     "niconico_id": ""
   },
   {
-    "song_id": "song_sm46933839",
-    "title": "Beyond",
-    "producer": "たまねぎ",
-    "vocal": "音街ウナ",
-    "youtube_id": "4SUpJide3RI",
-    "niconico_id": "sm46933839"
-  },
-  {
     "song_id": "song_sm46197396",
     "title": "VT",
     "producer": "火燵",
@@ -4016,6 +4000,126 @@
     "niconico_id": "sm39309892"
   },
   {
+    "song_id": "song_sm46941082",
+    "title": "ノイキャン・ガール 重音テト",
+    "producer": "GENMAI",
+    "vocal": "重音テト",
+    "youtube_id": "51W22QLlaCk",
+    "niconico_id": "sm46941082"
+  },
+  {
+    "song_id": "song_sm46940564",
+    "title": "時間ねぇー！",
+    "producer": "GRATUNE",
+    "vocal": "小春六花",
+    "youtube_id": "",
+    "niconico_id": "sm46940564"
+  },
+  {
+    "song_id": "song_sm46939574",
+    "title": "Star lyrics/Ⅱ",
+    "producer": "N-天",
+    "vocal": "VOCALOID",
+    "youtube_id": "9etZvpII1yY",
+    "niconico_id": "sm46939574"
+  },
+  {
+    "song_id": "song_sm46858697",
+    "title": "鬱とナードとウナロック",
+    "producer": "マジカルてP",
+    "vocal": "音街ウナ",
+    "youtube_id": "",
+    "niconico_id": "sm46858697"
+  },
+  {
+    "song_id": "song_sm46926018",
+    "title": "天国のあなたへ",
+    "producer": "shizuku",
+    "vocal": "可不",
+    "youtube_id": "nXNdEZ5LuXI",
+    "niconico_id": "sm46926018"
+  },
+  {
+    "song_id": "song_MheeLOtSawQ",
+    "title": "うみろ",
+    "producer": "ボカロPうみろ 臨界ダイバー作",
+    "vocal": "可不",
+    "youtube_id": "MheeLOtSawQ",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_sm44985521",
+    "title": "ダイアグノシス",
+    "producer": "竹椅子",
+    "vocal": "足立レイ",
+    "youtube_id": "D6AwMMG65ko",
+    "niconico_id": "sm44985521"
+  },
+  {
+    "song_id": "song_sm44471738",
+    "title": "Ghoul Sider",
+    "producer": "駆動快",
+    "vocal": "足立レイ・唄音ウタ(デフォ子)",
+    "youtube_id": "VD8-viND3w0",
+    "niconico_id": "sm44471738"
+  },
+  {
+    "song_id": "song_sm41962993",
+    "title": "レイ",
+    "producer": "ピクド",
+    "vocal": "足立レイ",
+    "youtube_id": "S4wuQWHguV8",
+    "niconico_id": "sm41962993"
+  },
+  {
+    "song_id": "song_P3Jk_vVU0ps",
+    "title": "혼잣말 MV /",
+    "producer": "Kitzneko (키츠네코)",
+    "vocal": "重音テト",
+    "youtube_id": "P3Jk_vVU0ps",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_inRXBlYgMGI",
+    "title": "Pathological Facade",
+    "producer": "GHOST",
+    "vocal": "重音テト",
+    "youtube_id": "inRXBlYgMGI",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_7QlqyUvTCno",
+    "title": "Someday Never (AFTERWORD)",
+    "producer": "KawaiiRiceBalls",
+    "vocal": "初音ミク",
+    "youtube_id": "7QlqyUvTCno",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_kt2BCbfUILQ",
+    "title": "NO CLIMAX, NO PUNCHLINE, NO MEANING",
+    "producer": "I-131",
+    "vocal": "MAYU",
+    "youtube_id": "kt2BCbfUILQ",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_6oPx70yyR1M",
+    "title": "MAKE IT BETTER",
+    "producer": "オニキスP",
+    "vocal": "鏡音リン",
+    "youtube_id": "6oPx70yyR1M",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_6as5dwaoMq4",
+    "title": "like you a lot",
+    "producer": "Foxy-P (YK)",
+    "vocal": "初音ミク・鏡音リン・巡音ルカ・MEIKO",
+    "youtube_id": "6as5dwaoMq4",
+    "niconico_id": ""
+  },
+  {
     "song_id": "song_sm46934360",
     "title": "░░してよ",
     "producer": "¿?shimon",
@@ -4064,19 +4168,19 @@
     "niconico_id": ""
   },
   {
-    "song_id": "song_3SOYHWQVVBA",
-    "title": "stranger",
-    "producer": "tart, hurricanemeem",
-    "vocal": "VOCALOID",
-    "youtube_id": "3SOYHWQVVBA",
-    "niconico_id": ""
-  },
-  {
     "song_id": "song_VlzCgE195x4",
     "title": "442E492E287929 ~The Grand Designer~",
     "producer": "DM DOKURO",
     "vocal": "GUMI・音街ウナ",
     "youtube_id": "VlzCgE195x4",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_3SOYHWQVVBA",
+    "title": "stranger",
+    "producer": "tart, hurricanemeem",
+    "vocal": "VOCALOID",
+    "youtube_id": "3SOYHWQVVBA",
     "niconico_id": ""
   },
   {
@@ -4110,6 +4214,14 @@
     "vocal": "音街ウナ",
     "youtube_id": "pRlqQZt_JzE",
     "niconico_id": ""
+  },
+  {
+    "song_id": "song_sm46936677",
+    "title": "待って！！！！うさぎ",
+    "producer": "クラッドインザラストライン",
+    "vocal": "VOCALOID",
+    "youtube_id": "HhzSCUJNHjY",
+    "niconico_id": "sm46936677"
   },
   {
     "song_id": "song_LiKnXreq4JI",
@@ -4150,14 +4262,6 @@
     "vocal": "音街ウナ",
     "youtube_id": "vz7zX-60D14",
     "niconico_id": ""
-  },
-  {
-    "song_id": "song_sm46936677",
-    "title": "待って！！！！うさぎ",
-    "producer": "クラッドインザラストライン",
-    "vocal": "VOCALOID",
-    "youtube_id": "HhzSCUJNHjY",
-    "niconico_id": "sm46936677"
   },
   {
     "song_id": "song_NVNQRRS1I0M",
@@ -4400,20 +4504,20 @@
     "niconico_id": ""
   },
   {
-    "song_id": "song_sm46647939",
-    "title": "スターダストレイン",
-    "producer": "捨て垢",
-    "vocal": "初音ミク",
-    "youtube_id": "RIItBfZ6S3Q",
-    "niconico_id": "sm46647939"
-  },
-  {
     "song_id": "song_V4HdD2Fu_64",
     "title": "keep me going (BIRDBRAIN)",
     "producer": "slayr, Ayub Hussein, waera",
     "vocal": "重音テト",
     "youtube_id": "V4HdD2Fu_64",
     "niconico_id": ""
+  },
+  {
+    "song_id": "song_sm46647939",
+    "title": "スターダストレイン",
+    "producer": "捨て垢",
+    "vocal": "初音ミク",
+    "youtube_id": "RIItBfZ6S3Q",
+    "niconico_id": "sm46647939"
   },
   {
     "song_id": "song_sm46688797",
@@ -4712,6 +4816,14 @@
     "niconico_id": "sm46935395"
   },
   {
+    "song_id": "song_sm3122624",
+    "title": "千年の独奏歌",
+    "producer": "yanagiP",
+    "vocal": "KAITO",
+    "youtube_id": "IudXfIgXH-s",
+    "niconico_id": "sm3122624"
+  },
+  {
     "song_id": "song_sm17520775",
     "title": "六兆年と一夜物語",
     "producer": "kemu",
@@ -4792,28 +4904,20 @@
     "niconico_id": "sm46933442"
   },
   {
-    "song_id": "song_sm46941082",
-    "title": "ノイキャン・ガール 重音テト",
-    "producer": "GENMAI",
+    "song_id": "song_sm46937180",
+    "title": "ダーリン",
+    "producer": "イバラナ",
     "vocal": "重音テト",
-    "youtube_id": "51W22QLlaCk",
-    "niconico_id": "sm46941082"
+    "youtube_id": "Mn7LTuIf5uc",
+    "niconico_id": "sm46937180"
   },
   {
-    "song_id": "song_sm46940564",
-    "title": "時間ねぇー！",
-    "producer": "GRATUNE",
-    "vocal": "小春六花",
-    "youtube_id": "",
-    "niconico_id": "sm46940564"
-  },
-  {
-    "song_id": "song_sm46939574",
-    "title": "Star lyrics/Ⅱ",
-    "producer": "N-天",
-    "vocal": "VOCALOID",
-    "youtube_id": "9etZvpII1yY",
-    "niconico_id": "sm46939574"
+    "song_id": "song_sm44633518",
+    "title": "カニが登場するボタン",
+    "producer": "ンバヂ",
+    "vocal": "重音テト",
+    "youtube_id": "_yRM0g3gZ14",
+    "niconico_id": "sm44633518"
   },
   {
     "song_id": "song_sm46932833",
@@ -4832,12 +4936,20 @@
     "niconico_id": "sm45317076"
   },
   {
-    "song_id": "song_sm46858697",
-    "title": "鬱とナードとウナロック",
-    "producer": "マジカルてP",
-    "vocal": "音街ウナ",
-    "youtube_id": "",
-    "niconico_id": "sm46858697"
+    "song_id": "song_sm23508101",
+    "title": "デウス・エクス・マキナ",
+    "producer": "ぶりるP",
+    "vocal": "初音ミク",
+    "youtube_id": "RqS6nQYrUSA",
+    "niconico_id": "sm23508101"
+  },
+  {
+    "song_id": "song_HumOeN2cq0g",
+    "title": "ミクトゥポポ",
+    "producer": "せなすけ",
+    "vocal": "初音ミク",
+    "youtube_id": "HumOeN2cq0g",
+    "niconico_id": ""
   },
   {
     "song_id": "song_sm44677326",
@@ -4856,30 +4968,6 @@
     "niconico_id": "sm44669739"
   },
   {
-    "song_id": "song_sm46926018",
-    "title": "天国のあなたへ",
-    "producer": "shizuku",
-    "vocal": "可不",
-    "youtube_id": "nXNdEZ5LuXI",
-    "niconico_id": "sm46926018"
-  },
-  {
-    "song_id": "song_MheeLOtSawQ",
-    "title": "うみろ",
-    "producer": "ボカロPうみろ 臨界ダイバー作",
-    "vocal": "可不",
-    "youtube_id": "MheeLOtSawQ",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_sm44985521",
-    "title": "ダイアグノシス",
-    "producer": "竹椅子",
-    "vocal": "足立レイ",
-    "youtube_id": "D6AwMMG65ko",
-    "niconico_id": "sm44985521"
-  },
-  {
     "song_id": "song_sm46712665",
     "title": "オールター",
     "producer": "Negusare",
@@ -4896,67 +4984,19 @@
     "niconico_id": "sm44669868"
   },
   {
-    "song_id": "song_sm44471738",
-    "title": "Ghoul Sider",
-    "producer": "駆動快",
-    "vocal": "足立レイ・唄音ウタ(デフォ子)",
-    "youtube_id": "VD8-viND3w0",
-    "niconico_id": "sm44471738"
-  },
-  {
-    "song_id": "song_sm41962993",
-    "title": "レイ",
-    "producer": "ピクド",
-    "vocal": "足立レイ",
-    "youtube_id": "S4wuQWHguV8",
-    "niconico_id": "sm41962993"
-  },
-  {
-    "song_id": "song_P3Jk_vVU0ps",
-    "title": "혼잣말 MV /",
-    "producer": "Kitzneko (키츠네코)",
-    "vocal": "重音テト",
-    "youtube_id": "P3Jk_vVU0ps",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_inRXBlYgMGI",
-    "title": "Pathological Facade",
-    "producer": "GHOST",
-    "vocal": "重音テト",
-    "youtube_id": "inRXBlYgMGI",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_7QlqyUvTCno",
-    "title": "Someday Never (AFTERWORD)",
-    "producer": "KawaiiRiceBalls",
+    "song_id": "song_x_ShgjmupZg",
+    "title": "\"백스테이지\"",
+    "producer": "MajimagaeP / 마지마게P",
     "vocal": "初音ミク",
-    "youtube_id": "7QlqyUvTCno",
+    "youtube_id": "x_ShgjmupZg",
     "niconico_id": ""
   },
   {
-    "song_id": "song_kt2BCbfUILQ",
-    "title": "NO CLIMAX, NO PUNCHLINE, NO MEANING",
-    "producer": "I-131",
-    "vocal": "MAYU",
-    "youtube_id": "kt2BCbfUILQ",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_6oPx70yyR1M",
-    "title": "MAKE IT BETTER",
-    "producer": "オニキスP",
-    "vocal": "鏡音リン",
-    "youtube_id": "6oPx70yyR1M",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_6as5dwaoMq4",
-    "title": "like you a lot",
-    "producer": "Foxy-P (YK)",
-    "vocal": "初音ミク・鏡音リン・巡音ルカ・MEIKO",
-    "youtube_id": "6as5dwaoMq4",
+    "song_id": "song_sC35y9eoE20",
+    "title": "怪談 GAMBLE -",
+    "producer": "Vega-P",
+    "vocal": "VOCALOID",
+    "youtube_id": "sC35y9eoE20",
     "niconico_id": ""
   }
 ]
