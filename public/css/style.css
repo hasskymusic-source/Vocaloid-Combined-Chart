@@ -139,7 +139,7 @@ main {
 .rank-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 3px;
   padding: 22px 26px;
   transition: border-color 0.2s;
 }
