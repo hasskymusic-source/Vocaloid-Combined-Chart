@@ -7,6 +7,7 @@ const WEIGHTS = {
   yt_likes: 50,
   yt_comments: 100,
   nc_views: 5,
+  nc_mylist: 100,
   nc_mylists: 100,
   nc_comments: 10,
 };
@@ -15,6 +16,14 @@ document.addEventListener("DOMContentLoaded", () => {
   initTabs();
   initChartApp();
 });
+
+function getSongsArray(chartData) {
+  if (!chartData) return [];
+  if (Array.isArray(chartData)) return chartData;
+  if (Array.isArray(chartData.ranking)) return chartData.ranking;
+  if (Array.isArray(chartData.songs)) return chartData.songs;
+  return [];
+}
 
 function initTabs() {
   const tabButtons = document.querySelectorAll(".tab-btn");
@@ -33,7 +42,7 @@ function initTabs() {
       }
 
       if (targetId === "tab-insight" && currentChartData) {
-        renderTop5InsightChart(currentChartData.ranking || []);
+        renderTop5InsightChart(getSongsArray(currentChartData));
       }
     });
   });
@@ -54,6 +63,7 @@ async function fetchJsonWithFallback(urls) {
 }
 
 function getSongIdentityKeys(song) {
+  if (!song || typeof song !== "object") return [];
   const keys = [];
   if (song.song_id) keys.push(`id:${song.song_id}`);
   if (song.id) keys.push(`id:${song.id}`);
@@ -71,16 +81,30 @@ async function loadArchiveHistory() {
   ]);
 
   const selectEl = document.getElementById("archive-select");
-  if (!indexData || !Array.isArray(indexData.archives)) {
+  const archiveList = Array.isArray(indexData)
+    ? indexData
+    : indexData && Array.isArray(indexData.archives)
+    ? indexData.archives
+    : [];
+
+  if (!archiveList.length) {
     return;
   }
 
-  // アーカイブプルダウンの構築
   if (selectEl) {
-    indexData.archives.forEach((item) => {
+    archiveList.forEach((item) => {
+      const fileVal =
+        typeof item === "string"
+          ? item
+          : item.file || item.path || (item.archiveId ? `${item.archiveId}.json` : item.id);
+      const labelText =
+        typeof item === "string"
+          ? item
+          : item.label || item.period || item.publishDate || item.archiveId || item.id;
+      if (!fileVal) return;
       const opt = document.createElement("option");
-      opt.value = item.file || item.path || item.id;
-      opt.textContent = item.label || item.period || item.id;
+      opt.value = fileVal;
+      opt.textContent = labelText;
       selectEl.appendChild(opt);
     });
 
@@ -89,9 +113,10 @@ async function loadArchiveHistory() {
       if (val === "latest") {
         await loadAndRenderChart();
       } else {
+        const cleanFile = val.endsWith(".json") ? val : `${val}.json`;
         const archiveData = await fetchJsonWithFallback([
-          `data/archives/${val}`,
-          `public/data/archives/${val}`,
+          `data/archives/${cleanFile}`,
+          `public/data/archives/${cleanFile}`,
           val,
         ]);
         if (archiveData) {
@@ -103,17 +128,20 @@ async function loadArchiveHistory() {
     });
   }
 
-  // 過去アーカイブを読み込んでチャートイン回数・前週比のフロントエンド補完用キャッシュを作成
   const loadedArchives = [];
-  for (const item of indexData.archives) {
-    const file = item.file || item.path || item.id;
-    if (!file) continue;
+  for (const item of archiveList) {
+    const rawFile =
+      typeof item === "string"
+        ? item
+        : item.file || item.path || (item.archiveId ? `${item.archiveId}.json` : item.id);
+    if (!rawFile) continue;
+    const cleanFile = rawFile.endsWith(".json") ? rawFile : `${rawFile}.json`;
     const data = await fetchJsonWithFallback([
-      `data/archives/${file}`,
-      `public/data/archives/${file}`,
-      file,
+      `data/archives/${cleanFile}`,
+      `public/data/archives/${cleanFile}`,
+      rawFile,
     ]);
-    if (data && Array.isArray(data.ranking)) {
+    if (data && getSongsArray(data).length > 0) {
       loadedArchives.push(data);
     }
   }
@@ -121,28 +149,32 @@ async function loadArchiveHistory() {
 }
 
 function enrichWithHistory(chartData) {
-  if (!chartData || !Array.isArray(chartData.ranking)) return;
+  const songs = getSongsArray(chartData);
+  if (!songs.length) return;
 
-  // 過去アーカイブキャッシュがある場合は通算回数と前週ポイントを補完
-  const targetPeriod = chartData.period || chartData.updated_at || "";
+  const targetKey =
+    chartData.archiveId || chartData.publishDate || chartData.period || chartData.updated_at || "";
+
   const olderCharts = archiveHistoryCache.filter((c) => {
-    const p = c.period || c.updated_at || "";
-    return p && targetPeriod ? p < targetPeriod : false;
+    const p = c.archiveId || c.publishDate || c.period || c.updated_at || "";
+    return p && targetKey ? p < targetKey : false;
   });
 
   const prevChart = olderCharts.length > 0 ? olderCharts[olderCharts.length - 1] : null;
 
-  chartData.ranking.forEach((song) => {
+  songs.forEach((song) => {
     const keys = getSongIdentityKeys(song);
 
-    // 1. チャートイン回数の補完（JSONに chart_in_count があればそれを優先、なければ履歴から算出）
+    // 1. チャートイン回数の補完
     if (typeof song.chart_in_count !== "number" || song.chart_in_count < 1) {
       let count = 1;
       olderCharts.forEach((past) => {
-        const matched = (past.ranking || []).slice(0, 20).some((ps) => {
-          const pKeys = getSongIdentityKeys(ps);
-          return keys.some((k) => pKeys.includes(k));
-        });
+        const matched = getSongsArray(past)
+          .slice(0, 20)
+          .some((ps) => {
+            const pKeys = getSongIdentityKeys(ps);
+            return keys.some((k) => pKeys.includes(k));
+          });
         if (matched) count += 1;
       });
       song.chart_in_count = count;
@@ -150,7 +182,7 @@ function enrichWithHistory(chartData) {
 
     // 2. 前週ポイント・ポイント前週比率の補完
     if (song.prev_total_pt === undefined && prevChart) {
-      const prevSong = (prevChart.ranking || []).find((ps) => {
+      const prevSong = getSongsArray(prevChart).find((ps) => {
         const pKeys = getSongIdentityKeys(ps);
         return keys.some((k) => pKeys.includes(k));
       });
@@ -178,8 +210,8 @@ async function loadAndRenderChart() {
   const data = await fetchJsonWithFallback([
     "data/latest_ranking.json",
     "public/data/latest_ranking.json",
+    "data/weekly_draft.json",
     "data/drafts/weekly_draft.json",
-    "weekly_draft.json",
     "latest_ranking.json",
   ]);
 
@@ -197,12 +229,12 @@ async function loadAndRenderChart() {
 }
 
 function renderAllViews(data) {
-  const periodEl = document.getElementById("chart-period");
+  const periodEl = document.getElementById("chart-period") || document.getElementById("chart-title");
   if (periodEl) {
-    periodEl.textContent = data.period || data.updated_at || "最新チャート";
+    periodEl.textContent = data.period || data.publishDate || data.updated_at || "最新チャート";
   }
 
-  const ranking = Array.isArray(data.ranking) ? data.ranking : [];
+  const ranking = getSongsArray(data);
   renderRankingView(ranking);
   renderTop5InsightChart(ranking);
   renderInsightTable(ranking);
@@ -213,13 +245,23 @@ function getPointsBreakdown(song) {
   const raw = song.raw || {};
   const pts = song.pts || {};
 
+  const rawNcMylist = raw.nc_mylist !== undefined ? raw.nc_mylist : raw.nc_mylists || 0;
+  const ptsNcMylist =
+    pts.nc_mylist !== undefined
+      ? pts.nc_mylist
+      : pts.nc_mylists !== undefined
+      ? pts.nc_mylists
+      : rawNcMylist * WEIGHTS.nc_mylist;
+
   const yt_views = pts.yt_views !== undefined ? pts.yt_views : (raw.yt_views || 0) * WEIGHTS.yt_views;
   const yt_likes = pts.yt_likes !== undefined ? pts.yt_likes : (raw.yt_likes || 0) * WEIGHTS.yt_likes;
-  const yt_comments = pts.yt_comments !== undefined ? pts.yt_comments : (raw.yt_comments || 0) * WEIGHTS.yt_comments;
+  const yt_comments =
+    pts.yt_comments !== undefined ? pts.yt_comments : (raw.yt_comments || 0) * WEIGHTS.yt_comments;
 
   const nc_views = pts.nc_views !== undefined ? pts.nc_views : (raw.nc_views || 0) * WEIGHTS.nc_views;
-  const nc_mylists = pts.nc_mylists !== undefined ? pts.nc_mylists : (raw.nc_mylists || 0) * WEIGHTS.nc_mylists;
-  const nc_comments = pts.nc_comments !== undefined ? pts.nc_comments : (raw.nc_comments || 0) * WEIGHTS.nc_comments;
+  const nc_mylists = ptsNcMylist;
+  const nc_comments =
+    pts.nc_comments !== undefined ? pts.nc_comments : (raw.nc_comments || 0) * WEIGHTS.nc_comments;
 
   const yt_total = pts.yt_total !== undefined ? pts.yt_total : yt_views + yt_likes + yt_comments;
   const nc_total = pts.nc_total !== undefined ? pts.nc_total : nc_views + nc_mylists + nc_comments;
@@ -235,11 +277,12 @@ function getPointsBreakdown(song) {
     yt_total,
     nc_total,
     total_pt,
+    rawNcMylist,
   };
 }
 
 function formatRankDiffBadge(song) {
-  const prev = song.prev_rank;
+  const prev = song.prev_rank !== undefined ? song.prev_rank : song.prevRank;
   const curr = song.rank;
   if (!prev || prev === null) {
     return `<span class="rank-diff diff-new">NEW</span>`;
@@ -255,8 +298,7 @@ function formatRankDiffBadge(song) {
 
 /**
  * ポイント前週比率のフォーマット
- * 例: 2,000,000pt -> 3,000,000pt の場合は緑色で「∧150%」
- * ポイントが下がっていた場合は赤色で「∨75%」
+ * 上昇時: 緑色で「∧150%」、下降時: 赤色で「∨85%」、初登場時: 「NEW」
  */
 function formatPointRatioHTML(song) {
   let ratio = song.pt_ratio;
@@ -370,7 +412,7 @@ function renderRankingView(ranking) {
               <h4>ニコニコ動画 指標内訳 (${Number(bd.nc_total).toLocaleString()} pt / ${ncPercent}%)</h4>
               <ul>
                 <li><span>週間再生数:</span> <strong>+${Number(raw.nc_views || 0).toLocaleString()}</strong> (${Number(bd.nc_views).toLocaleString()} pt)</li>
-                <li><span>週間マイリスト数:</span> <strong>+${Number(raw.nc_mylists || 0).toLocaleString()}</strong> (${Number(bd.nc_mylists).toLocaleString()} pt)</li>
+                <li><span>週間マイリスト数:</span> <strong>+${Number(bd.rawNcMylist).toLocaleString()}</strong> (${Number(bd.nc_mylists).toLocaleString()} pt)</li>
                 <li><span>週間コメント数:</span> <strong>+${Number(raw.nc_comments || 0).toLocaleString()}</strong> (${Number(bd.nc_comments).toLocaleString()} pt)</li>
               </ul>
               ${
@@ -407,7 +449,7 @@ window.toggleRankDetail = function (rank) {
  * ランキングインサイト：TOP 10 の積み上げ棒グラフを描画
  */
 function renderTop5InsightChart(ranking) {
-  const canvas = document.getElementById("top5Chart");
+  const canvas = document.getElementById("top5Chart") || document.getElementById("top20Chart");
   if (!canvas || typeof Chart === "undefined") return;
 
   const top10 = ranking.slice(0, 10);
@@ -531,9 +573,12 @@ function renderInsightTable(ranking) {
 }
 
 function renderCommentaryView(data, ranking) {
-  const overallEl = document.getElementById("overall-commentary");
+  const overallEl =
+    document.getElementById("overall-commentary") ||
+    document.getElementById("weekly-summary-text");
   if (overallEl) {
-    const overallText = data.overall_commentary || data.trend_analysis || "";
+    const overallText =
+      data.overall_commentary || data.weeklySummary || data.trend_analysis || "";
     overallEl.innerHTML = overallText
       ? `<p>${escapeHtml(overallText).replace(/\n/g, "<br>")}</p>`
       : `<p class="muted-text">今週の全体総評はまだ登録されていません。</p>`;

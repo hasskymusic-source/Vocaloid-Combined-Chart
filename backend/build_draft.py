@@ -1,6 +1,8 @@
 import os
 import json
 import glob
+import math
+from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
 try:
@@ -10,30 +12,40 @@ except ImportError:
 
 JST = timezone(timedelta(hours=9))
 
-# ディレクトリ・ファイルパス設定（config.py がある場合は優先）
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, "..")) if os.path.basename(BASE_DIR) == "backend" else BASE_DIR
+# プロジェクトルートの特定
+BASE_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = BASE_DIR.parent if BASE_DIR.name == "backend" else BASE_DIR
 
-def get_path(attr_name, default_rel_path):
-    if config and hasattr(config, attr_name):
-        return getattr(config, attr_name)
-    return os.path.join(PROJECT_ROOT, default_rel_path)
 
-SONGS_MASTER_FILE = get_path("SONGS_MASTER_FILE", "data/master/songs_master.json")
-SNAPSHOTS_DIR = get_path("SNAPSHOTS_DIR", "data/snapshots")
-DRAFTS_DIR = get_path("DRAFTS_DIR", "data/drafts")
-WEEKLY_DRAFT_FILE = get_path("WEEKLY_DRAFT_FILE", "data/drafts/weekly_draft.json")
-WEEKLY_DRAFT_BACKUP_FILE = get_path("WEEKLY_DRAFT_BACKUP_FILE", "data/drafts/weekly_draft.backup.json")
-LATEST_RANKING_FILE = get_path("LATEST_RANKING_FILE", "public/data/latest_ranking.json")
-ARCHIVES_DIR = get_path("ARCHIVES_DIR", "public/data/archives")
-DATA_ARCHIVES_DIR = os.path.join(PROJECT_ROOT, "data/archives")
+def resolve_config_path(attr_names, default_rel_path):
+    """
+    config.py に定義されている複数の変数名候補（Path または str）を安全に解決する
+    """
+    if config:
+        for name in attr_names:
+            if hasattr(config, name):
+                val = getattr(config, name)
+                if val:
+                    return Path(val)
+    return PROJECT_ROOT / default_rel_path
 
-# 6指標の重み付け係数
+
+MASTER_FILE = resolve_config_path(["MASTER_FILE", "SONGS_MASTER_FILE"], "data/songs_master.json")
+SNAPSHOTS_DIR = resolve_config_path(["SNAPSHOTS_DIR", "SNAPSHOT_DIR"], "data/snapshots")
+LATEST_SNAPSHOT = resolve_config_path(["LATEST_SNAPSHOT"], "data/snapshots/latest_monday.json")
+PREV_SNAPSHOT = resolve_config_path(["PREV_SNAPSHOT"], "data/snapshots/prev_monday.json")
+DRAFT_FILE = resolve_config_path(["DRAFT_FILE", "WEEKLY_DRAFT_FILE"], "data/weekly_draft.json")
+BACKUP_DRAFT_FILE = resolve_config_path(["BACKUP_DRAFT_FILE", "WEEKLY_DRAFT_BACKUP_FILE"], "data/weekly_draft.backup.json")
+PUBLIC_LATEST = resolve_config_path(["PUBLIC_LATEST", "LATEST_RANKING_FILE"], "public/data/latest_ranking.json")
+ARCHIVE_DIR = resolve_config_path(["ARCHIVE_DIR", "ARCHIVES_DIR"], "public/data/archives")
+ARCHIVE_INDEX = resolve_config_path(["ARCHIVE_INDEX"], "public/data/archives/archive_index.json")
+
 DEFAULT_WEIGHTS = {
     "yt_views": 1,
     "yt_likes": 50,
     "yt_comments": 100,
     "nc_views": 5,
+    "nc_mylist": 100,
     "nc_mylists": 100,
     "nc_comments": 10,
 }
@@ -42,26 +54,49 @@ TOP_N = getattr(config, "TOP_N", 20) if config else 20
 
 
 def load_json(filepath, default=None):
-    if not os.path.exists(filepath):
+    path_obj = Path(filepath)
+    if not path_obj.exists():
         return default
     try:
-        with open(filepath, "r", encoding="utf-8") as f:
+        with open(path_obj, "r", encoding="utf-8") as f:
             return json.load(f)
     except Exception as e:
-        print(f"[WARN] Failed to load {filepath}: {e}")
+        print(f"[WARN] JSON読み込み失敗 ({path_obj}): {e}")
         return default
 
 
 def save_json(filepath, data):
-    os.makedirs(os.path.dirname(os.path.abspath(filepath)), exist_ok=True)
-    with open(filepath, "w", encoding="utf-8") as f:
+    path_obj = Path(filepath)
+    path_obj.parent.mkdir(parents=True, exist_ok=True)
+    with open(path_obj, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def extract_songs_list(data):
+    """
+    JSONデータが list でも dict でも安全に楽曲オブジェクトの list を取り出す
+    """
+    if not data:
+        return []
+    if isinstance(data, list):
+        return [item for item in data if isinstance(item, dict)]
+    if isinstance(data, dict):
+        for key in ("songs", "ranking", "metrics", "items", "data"):
+            if key in data and isinstance(data[key], list):
+                return [item for item in data[key] if isinstance(item, dict)]
+        # 辞書マップ形式 { "song_id": { ... } } の場合
+        vals = list(data.values())
+        if vals and all(isinstance(v, dict) for v in vals):
+            return vals
+    return []
 
 
 def get_song_keys(song_obj):
     """
-    名寄せ・ID統合に対応するため、楽曲を一意に識別するキーセットを返す
+    楽曲の名寄せ・同一判定用の識別キーセットを生成する
     """
+    if not isinstance(song_obj, dict):
+        return set()
     keys = set()
     song_id = song_obj.get("song_id") or song_obj.get("id")
     yt_id = song_obj.get("youtube_id") or song_obj.get("yt_id")
@@ -75,62 +110,168 @@ def get_song_keys(song_obj):
     return keys
 
 
-def collect_past_charts(current_period_id=None):
+def parse_iso_datetime(dt_str):
+    if not dt_str or not isinstance(dt_str, str):
+        return None
+    try:
+        cleaned = dt_str.strip()
+        if cleaned.endswith("Z"):
+            cleaned = cleaned[:-1] + "+00:00"
+        dt = datetime.fromisoformat(cleaned)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=JST)
+        return dt.astimezone(JST)
+    except Exception:
+        for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d", "%Y/%m/%d"):
+            try:
+                return datetime.strptime(dt_str.strip(), fmt).replace(tzinfo=JST)
+            except Exception:
+                continue
+    return None
+
+
+def estimate_weekly_increment_for_new_entry(published_at_str, now_dt=None):
     """
-    public/data/archives/, data/archives/, public/data/latest_ranking.json から
-    過去の公開済みチャートデータを時系列順（古い順）に収集・重複排除して返す
+    前回スナップショットに存在しない新規発見曲について、累計値がそのまま週間ポイントとして
+    誤計上されるのを防ぐための経過日数減衰モデル
+    - 公開から7日以内: 100% (1.0) を期間内獲得分とする
+    - 公開から7日超: (7.0 / total_age_days) * exp(-0.03 * (total_age_days - 7.0)) を [0.02, 0.85] に制約
     """
+    if now_dt is None:
+        now_dt = datetime.now(JST)
+    pub_dt = parse_iso_datetime(published_at_str)
+    if not pub_dt:
+        return 0.05
+
+    total_age_days = max(0.1, (now_dt - pub_dt).total_seconds() / 86400.0)
+    if total_age_days <= 7.0:
+        return 1.0
+
+    fraction = (7.0 / total_age_days) * math.exp(-0.03 * (total_age_days - 7.0))
+    return max(0.02, min(0.85, fraction))
+
+
+def compute_chart_dates(now_dt=None):
+    """
+    集計期間（period）、公開日（publishDate）、アーカイブID（archiveId）を算出する
+    """
+    if now_dt is None:
+        now_dt = datetime.now(JST)
+    end_date = now_dt.date()
+    start_date = end_date - timedelta(days=7)
+    period_str = f"{start_date.strftime('%Y/%m/%d')} - {end_date.strftime('%Y/%m/%d')}"
+
+    # 水曜公開日（今週水曜日、または実行日基準）
+    days_until_wed = (2 - now_dt.weekday()) % 7
+    wed_date = end_date + timedelta(days=days_until_wed)
+    publish_date = wed_date.strftime("%Y-%m-%d")
+    archive_id = wed_date.strftime("%Y-%m-%d")
+    return period_str, publish_date, archive_id
+
+
+def extract_metrics_dict(snapshot_data):
+    """
+    スナップショット（list または dict）から { 識別キー: 楽曲メトリクス辞書 } を構築する
+    """
+    items = extract_songs_list(snapshot_data)
+    result = {}
+    for v in items:
+        for sk in get_song_keys(v):
+            result[sk] = v
+    return result
+
+
+def get_two_latest_snapshots():
+    """
+    LATEST_SNAPSHOT と PREV_SNAPSHOT を優先的に読み込み、
+    存在しない場合は SNAPSHOTS_DIR 内のJSONから最新・前回を取得する
+    """
+    latest_data = load_json(LATEST_SNAPSHOT)
+    prev_data = load_json(PREV_SNAPSHOT)
+
+    if latest_data is not None:
+        return latest_data, prev_data if prev_data is not None else []
+
+    if not SNAPSHOTS_DIR.exists():
+        return [], []
+
+    files = sorted(
+        [Path(p) for p in glob.glob(str(SNAPSHOTS_DIR / "*.json"))],
+        key=lambda p: p.stat().st_mtime,
+    )
+    if not files:
+        return [], []
+    latest_f = files[-1]
+    prev_f = files[-2] if len(files) >= 2 else None
+    return load_json(latest_f, []), load_json(prev_f, []) if prev_f else []
+
+
+def collect_past_charts(exclude_archive_id=None, exclude_period=None):
+    """
+    過去の公開済みランキング（public/data/archives/*.json および public/data/latest_ranking.json）を
+    古い順に収集し、前週比較および通算チャートイン回数の集計に使用する
+    """
+    candidate_dirs = [
+        ARCHIVE_DIR,
+        PROJECT_ROOT / "public/data/archives",
+        PROJECT_ROOT / "data/archives",
+    ]
     chart_files = []
-    for d in [ARCHIVES_DIR, DATA_ARCHIVES_DIR]:
-        if os.path.exists(d):
-            chart_files.extend(glob.glob(os.path.join(d, "*.json")))
+    for d in candidate_dirs:
+        if d.exists():
+            chart_files.extend(glob.glob(str(d / "*.json")))
 
-    if os.path.exists(LATEST_RANKING_FILE):
-        chart_files.append(LATEST_RANKING_FILE)
+    if PUBLIC_LATEST.exists():
+        chart_files.append(str(PUBLIC_LATEST))
 
-    charts_by_period = {}
+    charts_by_key = {}
     for fpath in chart_files:
-        if os.path.basename(fpath) in ("archive_index.json", "index.json"):
+        fname = os.path.basename(fpath)
+        if fname in ("archive_index.json", "index.json"):
             continue
         data = load_json(fpath)
-        if not isinstance(data, dict) or "ranking" not in data:
+        if not isinstance(data, dict):
             continue
-        period_key = (
-            data.get("chart_id")
-            or data.get("period")
-            or data.get("published_at")
-            or data.get("updated_at")
-            or os.path.splitext(os.path.basename(fpath))[0]
-        )
-        if current_period_id and period_key == current_period_id:
+        songs = extract_songs_list(data)
+        if not songs:
             continue
-        charts_by_period[period_key] = data
 
-    sorted_periods = sorted(charts_by_period.keys())
-    return [charts_by_period[k] for k in sorted_periods]
+        aid = data.get("archiveId") or data.get("chart_id") or data.get("publishDate")
+        prd = data.get("period")
+        key = aid or prd or os.path.splitext(fname)[0]
+
+        if exclude_archive_id and aid == exclude_archive_id:
+            continue
+        if exclude_period and prd == exclude_period:
+            continue
+
+        charts_by_key[key] = data
+
+    sorted_keys = sorted(charts_by_key.keys())
+    return [charts_by_key[k] for k in sorted_keys]
 
 
 def build_historical_stats(past_charts):
     """
-    過去チャート群から以下を集計する:
-    1. 各識別キーごとの過去TOP20チャートイン回数 (appearances)
-    2. 直近（前週）チャートの順位 (prev_rank) と 総合ポイント (prev_total_pt)
+    過去チャートから以下を算出する:
+    1. appearance_counts: 各楽曲が過去にTOP 20にランクインした通算回数
+    2. prev_chart_map: 直近（前週）チャートの順位 (prev_rank) と 総合ポイント (prev_total_pt)
     """
     appearance_counts = {}
     prev_chart_map = {}
 
     for chart in past_charts:
-        ranking_list = chart.get("ranking", [])
+        ranking_list = extract_songs_list(chart)
         for item in ranking_list[:TOP_N]:
             for k in get_song_keys(item):
                 appearance_counts[k] = appearance_counts.get(k, 0) + 1
 
     if past_charts:
         last_chart = past_charts[-1]
-        for item in last_chart.get("ranking", []):
+        for idx, item in enumerate(extract_songs_list(last_chart)[:TOP_N], start=1):
             info = {
-                "prev_rank": item.get("rank"),
-                "prev_total_pt": item.get("total_pt", 0),
+                "prev_rank": item.get("rank", idx),
+                "prev_total_pt": item.get("total_pt", item.get("total_points", 0)),
                 "prev_chart_in_count": item.get("chart_in_count", 0),
             }
             for k in get_song_keys(item):
@@ -139,36 +280,30 @@ def build_historical_stats(past_charts):
     return appearance_counts, prev_chart_map
 
 
-def get_two_latest_snapshots():
-    """
-    スナップショットディレクトリから最新と前回（7日前基準）の2つのスナップショットを取得する
-    """
-    if not os.path.exists(SNAPSHOTS_DIR):
-        return None, None
-    files = sorted(glob.glob(os.path.join(SNAPSHOTS_DIR, "*.json")))
-    if not files:
-        return None, None
-    latest_file = files[-1]
-    prev_file = files[-2] if len(files) >= 2 else None
-    return load_json(latest_file, {}), load_json(prev_file, {}) if prev_file else {}
-
-
 def preserve_existing_commentary():
     """
-    コンフリクト回避・原稿消失防止のため、既存の weekly_draft.json および
-    weekly_draft.backup.json から執筆済みの解説文や全体総評を救出する
+    既存の weekly_draft.json およびバックアップから執筆済みの解説文・全体総評を救出する
     """
     saved_song_comments = {}
     saved_meta = {}
 
-    for path in [WEEKLY_DRAFT_BACKUP_FILE, WEEKLY_DRAFT_FILE]:
+    candidate_files = [
+        BACKUP_DRAFT_FILE,
+        DRAFT_FILE,
+        PROJECT_ROOT / "data/drafts/weekly_draft.backup.json",
+        PROJECT_ROOT / "data/drafts/weekly_draft.json",
+    ]
+
+    for path in candidate_files:
         data = load_json(path)
         if not isinstance(data, dict):
             continue
-        for meta_key in ("overall_commentary", "trend_analysis", "editor_note", "summary"):
-            if data.get(meta_key):
-                saved_meta[meta_key] = data[meta_key]
-        for item in data.get("ranking", []):
+        for meta_key in ("weeklySummary", "overall_commentary", "trend_analysis", "editor_note"):
+            val = data.get(meta_key)
+            if val and str(val).strip():
+                saved_meta[meta_key] = val
+
+        for item in extract_songs_list(data):
             comment = item.get("commentary") or item.get("comment")
             if comment and str(comment).strip():
                 for k in get_song_keys(item):
@@ -177,60 +312,93 @@ def preserve_existing_commentary():
     return saved_song_comments, saved_meta
 
 
-def extract_metrics_dict(snapshot_data):
-    """
-    スナップショットJSONから { key: metrics } 辞書を構築する
-    """
-    if not snapshot_data:
-        return {}
-    items = snapshot_data.get("songs", snapshot_data.get("metrics", snapshot_data))
-    result = {}
-    if isinstance(items, dict):
-        for k, v in items.items():
-            if isinstance(v, dict):
-                result[f"id:{k}"] = v
-                for sk in get_song_keys(v):
-                    result[sk] = v
-    elif isinstance(items, list):
-        for v in items:
-            if isinstance(v, dict):
-                for sk in get_song_keys(v):
-                    result[sk] = v
-    return result
+def get_nc_mylist_value(metrics_dict):
+    if not isinstance(metrics_dict, dict):
+        return 0
+    val = metrics_dict.get("nc_mylist")
+    if val is None:
+        val = metrics_dict.get("nc_mylists", 0)
+    return int(val or 0)
 
 
-def calculate_song_points(song, current_metrics, prev_metrics):
+def calculate_song_points(song, current_metrics, prev_metrics, now_dt):
     """
-    6指標の期間内純増数を算出し、重み付けポイントを計算する
+    6指標の期間内純増数を算出し、重み付けポイントを計算する。
+    前回スナップショットにデータがない新規曲は経過日数減衰モデルで期間内獲得分を推計する。
     """
+    cur_m = current_metrics if isinstance(current_metrics, dict) and current_metrics else song
+    has_prev = isinstance(prev_metrics, dict) and bool(prev_metrics)
+
+    published_at = (
+        cur_m.get("published_at")
+        or song.get("published_at")
+        or (prev_metrics.get("published_at") if has_prev else "")
+        or ""
+    )
+
+    cur_vals = {
+        "yt_views": int(cur_m.get("yt_views", 0) or 0),
+        "yt_likes": int(cur_m.get("yt_likes", 0) or 0),
+        "yt_comments": int(cur_m.get("yt_comments", 0) or 0),
+        "nc_views": int(cur_m.get("nc_views", 0) or 0),
+        "nc_mylist": get_nc_mylist_value(cur_m),
+        "nc_comments": int(cur_m.get("nc_comments", 0) or 0),
+    }
+
     raw_gains = {}
-    pts_breakdown = {}
+    if has_prev:
+        prv_vals = {
+            "yt_views": int(prev_metrics.get("yt_views", 0) or 0),
+            "yt_likes": int(prev_metrics.get("yt_likes", 0) or 0),
+            "yt_comments": int(prev_metrics.get("yt_comments", 0) or 0),
+            "nc_views": int(prev_metrics.get("nc_views", 0) or 0),
+            "nc_mylist": get_nc_mylist_value(prev_metrics),
+            "nc_comments": int(prev_metrics.get("nc_comments", 0) or 0),
+        }
 
-    metric_keys = [
-        "yt_views",
-        "yt_likes",
-        "yt_comments",
-        "nc_views",
-        "nc_mylists",
-        "nc_comments",
-    ]
+        # 片方のプラットフォームが今週新規に名寄せ・紐付けされた場合の安全補正
+        yt_newly_linked = prv_vals["yt_views"] == 0 and cur_vals["yt_views"] > 0
+        nc_newly_linked = prv_vals["nc_views"] == 0 and cur_vals["nc_views"] > 0
+        est_factor = estimate_weekly_increment_for_new_entry(published_at, now_dt)
 
-    # すでに純増数 (raw) が直接入っている場合とスナップショット差分の両方に対応
-    raw_source = song.get("raw") if isinstance(song.get("raw"), dict) else None
+        for mk in ("yt_views", "yt_likes", "yt_comments"):
+            if yt_newly_linked:
+                raw_gains[mk] = int(round(cur_vals[mk] * est_factor))
+            else:
+                raw_gains[mk] = max(0, cur_vals[mk] - prv_vals[mk])
 
-    for mk in metric_keys:
-        if raw_source is not None and mk in raw_source:
-            diff = max(0, int(raw_source.get(mk, 0) or 0))
-        else:
-            cur_val = int(current_metrics.get(mk, song.get(mk, 0)) or 0)
-            prv_val = int(prev_metrics.get(mk, 0) or 0) if prev_metrics else 0
-            diff = max(0, cur_val - prv_val)
+        for mk in ("nc_views", "nc_mylist", "nc_comments"):
+            if nc_newly_linked:
+                raw_gains[mk] = int(round(cur_vals[mk] * est_factor))
+            else:
+                raw_gains[mk] = max(0, cur_vals[mk] - prv_vals[mk])
+    else:
+        est_factor = estimate_weekly_increment_for_new_entry(published_at, now_dt)
+        for mk, val in cur_vals.items():
+            raw_gains[mk] = int(round(max(0, val) * est_factor))
 
-        raw_gains[mk] = diff
-        pts_breakdown[mk] = diff * WEIGHTS.get(mk, 1)
+    # 互換性のため nc_mylist と nc_mylists の両方を保持
+    raw_gains["nc_mylists"] = raw_gains["nc_mylist"]
+
+    w_yt_views = WEIGHTS.get("yt_views", 1)
+    w_yt_likes = WEIGHTS.get("yt_likes", 50)
+    w_yt_comments = WEIGHTS.get("yt_comments", 100)
+    w_nc_views = WEIGHTS.get("nc_views", 5)
+    w_nc_mylist = WEIGHTS.get("nc_mylist", WEIGHTS.get("nc_mylists", 100))
+    w_nc_comments = WEIGHTS.get("nc_comments", 10)
+
+    pts_breakdown = {
+        "yt_views": raw_gains["yt_views"] * w_yt_views,
+        "yt_likes": raw_gains["yt_likes"] * w_yt_likes,
+        "yt_comments": raw_gains["yt_comments"] * w_yt_comments,
+        "nc_views": raw_gains["nc_views"] * w_nc_views,
+        "nc_mylist": raw_gains["nc_mylist"] * w_nc_mylist,
+        "nc_mylists": raw_gains["nc_mylist"] * w_nc_mylist,
+        "nc_comments": raw_gains["nc_comments"] * w_nc_comments,
+    }
 
     yt_total = pts_breakdown["yt_views"] + pts_breakdown["yt_likes"] + pts_breakdown["yt_comments"]
-    nc_total = pts_breakdown["nc_views"] + pts_breakdown["nc_mylists"] + pts_breakdown["nc_comments"]
+    nc_total = pts_breakdown["nc_views"] + pts_breakdown["nc_mylist"] + pts_breakdown["nc_comments"]
     total_pt = yt_total + nc_total
 
     pts_breakdown["yt_total"] = yt_total
@@ -241,40 +409,42 @@ def calculate_song_points(song, current_metrics, prev_metrics):
 
 def main():
     print("=== 週刊VOCALOID複合ランキング ドラフト生成開始 ===")
+    now_dt = datetime.now(JST)
+    period_str, publish_date, archive_id = compute_chart_dates(now_dt)
 
     # 1. 既存の解説原稿をバックアップ＆救出
-    existing_draft = load_json(WEEKLY_DRAFT_FILE)
+    existing_draft = load_json(DRAFT_FILE)
     if existing_draft:
-        save_json(WEEKLY_DRAFT_BACKUP_FILE, existing_draft)
+        save_json(BACKUP_DRAFT_FILE, existing_draft)
     saved_comments, saved_meta = preserve_existing_commentary()
 
-    # 2. 過去チャートから「前週ポイント」と「過去チャートイン回数」を集計
-    current_period = existing_draft.get("period") if isinstance(existing_draft, dict) else None
-    past_charts = collect_past_charts(current_period_id=current_period)
+    # 2. 過去チャートから「前週ポイント」「前週順位」「過去チャートイン回数」を集計
+    past_charts = collect_past_charts(exclude_archive_id=archive_id, exclude_period=period_str)
     appearance_counts, prev_chart_map = build_historical_stats(past_charts)
 
-    # 3. 楽曲マスターとスナップショットの読み込み
-    master_data = load_json(SONGS_MASTER_FILE)
+    # 3. スナップショットとマスターデータの読み込み（list / dict 両対応）
     latest_snap, prev_snap = get_two_latest_snapshots()
     cur_map = extract_metrics_dict(latest_snap)
     prv_map = extract_metrics_dict(prev_snap)
 
-    songs_list = []
-    if isinstance(master_data, dict):
-        songs_list = master_data.get("songs", list(master_data.values()))
-    elif isinstance(master_data, list):
-        songs_list = master_data
-
-    # マスターが空または既存の weekly_draft を再計算する場合のフォールバック
+    master_data = load_json(MASTER_FILE)
+    songs_list = extract_songs_list(master_data)
+    if not songs_list:
+        songs_list = extract_songs_list(latest_snap)
     if not songs_list and isinstance(existing_draft, dict):
-        songs_list = existing_draft.get("ranking", [])
+        songs_list = extract_songs_list(existing_draft)
 
     scored_songs = []
+    seen_song_keys = set()
+
     for song in songs_list:
         if not isinstance(song, dict):
             continue
 
         keys = get_song_keys(song)
+        if not keys or (keys & seen_song_keys):
+            continue
+
         cur_m = {}
         prv_m = {}
         for k in keys:
@@ -286,9 +456,14 @@ def main():
                 prv_m = prv_map[k]
                 break
 
-        total_pt, raw_gains, pts_breakdown = calculate_song_points(song, cur_m, prv_m)
+        if not cur_m and not song.get("yt_views") and not song.get("nc_views"):
+            continue
+
+        total_pt, raw_gains, pts_breakdown = calculate_song_points(song, cur_m, prv_m, now_dt)
         if total_pt <= 0:
             continue
+
+        seen_song_keys.update(keys)
 
         # 過去のチャートイン回数と前週データの照合
         past_count = 0
@@ -299,9 +474,16 @@ def main():
             if k in prev_chart_map and prev_info is None:
                 prev_info = prev_chart_map[k]
 
-        # 既存データに prev_rank や prev_total_pt が明示されている場合のフォールバック
-        prev_rank = prev_info["prev_rank"] if prev_info else song.get("prev_rank")
-        prev_total_pt = prev_info["prev_total_pt"] if prev_info else song.get("prev_total_pt")
+        prev_rank = (
+            prev_info["prev_rank"]
+            if prev_info
+            else (song.get("prev_rank") or song.get("prevRank"))
+        )
+        prev_total_pt = (
+            prev_info["prev_total_pt"]
+            if prev_info
+            else song.get("prev_total_pt")
+        )
 
         # ポイント前週比率（%）の算出（例: 2,000,000 -> 3,000,000 なら 150）
         pt_ratio = None
@@ -309,26 +491,42 @@ def main():
             pt_ratio = round((total_pt / prev_total_pt) * 100)
 
         # 救出した解説文の復元
-        commentary = song.get("commentary", "")
+        commentary = song.get("commentary") or song.get("comment") or ""
         for k in keys:
             if k in saved_comments:
                 commentary = saved_comments[k]
                 break
 
+        yt_id = (
+            song.get("youtube_id")
+            or song.get("yt_id")
+            or cur_m.get("youtube_id")
+            or cur_m.get("yt_id")
+        )
+        nc_id = (
+            song.get("niconico_id")
+            or song.get("nc_id")
+            or cur_m.get("niconico_id")
+            or cur_m.get("nc_id")
+        )
+        primary_id = song.get("song_id") or song.get("id") or yt_id or nc_id
+
         song_entry = {
-            "song_id": song.get("song_id") or song.get("id") or song.get("youtube_id") or song.get("niconico_id"),
-            "title": song.get("title", "不明な楽曲"),
-            "producer": song.get("producer", "不明"),
-            "vocal": song.get("vocal", "VOCALOID"),
-            "youtube_id": song.get("youtube_id") or song.get("yt_id"),
-            "niconico_id": song.get("niconico_id") or song.get("nc_id"),
-            "thumbnail": song.get("thumbnail") or (
-                f"https://i.ytimg.com/vi/{song.get('youtube_id')}/mqdefault.jpg"
-                if song.get("youtube_id")
-                else ""
+            "id": primary_id,
+            "song_id": primary_id,
+            "title": song.get("title") or cur_m.get("title") or "不明な楽曲",
+            "producer": song.get("producer") or cur_m.get("producer") or "不明",
+            "vocal": song.get("vocal") or cur_m.get("vocal") or "VOCALOID",
+            "youtube_id": yt_id,
+            "niconico_id": nc_id,
+            "thumbnail": (
+                song.get("thumbnail")
+                or cur_m.get("thumbnail")
+                or (f"https://i.ytimg.com/vi/{yt_id}/mqdefault.jpg" if yt_id else "")
             ),
-            "published_at": song.get("published_at", ""),
+            "published_at": song.get("published_at") or cur_m.get("published_at") or "",
             "total_pt": total_pt,
+            "prevRank": prev_rank,
             "prev_rank": prev_rank,
             "prev_total_pt": prev_total_pt,
             "pt_ratio": pt_ratio,
@@ -349,30 +547,35 @@ def main():
         # 今週TOP20入りした分 (+1) を加算した通算チャートイン回数
         item["chart_in_count"] = past_c + 1
 
-    now_str = datetime.now(JST).strftime("%Y-%m-%d %H:%M")
-    period_str = (
-        existing_draft.get("period")
-        if isinstance(existing_draft, dict) and existing_draft.get("period")
-        else datetime.now(JST).strftime("%Y-%m-%d")
+    now_str = now_dt.strftime("%Y-%m-%d %H:%M")
+    weekly_summary = (
+        saved_meta.get("weeklySummary")
+        or saved_meta.get("overall_commentary")
+        or (existing_draft.get("weeklySummary", "") if isinstance(existing_draft, dict) else "")
+        or (existing_draft.get("overall_commentary", "") if isinstance(existing_draft, dict) else "")
+    )
+    trend_analysis = (
+        saved_meta.get("trend_analysis")
+        or (existing_draft.get("trend_analysis", "") if isinstance(existing_draft, dict) else "")
     )
 
+    # publish_chart.py / editor_server.py / export_blog.py / app.js の全キー名に完全対応
     draft_output = {
-        "updated_at": now_str,
+        "publishDate": publish_date,
+        "archiveId": archive_id,
         "period": period_str,
-        "overall_commentary": saved_meta.get(
-            "overall_commentary",
-            existing_draft.get("overall_commentary", "") if isinstance(existing_draft, dict) else "",
-        ),
-        "trend_analysis": saved_meta.get(
-            "trend_analysis",
-            existing_draft.get("trend_analysis", "") if isinstance(existing_draft, dict) else "",
-        ),
+        "updated_at": now_str,
+        "weeklySummary": weekly_summary,
+        "overall_commentary": weekly_summary,
+        "trend_analysis": trend_analysis,
+        "weights": WEIGHTS,
+        "songs": top_songs,
         "ranking": top_songs,
     }
 
-    save_json(WEEKLY_DRAFT_FILE, draft_output)
-    save_json(WEEKLY_DRAFT_BACKUP_FILE, draft_output)
-    print(f"[OK] TOP {len(top_songs)} のドラフトを生成しました: {WEEKLY_DRAFT_FILE}")
+    save_json(DRAFT_FILE, draft_output)
+    save_json(BACKUP_DRAFT_FILE, draft_output)
+    print(f"[OK] TOP {len(top_songs)} のドラフトを生成しました: {DRAFT_FILE}")
 
 
 if __name__ == "__main__":
