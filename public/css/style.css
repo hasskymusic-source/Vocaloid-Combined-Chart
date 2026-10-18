@@ -27,7 +27,6 @@ body {
   line-height: 1.6;
 }
 
-/* Header */
 .site-header {
   background: linear-gradient(180deg, #131c31 0%, #0f172a 100%);
   border-bottom: 1px solid var(--border-color);
@@ -108,7 +107,6 @@ body {
   color: var(--text-primary);
 }
 
-/* Navigation Tabs */
 .tab-nav {
   max-width: 1200px;
   margin: 0 auto;
@@ -139,7 +137,6 @@ body {
   border-bottom-color: var(--accent-cyan);
 }
 
-/* Main Container */
 .main-container {
   max-width: 1200px;
   margin: 2rem auto;
@@ -171,7 +168,6 @@ body {
   color: var(--text-secondary);
 }
 
-/* Insight Cards & Table (スクリーンショット準拠) */
 .insight-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -197,7 +193,6 @@ body {
   margin-bottom: 1rem;
 }
 
-/* TOP 10 用にグラフ領域の高さを確保 */
 .chart-wrapper {
   position: relative;
   height: 460px;
@@ -268,7 +263,6 @@ body {
   white-space: nowrap;
 }
 
-/* ポイント前週比率（上昇: 緑 / 下降: 赤 / 維持: グレー / 初登場: 水色） */
 .col-pt-ratio {
   font-weight: 700;
   white-space: nowrap;
@@ -300,14 +294,12 @@ body {
   border-radius: 4px;
 }
 
-/* チャートイン回数 */
 .col-chart-in {
   font-weight: 700;
   color: var(--text-primary);
   white-space: nowrap;
 }
 
-/* プラットフォーム別比率 */
 .col-yt-ratio {
   color: var(--yt-color);
   font-weight: 500;
@@ -320,7 +312,6 @@ body {
   white-space: nowrap;
 }
 
-/* ランキング一覧カード */
 .ranking-list {
   display: flex;
   flex-direction: column;
@@ -466,7 +457,6 @@ body {
   margin-top: 0.2rem;
 }
 
-/* 詳細パネル */
 .rank-detail-panel {
   display: none;
   border-top: 1px solid var(--border-color);
@@ -552,7 +542,6 @@ body {
   margin-bottom: 0.35rem;
 }
 
-/* 解説タブ */
 .overall-commentary-box {
   font-size: 0.95rem;
   line-height: 1.75;

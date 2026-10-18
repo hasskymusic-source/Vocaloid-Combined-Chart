@@ -1,3 +1,5 @@
+window.__VOCALOID_APP_LOADED__ = true;
+
 let insightChartInstance = null;
 let currentChartData = null;
 let archiveHistoryCache = [];
@@ -12,10 +14,16 @@ const WEIGHTS = {
   nc_comments: 10,
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+function startApp() {
   initTabs();
   initChartApp();
-});
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", startApp);
+} else {
+  startApp();
+}
 
 function getSongsArray(chartData) {
   if (!chartData) return [];
@@ -73,11 +81,28 @@ function getSongIdentityKeys(song) {
   return keys;
 }
 
+async function initChartApp() {
+  // 1. まず最新ランキングを最優先で読み込んで即座に画面を描画する（「読み込み中...」で止まるのを防止）
+  await loadAndRenderChart();
+
+  // 2. バックグラウンドで過去アーカイブ履歴を読み込み、前週比・チャートイン回数の補完があれば再描画する
+  try {
+    await loadArchiveHistory();
+    if (currentChartData) {
+      enrichWithHistory(currentChartData);
+      renderAllViews(currentChartData);
+    }
+  } catch (err) {
+    console.warn("アーカイブ履歴の補完をスキップしました:", err);
+  }
+}
+
 async function loadArchiveHistory() {
   const indexData = await fetchJsonWithFallback([
-    "data/archives/archive_index.json",
+    "./data/archives/archive_index.json",
+    "./data/archive_index.json",
     "public/data/archives/archive_index.json",
-    "data/archive_index.json",
+    "public/data/archive_index.json",
   ]);
 
   const selectEl = document.getElementById("archive-select");
@@ -91,7 +116,7 @@ async function loadArchiveHistory() {
     return;
   }
 
-  if (selectEl) {
+  if (selectEl && selectEl.options.length <= 1) {
     archiveList.forEach((item) => {
       const fileVal =
         typeof item === "string"
@@ -115,7 +140,7 @@ async function loadArchiveHistory() {
       } else {
         const cleanFile = val.endsWith(".json") ? val : `${val}.json`;
         const archiveData = await fetchJsonWithFallback([
-          `data/archives/${cleanFile}`,
+          `./data/archives/${cleanFile}`,
           `public/data/archives/${cleanFile}`,
           val,
         ]);
@@ -137,7 +162,7 @@ async function loadArchiveHistory() {
     if (!rawFile) continue;
     const cleanFile = rawFile.endsWith(".json") ? rawFile : `${rawFile}.json`;
     const data = await fetchJsonWithFallback([
-      `data/archives/${cleanFile}`,
+      `./data/archives/${cleanFile}`,
       `public/data/archives/${cleanFile}`,
       rawFile,
     ]);
@@ -201,17 +226,14 @@ function enrichWithHistory(chartData) {
   });
 }
 
-async function initChartApp() {
-  await loadArchiveHistory();
-  await loadAndRenderChart();
-}
-
 async function loadAndRenderChart() {
   const data = await fetchJsonWithFallback([
+    "./data/latest_ranking.json",
     "data/latest_ranking.json",
     "public/data/latest_ranking.json",
+    "./data/weekly_draft.json",
     "data/weekly_draft.json",
-    "data/drafts/weekly_draft.json",
+    "../data/weekly_draft.json",
     "latest_ranking.json",
   ]);
 
@@ -352,7 +374,7 @@ function renderRankingView(ranking) {
       const chartInCount = song.chart_in_count || 1;
       const thumbUrl =
         song.thumbnail ||
-        (song.youtube_id ? `https://i.ytimg.com/vi/${song.youtube_id}/mqdefault.jpg` : "");
+        (song.youtube_id ? `[https://i.ytimg.com/vi/$](https://i.ytimg.com/vi/$){song.youtube_id}/mqdefault.jpg` : "");
 
       return `
       <article class="rank-card rank-${song.rank}" data-rank="${song.rank}">
@@ -403,7 +425,7 @@ function renderRankingView(ranking) {
               </ul>
               ${
                 song.youtube_id
-                  ? `<a href="https://www.youtube.com/watch?v=${encodeURIComponent(song.youtube_id)}" target="_blank" rel="noopener noreferrer" class="video-link yt-link">▶ YouTubeで視聴する</a>`
+                  ? `<a href="[https://www.youtube.com/watch?v=$](https://www.youtube.com/watch?v=$){encodeURIComponent(song.youtube_id)}" target="_blank" rel="noopener noreferrer" class="video-link yt-link">▶ YouTubeで視聴する</a>`
                   : ""
               }
             </div>
@@ -417,7 +439,7 @@ function renderRankingView(ranking) {
               </ul>
               ${
                 song.niconico_id
-                  ? `<a href="https://www.nicovideo.jp/watch/${encodeURIComponent(song.niconico_id)}" target="_blank" rel="noopener noreferrer" class="video-link nc-link">▶ ニコニコ動画で視聴する</a>`
+                  ? `<a href="[https://www.nicovideo.jp/watch/$](https://www.nicovideo.jp/watch/$){encodeURIComponent(song.niconico_id)}" target="_blank" rel="noopener noreferrer" class="video-link nc-link">▶ ニコニコ動画で視聴する</a>`
                   : ""
               }
             </div>

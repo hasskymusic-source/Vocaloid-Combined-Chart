@@ -4,8 +4,211 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>週刊VOCALOID複合ランキング</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- 外部CSSのマルチパス読み込み（直下・css/配下の両方に対応） -->
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="./css/style.css" />
+  <!-- 万が一外部CSSが404になった場合でも絶対に画面を崩さないフォールバックCSS内蔵 -->
+  <style>
+    :root {
+      --bg-main: #0f172a;
+      --bg-card: #161f33;
+      --bg-table-header: #131c31;
+      --bg-table-row-hover: #1e293b;
+      --border-color: #26334d;
+      --accent-cyan: #00d2ff;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --yt-color: #f87171;
+      --nc-color: #60a5fa;
+      --up-green: #4ade80;
+      --down-red: #f87171;
+      --stay-gray: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+      line-height: 1.6;
+    }
+    .site-header {
+      background: linear-gradient(180deg, #131c31 0%, #0f172a 100%);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1.5rem 1.5rem 0;
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .brand-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--accent-cyan);
+      margin-bottom: 0.25rem;
+    }
+    .site-title { font-size: 1.75rem; font-weight: 800; color: var(--text-primary); }
+    .site-subtitle { font-size: 0.9rem; color: var(--text-secondary); }
+    .header-controls { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .period-box, .archive-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.5rem 0.9rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .period-label, .archive-label { font-size: 0.72rem; color: var(--text-secondary); }
+    .period-value { font-size: 0.9rem; font-weight: 700; color: var(--accent-cyan); }
+    .archive-select {
+      background: transparent;
+      color: var(--text-primary);
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+    .archive-select option { background: var(--bg-card); color: var(--text-primary); }
+    .tab-nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      background: transparent;
+      color: var(--text-secondary);
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .tab-btn:hover { color: var(--text-primary); }
+    .tab-btn.active { color: var(--accent-cyan); border-bottom-color: var(--accent-cyan); }
+    .main-container { max-width: 1200px; margin: 2rem auto; padding: 0 1.25rem; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .section-header { margin-bottom: 1.25rem; }
+    .section-title, .insight-section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      border-left: 4px solid var(--accent-cyan);
+      padding-left: 0.75rem;
+      margin-bottom: 1rem;
+      line-height: 1.3;
+    }
+    .section-desc, .insight-section-desc { font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem; }
+    .insight-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-bottom: 1.75rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+    .chart-wrapper { position: relative; height: 460px; width: 100%; }
+    .table-responsive { width: 100%; overflow-x: auto; }
+    .insight-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--border-color);
+      font-size: 0.92rem;
+    }
+    .insight-table th, .insight-table td {
+      padding: 0.9rem 1rem;
+      text-align: left;
+      border: 1px solid var(--border-color);
+      vertical-align: middle;
+    }
+    .insight-table thead th {
+      background-color: var(--bg-table-header);
+      color: var(--accent-cyan);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .insight-table tbody tr { background-color: var(--bg-card); }
+    .insight-table tbody tr:hover { background-color: var(--bg-table-row-hover); }
+    .col-rank { font-weight: 700; white-space: nowrap; width: 68px; }
+    .col-song { min-width: 240px; }
+    .insight-song-title { color: var(--text-primary); font-weight: 500; margin-right: 0.35rem; }
+    .insight-song-producer { color: var(--text-secondary); font-size: 0.88rem; }
+    .col-total-pt, .col-pt-ratio, .col-chart-in { font-weight: 700; white-space: nowrap; }
+    .pt-ratio-up { color: var(--up-green); font-weight: 700; }
+    .pt-ratio-down { color: var(--down-red); font-weight: 700; }
+    .pt-ratio-stay { color: var(--stay-gray); font-weight: 600; }
+    .pt-ratio-new {
+      display: inline-block;
+      padding: 0.1rem 0.45rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      border: 1px solid rgba(0, 210, 255, 0.4);
+      background: rgba(0, 210, 255, 0.1);
+      border-radius: 4px;
+    }
+    .col-yt-ratio { color: var(--yt-color); font-weight: 500; white-space: nowrap; }
+    .col-nc-ratio { color: var(--nc-color); font-weight: 500; white-space: nowrap; }
+    .ranking-list { display: flex; flex-direction: column; gap: 0.85rem; }
+    .rank-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .rank-card-summary { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; cursor: pointer; }
+    .rank-number-col { display: flex; flex-direction: column; align-items: center; min-width: 82px; gap: 0.2rem; }
+    .rank-number { font-size: 1.45rem; font-weight: 800; }
+    .rank-diff { font-size: 0.72rem; font-weight: 700; }
+    .diff-up { color: var(--up-green); }
+    .diff-down { color: var(--down-red); }
+    .diff-stay { color: var(--stay-gray); }
+    .diff-new { color: var(--accent-cyan); }
+    .chart-in-mini { font-size: 0.72rem; color: var(--text-secondary); }
+    .rank-thumb { width: 112px; height: 63px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color); }
+    .rank-info-col { flex: 1; min-width: 0; }
+    .song-title { font-size: 1.08rem; font-weight: 700; margin-bottom: 0.2rem; }
+    .song-meta { font-size: 0.85rem; color: var(--text-secondary); display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.45rem; }
+    .platform-bar { height: 6px; background: #0f172a; border-radius: 999px; overflow: hidden; display: flex; }
+    .platform-bar-yt { background: var(--yt-color); }
+    .platform-bar-nc { background: var(--nc-color); }
+    .rank-points-col { text-align: right; min-width: 170px; }
+    .total-points { font-size: 1.25rem; font-weight: 800; }
+    .points-sub-row { font-size: 0.78rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.1rem; margin-top: 0.2rem; }
+    .rank-detail-panel { display: none; border-top: 1px solid var(--border-color); background: #11192b; padding: 1.25rem; }
+    .rank-detail-panel.open { display: block; }
+    .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+    .detail-box { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; }
+    .detail-box h4 { font-size: 0.92rem; margin-bottom: 0.65rem; }
+    .yt-detail-box h4 { color: var(--yt-color); }
+    .nc-detail-box h4 { color: var(--nc-color); }
+    .detail-box ul { list-style: none; font-size: 0.86rem; display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.85rem; }
+    .video-link { display: inline-block; font-size: 0.82rem; font-weight: 700; text-decoration: none; padding: 0.4rem 0.8rem; border-radius: 6px; }
+    .yt-link { background: rgba(248, 113, 113, 0.15); color: var(--yt-color); border: 1px solid rgba(248, 113, 113, 0.35); }
+    .nc-link { background: rgba(96, 165, 250, 0.15); color: var(--nc-color); border: 1px solid rgba(96, 165, 250, 0.35); }
+    .commentary-box { margin-top: 1rem; background: rgba(0, 210, 255, 0.06); border-left: 3px solid var(--accent-cyan); padding: 0.85rem 1rem; border-radius: 4px; }
+    .commentary-list { display: flex; flex-direction: column; gap: 1rem; }
+    .commentary-card { border: 1px solid var(--border-color); border-radius: 8px; padding: 1.1rem; background: #121b2d; }
+    .commentary-card-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.65rem; flex-wrap: wrap; }
+    .commentary-rank-badge { background: var(--accent-cyan); color: #0f172a; font-weight: 800; font-size: 0.8rem; padding: 0.15rem 0.55rem; border-radius: 4px; }
+    .commentary-song-title { font-size: 1rem; flex: 1; }
+    .commentary-song-pt { font-weight: 700; color: var(--accent-cyan); }
+    .loading-cell, .loading-state, .empty-state, .error-state { text-align: center; padding: 2rem; color: var(--text-secondary); }
+    .site-footer { text-align: center; padding: 2rem 1rem; color: var(--text-secondary); font-size: 0.85rem; border-top: 1px solid var(--border-color); margin-top: 3rem; }
+  </style>
+  <script src="[https://cdn.jsdelivr.net/npm/chart.js](https://cdn.jsdelivr.net/npm/chart.js)"></script>
 </head>
 <body>
   <header class="site-header">
@@ -49,7 +252,7 @@
       </div>
     </section>
 
-    <!-- タブ2: ランキングインサイト（TOP 10 に拡大） -->
+    <!-- タブ2: ランキングインサイト（TOP 10） -->
     <section id="tab-insight" class="tab-content">
       <div class="insight-card">
         <h2 class="insight-section-title">TOP 10 ポイント構成比（6指標内訳）</h2>
@@ -105,7 +308,7 @@
     <section id="tab-method" class="tab-content">
       <div class="insight-card">
         <h2 class="insight-section-title">集計方法・ポイント計算式について</h2>
-        <p class="method-lead">
+        <p class="method-lead" style="margin-bottom: 1rem;">
           「週刊VOCALOID複合ランキング」は、YouTubeとニコニコ動画の2大プラットフォームにおける週間純増数を取得し、ボカロリスナーの視聴・支持行動を多角的に反映して算出する複合チャートです。
         </p>
         <div class="table-responsive">
@@ -166,6 +369,14 @@
     <p>&copy; 週刊VOCALOID複合ランキング All Rights Reserved.</p>
   </footer>
 
-  <script src="app.js"></script>
+  <!-- JSマルチパス自動フォールバック読み込み（./app.js が無ければ ./js/app.js を自動ロード） -->
+  <script src="./app.js"></script>
+  <script>
+    if (!window.__VOCALOID_APP_LOADED__) {
+      var fallbackScript = document.createElement("script");
+      fallbackScript.src = "./js/app.js";
+      document.body.appendChild(fallbackScript);
+    }
+  </script>
 </body>
 </html>
