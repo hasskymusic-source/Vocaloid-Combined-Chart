@@ -1,0 +1,616 @@
+{
+  "publishDate": "2026-10-14 13:00",
+  "archiveId": "2026-10-14",
+  "period": "2026-10-05 〜 2026-10-11",
+  "weeklySummary": "集計期間（2026-10-05 〜 2026-10-11）の週間VOCALOID複合ランキングTOP 20（初回公開）。日本国内のボカロ新譜から韓国・英語圏をはじめとするグローバルボカロPのヒット曲まで、YouTubeとニコニコ動画の6指標を横断集計した結果、뭐든지모에화「展示中毒」が週間 2,982,329 pt で総合1位を獲得した。",
+  "weights": {
+    "yt_views": 1,
+    "yt_likes": 50,
+    "yt_comments": 100,
+    "nc_views": 5,
+    "nc_mylist": 100,
+    "nc_comments": 10
+  },
+  "songs": [
+    {
+      "song_id": "song_sm46828928",
+      "title": "展示中毒",
+      "producer": "뭐든지모에화",
+      "vocal": "初音ミク",
+      "youtube_id": "786OXxbw2aM",
+      "niconico_id": "sm46828928",
+      "total_pt": 2982329,
+      "yt_total_pt": 2967759,
+      "nc_total_pt": 14570,
+      "raw": {
+        "yt_views": 1470409,
+        "yt_likes": 26333,
+        "yt_comments": 1807,
+        "nc_views": 2408,
+        "nc_mylist": 23,
+        "nc_comments": 23
+      },
+      "pts": {
+        "yt_views": 1470409,
+        "yt_likes": 1316650,
+        "yt_comments": 180700,
+        "nc_views": 12040,
+        "nc_mylist": 2300,
+        "nc_comments": 230
+      },
+      "prevRank": "NEW",
+      "commentary": "YouTube指標 99.5%（2,967,759pt）、ニコニコ動画指標 0.5%（14,570pt）を獲得し総合1位にランクインした。",
+      "rank": 1
+    },
+    {
+      "song_id": "song_sm46354721",
+      "title": "ヤラララ",
+      "producer": "ABM (AnythingBecomeMoe)",
+      "vocal": "重音テト",
+      "youtube_id": "T24rF_x0TmQ",
+      "niconico_id": "sm46354721",
+      "total_pt": 2619337,
+      "yt_total_pt": 2521097,
+      "nc_total_pt": 98240,
+      "raw": {
+        "yt_views": 1666447,
+        "yt_likes": 16163,
+        "yt_comments": 465,
+        "nc_views": 18486,
+        "nc_mylist": 54,
+        "nc_comments": 41
+      },
+      "pts": {
+        "yt_views": 1666447,
+        "yt_likes": 808150,
+        "yt_comments": 46500,
+        "nc_views": 92430,
+        "nc_mylist": 5400,
+        "nc_comments": 410
+      },
+      "prevRank": "NEW",
+      "commentary": "YouTube指標 96.2%（2,521,097pt）、ニコニコ動画指標 3.8%（98,240pt）を獲得し総合2位にランクイン。",
+      "rank": 2
+    },
+    {
+      "song_id": "song_sm46891435",
+      "title": "惑星直列",
+      "producer": "いよわ",
+      "vocal": "足立レイ",
+      "youtube_id": "hL9W5TSUfwM",
+      "niconico_id": "sm46904359",
+      "total_pt": 2151513,
+      "yt_total_pt": 1954908,
+      "nc_total_pt": 196605,
+      "raw": {
+        "yt_views": 464408,
+        "yt_likes": 27870,
+        "yt_comments": 970,
+        "nc_views": 27825,
+        "nc_mylist": 511,
+        "nc_comments": 638
+      },
+      "pts": {
+        "yt_views": 464408,
+        "yt_likes": 1393500,
+        "yt_comments": 97000,
+        "nc_views": 139125,
+        "nc_mylist": 51100,
+        "nc_comments": 6380
+      },
+      "prevRank": "NEW",
+      "commentary": "YouTube指標 90.9%（1,954,908pt）、ニコニコ動画指標 9.1%（196,605pt）を獲得し総合3位にランクイン。",
+      "rank": 3
+    },
+    {
+      "song_id": "song_JkGyMUwzxQE",
+      "title": "ただ浮かぶ脳裏のモーション",
+      "producer": "バーバパパ",
+      "vocal": "重音テト",
+      "youtube_id": "JkGyMUwzxQE",
+      "niconico_id": "",
+      "total_pt": 2019924,
+      "yt_total_pt": 2019924,
+      "nc_total_pt": 0,
+      "raw": {
+        "yt_views": 722174,
+        "yt_likes": 24005,
+        "yt_comments": 975,
+        "nc_views": 0,
+        "nc_mylist": 0,
+        "nc_comments": 0
+      },
+      "pts": {
+        "yt_views": 722174,
+        "yt_likes": 1200250,
+        "yt_comments": 97500,
+        "nc_views": 0,
+        "nc_mylist": 0,
+        "nc_comments": 0
+      },
+      "prevRank": "NEW",
+      "commentary": "YouTube指標 100.0%（2,019,924pt）、ニコニコ動画指標 0.0%（0pt）を獲得し総合4位にランクイン。",
+      "rank": 4
+    },
+    {
+      "song_id": "song_cY0qV7q9IC4",
+      "title": "Clover",
+      "producer": "FLAVOR FOLEY",
+      "vocal": "知声",
+      "youtube_id": "cY0qV7q9IC4",
+      "niconico_id": "",
+      "total_pt": 2014247,
+      "yt_total_pt": 2014247,
+      "nc_total_pt": 0,
+      "raw": {
+        "yt_views": 585997,
+        "yt_likes": 25139,
+        "yt_comments": 1713,
+        "nc_views": 0,
+        "nc_mylist": 0,
+        "nc_comments": 0
+      },
+      "pts": {
+        "yt_views": 585997,
+        "yt_likes": 1256950,
+        "yt_comments": 171300,
+        "nc_views": 0,
+        "nc_mylist": 0,
+        "nc_comments": 0
+      },
+      "prevRank": "NEW",
+      "commentary": "YouTube指標 100.0%（2,014,247pt）、ニコニコ動画指標 0.0%（0pt）を獲得し総合5位にランクイン。",
+      "rank": 5
+    },
+    {
+      "song_id": "song_sm46865356",
+      "title": "えねみぃ",
+      "producer": "ピノキオピー",
+      "vocal": "初音ミク・重音テト",
+      "youtube_id": "MflA4ZIKD3U",
+      "niconico_id": "sm46865356",
+      "total_pt": 1837819,
+      "yt_total_pt": 1711164,
+      "nc_total_pt": 126655,
+      "raw": {
+        "yt_views": 659864,
+        "yt_likes": 19692,
+        "yt_comments": 667,
+        "nc_views": 20689,
+        "nc_mylist": 214,
+        "nc_comments": 181
+      },
+      "pts": {
+        "yt_views": 659864,
+        "yt_likes": 984600,
+        "yt_comments": 66700,
+        "nc_views": 103445,
+        "nc_mylist": 21400,
+        "nc_comments": 1810
+      },
+      "prevRank": "NEW",
+      "commentary": "",
+      "rank": 6
+    },
+    {
+      "song_id": "song_GPr_cM7Nyzk",
+      "title": "肆足歩行",
+      "producer": "サツキ",
+      "vocal": "足立レイ",
+      "youtube_id": "GPr_cM7Nyzk",
+      "niconico_id": "sm46867629",
+      "total_pt": 1690789,
+      "yt_total_pt": 1566729,
+      "nc_total_pt": 124060,
+      "raw": {
+        "yt_views": 318729,
+        "yt_likes": 23916,
+        "yt_comments": 522,
+        "nc_views": 17670,
+        "nc_mylist": 312,
+        "nc_comments": 451
+      },
+      "pts": {
+        "yt_views": 318729,
+        "yt_likes": 1195800,
+        "yt_comments": 52200,
+        "nc_views": 88350,
+        "nc_mylist": 31200,
+        "nc_comments": 4510
+      },
+      "prevRank": "NEW",
+      "commentary": "",
+      "rank": 7
+    },
+    {
+      "song_id": "song_sm46904318",
+      "title": "ご主人様、ロックのお時間にございます",
+      "producer": "Neru",
+      "vocal": "鏡音リン・鏡音レン",
+      "youtube_id": "MecJkEnEG9w",
+      "niconico_id": "sm46904318",
+      "total_pt": 1589342,
+      "yt_total_pt": 1438207,
+      "nc_total_pt": 151135,
+      "raw": {
+        "yt_views": 376357,
+        "yt_likes": 19951,
+        "yt_comments": 643,
+        "nc_views": 20803,
+        "nc_mylist": 438,
+        "nc_comments": 332
+      },
+      "pts": {
+        "yt_views": 376357,
+        "yt_likes": 997550,
+        "yt_comments": 64300,
+        "nc_views": 104015,
+        "nc_mylist": 43800,
+        "nc_comments": 3320
+      },
+      "prevRank": "NEW",
+      "commentary": "",
+      "rank": 8
+    },
+    {
+      "song_id": "song_sm45739389",
+      "title": "ループザルーム",
+      "producer": "ルシノ",
+      "vocal": "初音ミク",
+      "youtube_id": "icBDYkfxpMs",
+      "niconico_id": "sm45739389",
+      "total_pt": 1561593,
+      "yt_total_pt": 1446073,
+      "nc_total_pt": 115520,
+      "raw": {
+        "yt_views": 951823,
+        "yt_likes": 9543,
+        "yt_comments": 171,
+        "nc_views": 22194,
+        "nc_mylist": 42,
+        "nc_comments": 35
+      },
+      "pts": {
+        "yt_views": 951823,
+        "yt_likes": 477150,
+        "yt_comments": 17100,
+        "nc_views": 110970,
+        "nc_mylist": 4200,
+        "nc_comments": 350
+      },
+      "prevRank": "NEW",
+      "commentary": "",
+      "rank": 9
+    },
+    {
+      "song_id": "song_sm46855974",
+      "title": "もしもしも",
+      "producer": "なきそ",
+      "vocal": "初音ミク",
+      "youtube_id": "7qUq1yOjoPM",
+      "niconico_id": "sm46855974",
+      "total_pt": 1495438,
+      "yt_total_pt": 1402793,
+      "nc_total_pt": 92645,
+      "raw": {
+        "yt_views": 507543,
+        "yt_likes": 17063,
+        "yt_comments": 421,
+        "nc_views": 16083,
+        "nc_mylist": 118,
+        "nc_comments": 43
+      },
+      "pts": {
+        "yt_views": 507543,
+        "yt_likes": 853150,
+        "yt_comments": 42100,
+        "nc_views": 80415,
+        "nc_mylist": 11800,
+        "nc_comments": 430
+      },
+      "prevRank": "NEW",
+      "commentary": "",
+      "rank": 10
+    },
+    {
+      "song_id": "song_sm46705438",
+      "title": "デビットビット",
+      "producer": "アボガド6",
+      "vocal": "VOCALOID",
+      "youtube_id": "7O9PFfabVkk",
+      "niconico_id": "sm46705438",
+      "total_pt": 1361133,
+      "yt_total_pt": 1173468,
+      "nc_total_pt": 187665,
+      "raw": {
+        "yt_views": 547468,
+        "yt_likes": 12100,
+        "yt_comments": 210,
+        "nc_views": 33809,
+        "nc_mylist": 143,
+        "nc_comments": 432
+      },
+      "pts": {
+        "yt_views": 547468,
+        "yt_likes": 605000,
+        "yt_comments": 21000,
+        "nc_views": 169045,
+        "nc_mylist": 14300,
+        "nc_comments": 4320
+      },
+      "prevRank": "NEW",
+      "commentary": "",
+      "rank": 11
+    },
+    {
+      "song_id": "song_sm46875283",
+      "title": "ワソダーラソド",
+      "producer": "サツキ",
+      "vocal": "重音テト",
+      "youtube_id": "sQCn62k1ycs",
+      "niconico_id": "sm46875283",
+      "total_pt": 1322387,
+      "yt_total_pt": 1231582,
+      "nc_total_pt": 90805,
+      "raw": {
+        "yt_views": 242432,
+        "yt_likes": 18377,
+        "yt_comments": 703,
+        "nc_views": 15627,
+        "nc_mylist": 119,
+        "nc_comments": 77
+      },
+      "pts": {
+        "yt_views": 242432,
+        "yt_likes": 918850,
+        "yt_comments": 70300,
+        "nc_views": 78135,
+        "nc_mylist": 11900,
+        "nc_comments": 770
+      },
+      "prevRank": "NEW",
+      "commentary": "",
+      "rank": 12
+    },
+    {
+      "song_id": "song_sm46537381",
+      "title": "ブレインロット",
+      "producer": "東京真中",
+      "vocal": "重音テト",
+      "youtube_id": "UsjsYMo3O1Q",
+      "niconico_id": "sm46537381",
+      "total_pt": 1210703,
+      "yt_total_pt": 1160793,
+      "nc_total_pt": 49910,
+      "raw": {
+        "yt_views": 736743,
+        "yt_likes": 8161,
+        "yt_comments": 160,
+        "nc_views": 8808,
+        "nc_mylist": 55,
+        "nc_comments": 37
+      },
+      "pts": {
+        "yt_views": 736743,
+        "yt_likes": 408050,
+        "yt_comments": 16000,
+        "nc_views": 44040,
+        "nc_mylist": 5500,
+        "nc_comments": 370
+      },
+      "prevRank": "NEW",
+      "commentary": "",
+      "rank": 13
+    },
+    {
+      "song_id": "song_sm45241713",
+      "title": "いますぐ輪廻",
+      "producer": "なきそ",
+      "vocal": "初音ミク",
+      "youtube_id": "3iUgKH8c7p4",
+      "niconico_id": "sm45241713",
+      "total_pt": 1120698,
+      "yt_total_pt": 1004523,
+      "nc_total_pt": 116175,
+      "raw": {
+        "yt_views": 701123,
+        "yt_likes": 5750,
+        "yt_comments": 159,
+        "nc_views": 22199,
+        "nc_mylist": 46,
+        "nc_comments": 58
+      },
+      "pts": {
+        "yt_views": 701123,
+        "yt_likes": 287500,
+        "yt_comments": 15900,
+        "nc_views": 110995,
+        "nc_mylist": 4600,
+        "nc_comments": 580
+      },
+      "prevRank": "NEW",
+      "commentary": "",
+      "rank": 14
+    },
+    {
+      "song_id": "song_sm44317852",
+      "title": "モニタリング",
+      "producer": "DECO＊27, 山本隼人, OTOIRO",
+      "vocal": "初音ミク",
+      "youtube_id": "kbNdx0yqbZE",
+      "niconico_id": "sm44317852",
+      "total_pt": 1115291,
+      "yt_total_pt": 972236,
+      "nc_total_pt": 143055,
+      "raw": {
+        "yt_views": 718986,
+        "yt_likes": 4901,
+        "yt_comments": 82,
+        "nc_views": 27267,
+        "nc_mylist": 63,
+        "nc_comments": 42
+      },
+      "pts": {
+        "yt_views": 718986,
+        "yt_likes": 245050,
+        "yt_comments": 8200,
+        "nc_views": 136335,
+        "nc_mylist": 6300,
+        "nc_comments": 420
+      },
+      "prevRank": "NEW",
+      "commentary": "",
+      "rank": 15
+    },
+    {
+      "song_id": "song_sm46613085",
+      "title": "アクマバライ",
+      "producer": "うちのボカロは様子がおかしい",
+      "vocal": "初音ミク",
+      "youtube_id": "TzH5BsJj81Y",
+      "niconico_id": "sm46613085",
+      "total_pt": 1055327,
+      "yt_total_pt": 994472,
+      "nc_total_pt": 60855,
+      "raw": {
+        "yt_views": 612572,
+        "yt_likes": 7120,
+        "yt_comments": 259,
+        "nc_views": 11443,
+        "nc_mylist": 33,
+        "nc_comments": 34
+      },
+      "pts": {
+        "yt_views": 612572,
+        "yt_likes": 356000,
+        "yt_comments": 25900,
+        "nc_views": 57215,
+        "nc_mylist": 3300,
+        "nc_comments": 340
+      },
+      "prevRank": "NEW",
+      "commentary": "",
+      "rank": 16
+    },
+    {
+      "song_id": "song_sm44301514",
+      "title": "テトリス",
+      "producer": "柊マグネタイト",
+      "vocal": "重音テト",
+      "youtube_id": "Soy4jGPHr3g",
+      "niconico_id": "sm44301514",
+      "total_pt": 1039457,
+      "yt_total_pt": 895117,
+      "nc_total_pt": 144340,
+      "raw": {
+        "yt_views": 703667,
+        "yt_likes": 3653,
+        "yt_comments": 88,
+        "nc_views": 27462,
+        "nc_mylist": 65,
+        "nc_comments": 53
+      },
+      "pts": {
+        "yt_views": 703667,
+        "yt_likes": 182650,
+        "yt_comments": 8800,
+        "nc_views": 137310,
+        "nc_mylist": 6500,
+        "nc_comments": 530
+      },
+      "prevRank": "NEW",
+      "commentary": "",
+      "rank": 17
+    },
+    {
+      "song_id": "song_sm46887855",
+      "title": "マイバッド",
+      "producer": "はるまきごはん",
+      "vocal": "初音ミク",
+      "youtube_id": "BBCRBlHT_Go",
+      "niconico_id": "sm46887855",
+      "total_pt": 1038509,
+      "yt_total_pt": 869104,
+      "nc_total_pt": 169405,
+      "raw": {
+        "yt_views": 265254,
+        "yt_likes": 11489,
+        "yt_comments": 294,
+        "nc_views": 26143,
+        "nc_mylist": 372,
+        "nc_comments": 149
+      },
+      "pts": {
+        "yt_views": 265254,
+        "yt_likes": 574450,
+        "yt_comments": 29400,
+        "nc_views": 130715,
+        "nc_mylist": 37200,
+        "nc_comments": 1490
+      },
+      "prevRank": "NEW",
+      "commentary": "",
+      "rank": 18
+    },
+    {
+      "song_id": "song_sm45964915",
+      "title": "처형박수",
+      "producer": "TRAP CHICK",
+      "vocal": "重音テト",
+      "youtube_id": "YcxhmHEykPg",
+      "niconico_id": "sm45964915",
+      "total_pt": 1007911,
+      "yt_total_pt": 993701,
+      "nc_total_pt": 14210,
+      "raw": {
+        "yt_views": 674101,
+        "yt_likes": 5906,
+        "yt_comments": 243,
+        "nc_views": 2660,
+        "nc_mylist": 8,
+        "nc_comments": 11
+      },
+      "pts": {
+        "yt_views": 674101,
+        "yt_likes": 295300,
+        "yt_comments": 24300,
+        "nc_views": 13300,
+        "nc_mylist": 800,
+        "nc_comments": 110
+      },
+      "prevRank": "NEW",
+      "commentary": "",
+      "rank": 19
+    },
+    {
+      "song_id": "song_sm45768297",
+      "title": "バゥムクゥヘン・エンドロゥル",
+      "producer": "雨良",
+      "vocal": "初音ミク・重音テト・亞北ネル",
+      "youtube_id": "Dz5rALpx06M",
+      "niconico_id": "sm45768297",
+      "total_pt": 888329,
+      "yt_total_pt": 845324,
+      "nc_total_pt": 43005,
+      "raw": {
+        "yt_views": 591474,
+        "yt_likes": 4647,
+        "yt_comments": 215,
+        "nc_views": 8111,
+        "nc_mylist": 22,
+        "nc_comments": 25
+      },
+      "pts": {
+        "yt_views": 591474,
+        "yt_likes": 232350,
+        "yt_comments": 21500,
+        "nc_views": 40555,
+        "nc_mylist": 2200,
+        "nc_comments": 250
+      },
+      "prevRank": "NEW",
+      "commentary": "",
+      "rank": 20
+    }
+  ]
+}
