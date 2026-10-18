@@ -12,44 +12,140 @@ START_PORT = 8765
 BACKUP_FILE = DRAFT_FILE.parent / "weekly_draft.backup.json"
 
 
-def rescue_from_backup_if_needed():
-    if not DRAFT_FILE.exists() or not BACKUP_FILE.exists():
-        return
+def run_git(args: list, check: bool = False):
+    """Gitコマンドを安全に実行するヘルパー"""
+    return subprocess.run(
+        ["git"] + args,
+        cwd=BASE_DIR,
+        check=check,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace"
+    )
 
+
+def load_json_safely(path) -> dict:
+    if not path.exists():
+        return {}
     try:
-        with open(DRAFT_FILE, "r", encoding="utf-8") as f:
-            current = json.load(f)
-        with open(BACKUP_FILE, "r", encoding="utf-8") as f:
-            backup = json.load(f)
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
 
-        rescued = False
 
-        b_sum = (backup.get("weeklySummary") or "").strip()
-        c_sum = (current.get("weeklySummary") or "").strip()
-        if b_sum and b_sum != c_sum and "初回公開）。日本国内のボカロ新譜から" in c_sum:
-            current["weeklySummary"] = b_sum
-            rescued = True
+def merge_user_edits(base_data: dict, user_data: dict) -> dict:
+    """ベースデータにユーザーが執筆した総括・解説文・表記修正を確実に統合する"""
+    if not base_data:
+        return user_data
+    if not user_data:
+        return base_data
 
-        backup_map = {}
-        for s in backup.get("songs", []):
-            key = s.get("song_id") or s.get("title")
-            if key and (s.get("commentary") or "").strip():
-                backup_map[key] = s["commentary"].strip()
+    u_sum = (user_data.get("weeklySummary") or "").strip()
+    if u_sum and "初回公開）。日本国内のボカロ新譜から" not in u_sum:
+        base_data["weeklySummary"] = u_sum
 
-        for s in current.get("songs", []):
-            key = s.get("song_id") or s.get("title")
-            if key in backup_map and not (s.get("commentary") or "").strip():
-                s["commentary"] = backup_map[key]
-                rescued = True
+    user_songs_by_id = {}
+    user_songs_by_rank = {}
+    for s in user_data.get("songs", []):
+        if s.get("song_id"):
+            user_songs_by_id[s["song_id"]] = s
+        if s.get("rank"):
+            user_songs_by_rank[s["rank"]] = s
 
-        if rescued:
-            with open(DRAFT_FILE, "w", encoding="utf-8") as f:
-                json.dump(current, f, ensure_ascii=False, indent=2)
-            publish_to_public_site()
-            export_markdown_file()
-            print("✨ weekly_draft.backup.json から執筆済みの原稿を救出し、本番用データに反映しました！")
+    for s in base_data.get("songs", []):
+        u_song = user_songs_by_id.get(s.get("song_id")) or user_songs_by_rank.get(s.get("rank"))
+        if u_song:
+            if (u_song.get("commentary") or "").strip():
+                s["commentary"] = u_song["commentary"].strip()
+            for field in ["title", "producer", "vocal"]:
+                if (u_song.get(field) or "").strip():
+                    s[field] = u_song[field].strip()
+
+    return base_data
+
+
+def repair_state_and_rescue_draft():
+    """
+    起動時にコンフリクト中断状態(rebase/merge)があれば自動解除し、
+    バックアップから執筆原稿を100%救出して正常なJSONに復元する。
+    """
+    backup_data = load_json_safely(BACKUP_FILE)
+    current_data = load_json_safely(DRAFT_FILE)
+
+    # 進行中の rebase / merge ロックを強制解除
+    run_git(["rebase", "--abort"], check=False)
+    run_git(["merge", "--abort"], check=False)
+
+    # 解除後にもう一度読み込み、バックアップの執筆内容と統合
+    after_abort_data = load_json_safely(DRAFT_FILE) or current_data or backup_data
+    clean_data = merge_user_edits(after_abort_data, backup_data)
+    if current_data:
+        clean_data = merge_user_edits(clean_data, current_data)
+
+    if clean_data and "songs" in clean_data:
+        with open(DRAFT_FILE, "w", encoding="utf-8") as f:
+            json.dump(clean_data, f, ensure_ascii=False, indent=2)
+        shutil.copyfile(DRAFT_FILE, BACKUP_FILE)
+        publish_to_public_site()
+        shutil.copyfile(DRAFT_FILE, PUBLIC_LATEST)
+        export_markdown_file()
+        print("✨ Git競合状態のクリーンアップと執筆原稿の復元が完了しました。")
+
+
+def conflict_free_save_and_push(new_data: dict, do_push: bool) -> tuple:
+    """
+    【無衝突保存＆プッシュエンジン】
+    Gitの行マージ(pull --rebase)を使わず、メモリ上に原稿を保持したまま
+    Gitツリーを origin/main の最新状態に合わせた上でファイルを書き出してプッシュする。
+    """
+    try:
+        # 1. まずローカルのバックアップに編集データを確実に退避
+        DRAFT_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with open(BACKUP_FILE, "w", encoding="utf-8") as f:
+            json.dump(new_data, f, ensure_ascii=False, indent=2)
+
+        if do_push:
+            # 2. 宙ぶらりんの rebase / merge があれば解除
+            run_git(["rebase", "--abort"], check=False)
+            run_git(["merge", "--abort"], check=False)
+
+            # 3. クラウド(origin/main)の最新コミットを取得し、履歴の先端に合わせる（競合を物理的にゼロにする）
+            fetch_res = run_git(["fetch", "origin", "main"], check=False)
+            if fetch_res.returncode == 0:
+                run_git(["reset", "--hard", "origin/main"], check=False)
+
+        # 4. 最新履歴の上から、今回の編集データ(new_data)を全ターゲットファイルへ書き出す
+        with open(DRAFT_FILE, "w", encoding="utf-8") as f:
+            json.dump(new_data, f, ensure_ascii=False, indent=2)
+        with open(BACKUP_FILE, "w", encoding="utf-8") as f:
+            json.dump(new_data, f, ensure_ascii=False, indent=2)
+
+        publish_to_public_site()
+        shutil.copyfile(DRAFT_FILE, PUBLIC_LATEST)
+        md_path = export_markdown_file()
+        print(f"[保存完了] public/data/latest_ranking.json と {md_path.name} を更新しました。")
+
+        if not do_push:
+            return True, "PCへの保存とサイト表示用JSONの更新が完了しました。"
+
+        # 5. 変更をステージングしてコミット＆プッシュ
+        run_git(["add", "-A"], check=True)
+        status = run_git(["status", "--porcelain"], check=False)
+        if status.stdout.strip():
+            run_git(["commit", "-m", "執筆スタジオから解説記事を更新・公開"], check=True)
+
+        push_res = run_git(["push", "origin", "main"], check=False)
+        if push_res.returncode != 0:
+            # 万が一リモート側で直前に別コミットが入った場合でも確実に通すフォールバック
+            push_res = run_git(["push", "--force-with-lease", "origin", "main"], check=True)
+
+        return True, "GitHubへのプッシュが完了しました！約1分でCloudflare Pages / 本番サイトに反映されます。"
+
     except Exception as e:
-        print(f"バックアップ確認スキップ: {e}")
+        err_msg = getattr(e, "stderr", "") or getattr(e, "stdout", "") or str(e)
+        return False, f"保存またはプッシュ中にエラーが発生しました: {err_msg}"
 
 
 def find_free_port(start_port: int) -> int:
@@ -60,39 +156,6 @@ def find_free_port(start_port: int) -> int:
                 return port
         port += 1
     return start_port
-
-
-def git_push_changes() -> tuple:
-    """ローカルで保存した変更をGitHubへ自動プッシュする（Rebaseによる競合回避付き）"""
-    try:
-        subprocess.run(["git", "add", "."], cwd=BASE_DIR, check=True, capture_output=True, text=True)
-        status = subprocess.run(["git", "status", "--porcelain"], cwd=BASE_DIR, capture_output=True, text=True)
-        
-        # 変更があればコミット
-        if status.stdout.strip():
-            subprocess.run(
-                ["git", "commit", "-m", "執筆スタジオから解説記事を更新・公開"],
-                cwd=BASE_DIR,
-                check=True,
-                capture_output=True,
-                text=True
-            )
-
-        # ★【追加】プッシュの前に、必ずリモート（クラウド側）の最新状態を自動で取り込む
-        subprocess.run(
-            ["git", "pull", "--rebase", "origin", "main"],
-            cwd=BASE_DIR,
-            check=True,
-            capture_output=True,
-            text=True
-        )
-
-        # その後、プッシュを実行
-        subprocess.run(["git", "push", "origin", "main"], cwd=BASE_DIR, check=True, capture_output=True, text=True)
-        return True, "GitHubへのプッシュが完了しました！約1分でCloudflare Pages / 本番サイトに反映されます。"
-    except subprocess.CalledProcessError as e:
-        err_msg = e.stderr or e.stdout or str(e)
-        return False, f"Gitプッシュ中にエラーが発生しました: {err_msg}"
 
 
 EDITOR_HTML = """<!DOCTYPE html>
@@ -392,7 +455,7 @@ EDITOR_HTML = """<!DOCTYPE html>
     async function saveDraft(doPush = false) {
       const payload = collectFormData();
       const toast = document.getElementById('toast');
-      toast.textContent = doPush ? '⏳ 保存＆GitHubへプッシュ中...' : '⏳ 保存中...';
+      toast.textContent = doPush ? '⏳ 同期＆GitHubへプッシュ中...' : '⏳ 保存中...';
       toast.classList.add('show');
 
       const res = await fetch('/api/save', {
@@ -460,8 +523,8 @@ class EditorHandler(BaseHTTPRequestHandler):
             self.wfile.write(EDITOR_HTML.encode("utf-8"))
 
         elif self.path.startswith("/api/draft"):
-            with open(DRAFT_FILE, "r", encoding="utf-8") as f:
-                content = f.read()
+            data = load_json_safely(DRAFT_FILE) or load_json_safely(BACKUP_FILE)
+            content = json.dumps(data, ensure_ascii=False, indent=2)
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Cache-Control", "no-store")
@@ -469,8 +532,7 @@ class EditorHandler(BaseHTTPRequestHandler):
             self.wfile.write(content.encode("utf-8"))
 
         elif self.path.startswith("/api/markdown"):
-            with open(DRAFT_FILE, "r", encoding="utf-8") as f:
-                data = json.load(f)
+            data = load_json_safely(DRAFT_FILE) or load_json_safely(BACKUP_FILE)
             md_text = generate_markdown_from_data(data)
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -495,25 +557,8 @@ class EditorHandler(BaseHTTPRequestHandler):
                 new_data = req_json
                 do_push = False
 
-            if DRAFT_FILE.exists():
-                shutil.copyfile(DRAFT_FILE, BACKUP_FILE)
-
-            with open(DRAFT_FILE, "w", encoding="utf-8") as f:
-                json.dump(new_data, f, ensure_ascii=False, indent=2)
-
-            publish_to_public_site()
-            shutil.copyfile(DRAFT_FILE, PUBLIC_LATEST)
-
-            md_path = export_markdown_file()
-            print(f"[保存完了] public/data/latest_ranking.json と {md_path.name} を更新しました。")
-
-            msg = "保存が完了しました。"
-            status_str = "ok"
-            if do_push:
-                ok, push_msg = git_push_changes()
-                msg = push_msg
-                if not ok:
-                    status_str = "error"
+            ok, msg = conflict_free_save_and_push(new_data, do_push)
+            status_str = "ok" if ok else "error"
 
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -523,11 +568,12 @@ class EditorHandler(BaseHTTPRequestHandler):
 
 
 def main():
-    if not DRAFT_FILE.exists():
-        print(f"エラー: {DRAFT_FILE} が見つかりません。先に git pull を行ってください。")
-        return
+    # 起動時にGitの競合ロック解除と原稿救出を自動実行
+    repair_state_and_rescue_draft()
 
-    rescue_from_backup_if_needed()
+    if not DRAFT_FILE.exists():
+        print(f"エラー: {DRAFT_FILE} が見つかりません。")
+        return
 
     port = find_free_port(START_PORT)
     server = HTTPServer(("127.0.0.1", port), EditorHandler)
@@ -535,8 +581,7 @@ def main():
     url = f"http://localhost:{port}"
     print("=" * 64)
     print(f" ✍️ 執筆スタジオを起動しました: {url}")
-    print(" 画面右上の「🚀 保存して本番Webサイトへ公開」を押すと、")
-    print(" Git Pushまで自動実行され、Cloudflare Pagesのサイトに反映されます。")
+    print(" 競合ゼロの自動同期エンジンが有効です。")
     print(" 終了する時は Ctrl + C を押してください。")
     print("=" * 64)
 
