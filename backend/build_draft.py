@@ -12,15 +12,11 @@ except ImportError:
 
 JST = timezone(timedelta(hours=9))
 
-# プロジェクトルートの特定
 BASE_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BASE_DIR.parent if BASE_DIR.name == "backend" else BASE_DIR
 
 
 def resolve_config_path(attr_names, default_rel_path):
-    """
-    config.py に定義されている複数の変数名候補（Path または str）を安全に解決する
-    """
     if config:
         for name in attr_names:
             if hasattr(config, name):
@@ -73,9 +69,6 @@ def save_json(filepath, data):
 
 
 def extract_songs_list(data):
-    """
-    JSONデータが list でも dict でも安全に楽曲オブジェクトの list を取り出す
-    """
     if not data:
         return []
     if isinstance(data, list):
@@ -84,7 +77,6 @@ def extract_songs_list(data):
         for key in ("songs", "ranking", "metrics", "items", "data"):
             if key in data and isinstance(data[key], list):
                 return [item for item in data[key] if isinstance(item, dict)]
-        # 辞書マップ形式 { "song_id": { ... } } の場合
         vals = list(data.values())
         if vals and all(isinstance(v, dict) for v in vals):
             return vals
@@ -92,9 +84,6 @@ def extract_songs_list(data):
 
 
 def get_song_keys(song_obj):
-    """
-    楽曲の名寄せ・同一判定用の識別キーセットを生成する
-    """
     if not isinstance(song_obj, dict):
         return set()
     keys = set()
@@ -131,12 +120,6 @@ def parse_iso_datetime(dt_str):
 
 
 def estimate_weekly_increment_for_new_entry(published_at_str, now_dt=None):
-    """
-    前回スナップショットに存在しない新規発見曲について、累計値がそのまま週間ポイントとして
-    誤計上されるのを防ぐための経過日数減衰モデル
-    - 公開から7日以内: 100% (1.0) を期間内獲得分とする
-    - 公開から7日超: (7.0 / total_age_days) * exp(-0.03 * (total_age_days - 7.0)) を [0.02, 0.85] に制約
-    """
     if now_dt is None:
         now_dt = datetime.now(JST)
     pub_dt = parse_iso_datetime(published_at_str)
@@ -153,26 +136,24 @@ def estimate_weekly_increment_for_new_entry(published_at_str, now_dt=None):
 
 def compute_chart_dates(now_dt=None):
     """
-    集計期間（period）、公開日（publishDate）、アーカイブID（archiveId）を算出する
+    今週の月曜日を基準として、直前の月曜日〜日曜日（7日間）を集計期間として算出する
+    例: 2026/10/19(月) に実行した場合 -> 集計期間: 2026/10/12 - 2026/10/18
     """
     if now_dt is None:
         now_dt = datetime.now(JST)
-    end_date = now_dt.date()
-    start_date = end_date - timedelta(days=7)
+    today = now_dt.date()
+    this_monday = today - timedelta(days=today.weekday())
+    start_date = this_monday - timedelta(days=7)
+    end_date = this_monday - timedelta(days=1)
     period_str = f"{start_date.strftime('%Y/%m/%d')} - {end_date.strftime('%Y/%m/%d')}"
 
-    # 水曜公開日（今週水曜日、または実行日基準）
-    days_until_wed = (2 - now_dt.weekday()) % 7
-    wed_date = end_date + timedelta(days=days_until_wed)
+    wed_date = this_monday + timedelta(days=2)
     publish_date = wed_date.strftime("%Y-%m-%d")
     archive_id = wed_date.strftime("%Y-%m-%d")
     return period_str, publish_date, archive_id
 
 
 def extract_metrics_dict(snapshot_data):
-    """
-    スナップショット（list または dict）から { 識別キー: 楽曲メトリクス辞書 } を構築する
-    """
     items = extract_songs_list(snapshot_data)
     result = {}
     for v in items:
@@ -182,10 +163,6 @@ def extract_metrics_dict(snapshot_data):
 
 
 def get_two_latest_snapshots():
-    """
-    LATEST_SNAPSHOT と PREV_SNAPSHOT を優先的に読み込み、
-    存在しない場合は SNAPSHOTS_DIR 内のJSONから最新・前回を取得する
-    """
     latest_data = load_json(LATEST_SNAPSHOT)
     prev_data = load_json(PREV_SNAPSHOT)
 
@@ -207,10 +184,6 @@ def get_two_latest_snapshots():
 
 
 def collect_past_charts(exclude_archive_id=None, exclude_period=None):
-    """
-    過去の公開済みランキング（public/data/archives/*.json および public/data/latest_ranking.json）を
-    古い順に収集し、前週比較および通算チャートイン回数の集計に使用する
-    """
     candidate_dirs = [
         ARCHIVE_DIR,
         PROJECT_ROOT / "public/data/archives",
@@ -252,11 +225,6 @@ def collect_past_charts(exclude_archive_id=None, exclude_period=None):
 
 
 def build_historical_stats(past_charts):
-    """
-    過去チャートから以下を算出する:
-    1. appearance_counts: 各楽曲が過去にTOP 20にランクインした通算回数
-    2. prev_chart_map: 直近（前週）チャートの順位 (prev_rank) と 総合ポイント (prev_total_pt)
-    """
     appearance_counts = {}
     prev_chart_map = {}
 
@@ -281,9 +249,6 @@ def build_historical_stats(past_charts):
 
 
 def preserve_existing_commentary():
-    """
-    既存の weekly_draft.json およびバックアップから執筆済みの解説文・全体総評を救出する
-    """
     saved_song_comments = {}
     saved_meta = {}
 
@@ -322,10 +287,6 @@ def get_nc_mylist_value(metrics_dict):
 
 
 def calculate_song_points(song, current_metrics, prev_metrics, now_dt):
-    """
-    6指標の期間内純増数を算出し、重み付けポイントを計算する。
-    前回スナップショットにデータがない新規曲は経過日数減衰モデルで期間内獲得分を推計する。
-    """
     cur_m = current_metrics if isinstance(current_metrics, dict) and current_metrics else song
     has_prev = isinstance(prev_metrics, dict) and bool(prev_metrics)
 
@@ -356,7 +317,6 @@ def calculate_song_points(song, current_metrics, prev_metrics, now_dt):
             "nc_comments": int(prev_metrics.get("nc_comments", 0) or 0),
         }
 
-        # 片方のプラットフォームが今週新規に名寄せ・紐付けされた場合の安全補正
         yt_newly_linked = prv_vals["yt_views"] == 0 and cur_vals["yt_views"] > 0
         nc_newly_linked = prv_vals["nc_views"] == 0 and cur_vals["nc_views"] > 0
         est_factor = estimate_weekly_increment_for_new_entry(published_at, now_dt)
@@ -377,7 +337,6 @@ def calculate_song_points(song, current_metrics, prev_metrics, now_dt):
         for mk, val in cur_vals.items():
             raw_gains[mk] = int(round(max(0, val) * est_factor))
 
-    # 互換性のため nc_mylist と nc_mylists の両方を保持
     raw_gains["nc_mylists"] = raw_gains["nc_mylist"]
 
     w_yt_views = WEIGHTS.get("yt_views", 1)
@@ -412,17 +371,14 @@ def main():
     now_dt = datetime.now(JST)
     period_str, publish_date, archive_id = compute_chart_dates(now_dt)
 
-    # 1. 既存の解説原稿をバックアップ＆救出
     existing_draft = load_json(DRAFT_FILE)
     if existing_draft:
         save_json(BACKUP_DRAFT_FILE, existing_draft)
     saved_comments, saved_meta = preserve_existing_commentary()
 
-    # 2. 過去チャートから「前週ポイント」「前週順位」「過去チャートイン回数」を集計
     past_charts = collect_past_charts(exclude_archive_id=archive_id, exclude_period=period_str)
     appearance_counts, prev_chart_map = build_historical_stats(past_charts)
 
-    # 3. スナップショットとマスターデータの読み込み（list / dict 両対応）
     latest_snap, prev_snap = get_two_latest_snapshots()
     cur_map = extract_metrics_dict(latest_snap)
     prv_map = extract_metrics_dict(prev_snap)
@@ -465,7 +421,6 @@ def main():
 
         seen_song_keys.update(keys)
 
-        # 過去のチャートイン回数と前週データの照合
         past_count = 0
         prev_info = None
         for k in keys:
@@ -485,12 +440,10 @@ def main():
             else song.get("prev_total_pt")
         )
 
-        # ポイント前週比率（%）の算出（例: 2,000,000 -> 3,000,000 なら 150）
         pt_ratio = None
         if prev_total_pt is not None and prev_total_pt > 0:
             pt_ratio = round((total_pt / prev_total_pt) * 100)
 
-        # 救出した解説文の復元
         commentary = song.get("commentary") or song.get("comment") or ""
         for k in keys:
             if k in saved_comments:
@@ -537,14 +490,12 @@ def main():
         }
         scored_songs.append(song_entry)
 
-    # 総合ポイント降順でソートして TOP 20 を抽出
     scored_songs.sort(key=lambda x: x["total_pt"], reverse=True)
     top_songs = scored_songs[:TOP_N]
 
     for idx, item in enumerate(top_songs, start=1):
         item["rank"] = idx
         past_c = item.pop("_past_chart_in_count", 0)
-        # 今週TOP20入りした分 (+1) を加算した通算チャートイン回数
         item["chart_in_count"] = past_c + 1
 
     now_str = now_dt.strftime("%Y-%m-%d %H:%M")
@@ -559,7 +510,6 @@ def main():
         or (existing_draft.get("trend_analysis", "") if isinstance(existing_draft, dict) else "")
     )
 
-    # publish_chart.py / editor_server.py / export_blog.py / app.js の全キー名に完全対応
     draft_output = {
         "publishDate": publish_date,
         "archiveId": archive_id,
@@ -575,7 +525,7 @@ def main():
 
     save_json(DRAFT_FILE, draft_output)
     save_json(BACKUP_DRAFT_FILE, draft_output)
-    print(f"[OK] TOP {len(top_songs)} のドラフトを生成しました: {DRAFT_FILE}")
+    print(f"[OK] TOP {len(top_songs)} のドラフトを生成しました: {DRAFT_FILE} (集計期間: {period_str})")
 
 
 if __name__ == "__main__":

@@ -51,11 +51,36 @@ def save_json(filepath, data):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
+def normalize_period_str(period_str, now_dt=None):
+    """
+    集計期間が月曜〜翌月曜（7日差＝8日間、例: 2026/10/12 - 2026/10/19）になっている場合、
+    終了日を1日引いて月曜〜日曜（例: 2026/10/12 - 2026/10/18）に正規化する
+    """
+    if now_dt is None:
+        now_dt = datetime.now(JST)
+    if not period_str or not isinstance(period_str, str):
+        today = now_dt.date()
+        this_monday = today - timedelta(days=today.weekday())
+        start_d = this_monday - timedelta(days=7)
+        end_d = this_monday - timedelta(days=1)
+        return f"{start_d.strftime('%Y/%m/%d')} - {end_d.strftime('%Y/%m/%d')}"
+
+    m = re.match(
+        r"^\s*(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})\s*[\-~〜]\s*(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})\s*$",
+        period_str,
+    )
+    if not m:
+        return period_str
+
+    from datetime import date
+    start_d = date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+    end_d = date(int(m.group(4)), int(m.group(5)), int(m.group(6)))
+    if (end_d - start_d).days == 7:
+        end_d = end_d - timedelta(days=1)
+    return f"{start_d.strftime('%Y/%m/%d')} - {end_d.strftime('%Y/%m/%d')}"
+
+
 def sanitize_frontend_content(text):
-    """
-    コピペ時に誤って先頭や末尾に Markdown のコードブロック (```html, ```css, ```javascript 等) が
-    混入していた場合でも自動的に除去して正常なコードに修復する
-    """
     if not text:
         return text
     cleaned = text.strip()
@@ -65,11 +90,6 @@ def sanitize_frontend_content(text):
 
 
 def sync_frontend_assets():
-    """
-    ルート直下・public直下・public/css・public/js のどこでファイルが編集されても、
-    最新（最終更新時刻が最も新しい）ファイルを検出し、すべての参照パスへ自動同期する。
-    これにより GitHub Pages での CSS/JS 404 エラーを恒久的に防止する。
-    """
     asset_groups = {
         "index.html": [
             PROJECT_ROOT / "public/index.html",
@@ -87,7 +107,7 @@ def sync_frontend_assets():
         ],
     }
 
-    public_Targets = {
+    public_targets = {
         "index.html": [PROJECT_ROOT / "public/index.html"],
         "style.css": [PROJECT_ROOT / "public/style.css", PROJECT_ROOT / "public/css/style.css"],
         "app.js": [PROJECT_ROOT / "public/app.js", PROJECT_ROOT / "public/js/app.js"],
@@ -97,12 +117,11 @@ def sync_frontend_assets():
         existing = [p for p in candidates if p.exists() and p.is_file() and p.stat().st_size > 0]
         if not existing:
             continue
-        # 最も新しく編集されたファイルを採用
         newest_file = max(existing, key=lambda p: p.stat().st_mtime)
         try:
             raw_content = newest_file.read_text(encoding="utf-8")
             clean_content = sanitize_frontend_content(raw_content)
-            for target in public_Targets[name]:
+            for target in public_targets[name]:
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_text(clean_content, encoding="utf-8")
             print(f"[SYNC] {name} を最新状態に同期・検証しました (source: {newest_file.relative_to(PROJECT_ROOT)})")
@@ -111,9 +130,6 @@ def sync_frontend_assets():
 
 
 def update_archive_index(archive_id, period_str, publish_date):
-    """
-    archive_index.json を読み込み、今回のアーカイブを追加・更新する
-    """
     existing = load_json(ARCHIVE_INDEX, default=[])
     if isinstance(existing, dict) and "archives" in existing:
         archive_list = existing["archives"]
@@ -146,7 +162,6 @@ def update_archive_index(archive_id, period_str, publish_date):
     if not updated:
         archive_list.insert(0, new_entry)
 
-    # 新しい順（降順）にソート
     archive_list.sort(
         key=lambda x: (x.get("archiveId") or x.get("publishDate") or x.get("id") or "")
         if isinstance(x, dict)
@@ -156,17 +171,14 @@ def update_archive_index(archive_id, period_str, publish_date):
 
     payload = {"archives": archive_list} if is_wrapped else archive_list
     save_json(ARCHIVE_INDEX, payload)
-    # フォールバック用パスにも保存
     save_json(PROJECT_ROOT / "public/data/archive_index.json", payload)
 
 
 def main():
     print("=== 週刊VOCALOID複合ランキング 本番公開処理開始 ===")
 
-    # 1. フロントエンドファイル（HTML/CSS/JS）の自動同期＆構文サニタイズ
     sync_frontend_assets()
 
-    # 2. ドラフトデータの読み込み（複数候補パスに対応）
     draft_candidates = [
         DRAFT_FILE,
         PROJECT_ROOT / "data/weekly_draft.json",
@@ -174,9 +186,12 @@ def main():
         BACKUP_DRAFT_FILE,
     ]
     draft_data = None
+    used_draft_path = DRAFT_FILE
     for cand in draft_candidates:
-        draft_data = load_json(cand)
-        if isinstance(draft_data, dict) and (draft_data.get("songs") or draft_data.get("ranking")):
+        loaded = load_json(cand)
+        if isinstance(loaded, dict) and (loaded.get("songs") or loaded.get("ranking")):
+            draft_data = loaded
+            used_draft_path = cand
             break
 
     if not isinstance(draft_data, dict):
@@ -185,7 +200,8 @@ def main():
     now_dt = datetime.now(JST)
     publish_date = draft_data.get("publishDate") or now_dt.strftime("%Y-%m-%d")
     archive_id = draft_data.get("archiveId") or publish_date
-    period_str = draft_data.get("period") or publish_date
+    period_str = normalize_period_str(draft_data.get("period"), now_dt)
+    now_str = now_dt.strftime("%Y-%m-%d %H:%M")
 
     songs = draft_data.get("ranking") or draft_data.get("songs") or []
     draft_data["songs"] = songs
@@ -193,18 +209,22 @@ def main():
     draft_data["publishDate"] = publish_date
     draft_data["archiveId"] = archive_id
     draft_data["period"] = period_str
-    draft_data["published_at"] = now_dt.strftime("%Y-%m-%d %H:%M")
+    draft_data["updated_at"] = draft_data.get("updated_at") or now_str
+    draft_data["published_at"] = now_str
 
-    # 3. 最新ランキング JSON の保存
+    # 補正した期間をドラフト側にも保存しておく
+    save_json(used_draft_path, draft_data)
+
+    # 最新ランキング JSON の保存
     save_json(PUBLIC_LATEST, draft_data)
     save_json(PROJECT_ROOT / "data/latest_ranking.json", draft_data)
 
-    # 4. アーカイブ JSON の保存とインデックス更新
+    # アーカイブ JSON の保存とインデックス更新
     archive_file = ARCHIVE_DIR / f"{archive_id}.json"
     save_json(archive_file, draft_data)
     update_archive_index(archive_id, period_str, publish_date)
 
-    print(f"[OK] 最新ランキングを公開しました: {PUBLIC_LATEST}")
+    print(f"[OK] 最新ランキングを公開しました: {PUBLIC_LATEST} (集計期間: {period_str})")
     print(f"[OK] アーカイブを保存しました: {archive_file}")
 
 

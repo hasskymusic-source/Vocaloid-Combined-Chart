@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>週刊VOCALOID複合ランキング</title>
+  <title>週刊VOCALOID™複合ランキング</title>
   <!-- 外部CSSのマルチパス読み込み -->
   <link rel="stylesheet" href="./style.css" />
   <link rel="stylesheet" href="./css/style.css" />
@@ -15,7 +15,7 @@
       --bg-table-header: #131c31;
       --bg-table-row-hover: #1e293b;
       --border-color: #26334d;
-      --accent-cyan: #38bdf8;
+      --accent-cyan: #00d2ff;
       --text-primary: #f8fafc;
       --text-secondary: #94a3b8;
       --yt-views: #ef4444;
@@ -37,20 +37,29 @@
       font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
       line-height: 1.6;
     }
+    .tm-mark {
+      font-size: 0.45em;
+      font-weight: 700;
+      vertical-align: super;
+      line-height: 0;
+      margin-left: 0.08em;
+      margin-right: 0.08em;
+      letter-spacing: 0;
+    }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
     .rank-detail-panel { display: none; }
     .rank-detail-panel.open { display: block; }
   </style>
-  <!-- Chart.js 正規UMDビルドを明示指定 -->
+  <!-- Chart.js 正規UMDビルド -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
   <header class="site-header">
     <div class="header-inner">
       <div class="brand-area">
-        <span class="brand-badge">WEEKLY VOCALOID COMPOSITE CHART</span>
-        <h1 class="site-title">週刊VOCALOID複合ランキング</h1>
+        <span class="brand-badge">WEEKLY VOCALOID COMBINED RANKING</span>
+        <h1 class="site-title">週刊VOCALOID<sup class="tm-mark">TM</sup>複合ランキング</h1>
         <p class="site-subtitle">YouTube × ニコニコ動画 6指標統合ボカロチャート</p>
       </div>
       <div class="header-controls">
@@ -76,7 +85,7 @@
   </header>
 
   <main class="main-container">
-    <!-- タブ1: 週間ランキング TOP 20（不要な解説文を消去） -->
+    <!-- タブ1: 週間ランキング TOP 20 -->
     <section id="tab-ranking" class="tab-content active">
       <div class="section-header">
         <h2 class="section-title">週間ランキング TOP 20</h2>
@@ -142,8 +151,8 @@
     <section id="tab-method" class="tab-content">
       <div class="insight-card">
         <h2 class="insight-section-title">集計方法・ポイント計算式について</h2>
-        <p class="method-lead" style="margin-bottom: 1rem;">
-          「週刊VOCALOID複合ランキング」は、YouTubeとニコニコ動画の2大プラットフォームにおける週間純増数を取得し、ボカロリスナーの視聴・支持行動を多角的に反映して算出する複合チャートです。
+        <p class="method-lead">
+          「週刊VOCALOID<sup class="tm-mark">TM</sup>複合ランキング」は、YouTubeとニコニコ動画の2大プラットフォームにおける週間純増数（月曜〜日曜の7日間）を取得し、ボカロリスナーの視聴・支持行動を多角的に反映して算出する複合チャートです。
         </p>
         <div class="table-responsive">
           <table class="insight-table method-table">
@@ -196,11 +205,29 @@
           </table>
         </div>
       </div>
+
+      <div class="insight-card">
+        <h2 class="insight-section-title">ランキングを制作した背景</h2>
+        <div class="method-background-text">
+          <p>
+            近年、VOCALOID<sup class="tm-mark">TM</sup>をはじめとする合成音声音楽（ボカロ）シーンは、かつてのニコニコ動画を中心とした単一のコミュニティから、YouTubeやグローバルな音楽プラットフォームへと大きく拡大・多様化しています。
+          </p>
+          <p>
+            現在では、ニコニコ動画の濃密なコメント文化やマイリストを通じて熱狂的な支持を集める楽曲がある一方で、YouTubeを主戦場として国内外の幅広いリスナーにリーチし爆発的な再生数や高評価を獲得する楽曲、さらには海外ボカロPによるヒット作も次々と生まれています。こうした環境の変化により、どちらか単一のプラットフォームのランキングだけを参照していては、ボカロシーン全体のリアルな流行や熱量を正確に把握することが難しくなっています。
+          </p>
+          <p>
+            このような現状と課題意識から、当サイト「週刊VOCALOID<sup class="tm-mark">TM</sup>複合ランキング」では、YouTubeとニコニコ動画の双方から「再生数・高評価数・マイリスト数・コメント数」の計6指標を自動収集し、各プラットフォームのユーザー規模やアクションの重みに応じた独自の補正係数を掛け合わせて統合ポイント化しました。2つのプラットフォームの特性を掛け合わせることで、現在のボカロシーンにおける真のトレンドと楽曲の多面的な魅力を可視化することを目指しています。
+          </p>
+          <p class="trademark-note">
+            ※「VOCALOID（ボーカロイド）」はヤマハ株式会社の登録商標です。また、本ランキングでは広義のボカロ曲（CeVIO、Synthesizer V、UTAU、VoiSona等の各種合成音声ソフトウェアを用いた楽曲および派生キャラクター楽曲）も集計対象として網羅しています。
+          </p>
+        </div>
+      </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <p>&copy; 週刊VOCALOID複合ランキング All Rights Reserved.</p>
+    <p>&copy; 週刊VOCALOID<sup class="tm-mark">TM</sup>複合ランキング All Rights Reserved.</p>
   </footer>
 
   <!-- JSマルチパス自動フォールバック読み込み -->
