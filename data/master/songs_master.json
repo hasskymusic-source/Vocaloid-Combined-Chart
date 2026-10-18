@@ -3460,7 +3460,7 @@
     "title": "メテオラヴ/重音テト",
     "producer": "Jelly______",
     "vocal": "重音テト",
-    "youtube_id": "",
+    "youtube_id": "mrn5ePlvrug",
     "niconico_id": "sm46928401"
   },
   {
@@ -4176,6 +4176,30 @@
     "niconico_id": ""
   },
   {
+    "song_id": "song_aRFC7HPkLVc",
+    "title": "❤︎❤︎❤︎❤︎",
+    "producer": "Ruru",
+    "vocal": "初音ミク",
+    "youtube_id": "aRFC7HPkLVc",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_sm45021299",
+    "title": "愛されたいだけ",
+    "producer": "カササギ",
+    "vocal": "初音ミク",
+    "youtube_id": "vFdPkGV6brA",
+    "niconico_id": "sm45021299"
+  },
+  {
+    "song_id": "song_Lm92Ntt7vvU",
+    "title": "天国に花束",
+    "producer": "幽波 / yu-nami",
+    "vocal": "初音ミク",
+    "youtube_id": "Lm92Ntt7vvU",
+    "niconico_id": ""
+  },
+  {
     "song_id": "song_sm46934360",
     "title": "░░してよ",
     "producer": "¿?shimon",
@@ -4640,20 +4664,20 @@
     "niconico_id": ""
   },
   {
-    "song_id": "song_sm46537381",
-    "title": "ブレインロット",
-    "producer": "東京真中",
-    "vocal": "重音テト",
-    "youtube_id": "UsjsYMo3O1Q",
-    "niconico_id": "sm46537381"
-  },
-  {
     "song_id": "song_sm45883571",
     "title": "幸福刑",
     "producer": "ろねぴ",
     "vocal": "初音ミク",
     "youtube_id": "MlTQUSFr-gw",
     "niconico_id": "sm45883571"
+  },
+  {
+    "song_id": "song_sm46537381",
+    "title": "ブレインロット",
+    "producer": "東京真中",
+    "vocal": "重音テト",
+    "youtube_id": "UsjsYMo3O1Q",
+    "niconico_id": "sm46537381"
   },
   {
     "song_id": "song_CsYDv5Cf0yo",
@@ -4912,14 +4936,6 @@
     "niconico_id": "sm46875504"
   },
   {
-    "song_id": "song_sm7706816",
-    "title": "Paranoid Doll",
-    "producer": "Various artists",
-    "vocal": "神威がくぽ",
-    "youtube_id": "alrQFrYLW3o",
-    "niconico_id": "sm7706816"
-  },
-  {
     "song_id": "song_sm31791630",
     "title": "アンノウン・マザーグース",
     "producer": "wowaka, ヒトリエ",
@@ -4968,28 +4984,12 @@
     "niconico_id": "sm45317076"
   },
   {
-    "song_id": "song_aRFC7HPkLVc",
-    "title": "❤︎❤︎❤︎❤︎",
-    "producer": "Ruru",
-    "vocal": "初音ミク",
-    "youtube_id": "aRFC7HPkLVc",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_sm45021299",
-    "title": "愛されたいだけ",
-    "producer": "カササギ",
-    "vocal": "初音ミク",
-    "youtube_id": "vFdPkGV6brA",
-    "niconico_id": "sm45021299"
-  },
-  {
-    "song_id": "song_Lm92Ntt7vvU",
-    "title": "天国に花束",
-    "producer": "幽波 / yu-nami",
-    "vocal": "初音ミク",
-    "youtube_id": "Lm92Ntt7vvU",
-    "niconico_id": ""
+    "song_id": "song_sm46762254",
+    "title": "リヴェラル",
+    "producer": "すけありーぐりむ",
+    "vocal": "花隈千冬",
+    "youtube_id": "",
+    "niconico_id": "sm46762254"
   },
   {
     "song_id": "song_sm44677326",
@@ -5014,5 +5014,21 @@
     "vocal": "足立レイ",
     "youtube_id": "Ewmq-TVbNj4",
     "niconico_id": "sm46712665"
+  },
+  {
+    "song_id": "song_O1pQE5H0Zlg",
+    "title": "劣情／乳酸菌",
+    "producer": "生きて腸まで届かないタイプの乳酸菌",
+    "vocal": "足立レイ",
+    "youtube_id": "O1pQE5H0Zlg",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_fvtEY5RfkDI",
+    "title": "U_Ų",
+    "producer": "ゐねよ",
+    "vocal": "星界・ナースロボ＿タイプＴ",
+    "youtube_id": "fvtEY5RfkDI",
+    "niconico_id": ""
   }
 ]
