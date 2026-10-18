@@ -9,7 +9,7 @@ from config import MASTER_FILE, PREV_SNAPSHOT, LATEST_SNAPSHOT
 from discover_songs import clean_song_title, detect_vocals, search_youtube_id_web_strict
 from googleapiclient.discovery import build
 
-USER_AGENT = "Mozilla/5.0 (compatible; VocaloidCombinedChartBot/8.0)"
+USER_AGENT = "Mozilla/5.0 (compatible; VocaloidCombinedChartBot/8.1)"
 
 def rotate_snapshots_if_needed():
     if not LATEST_SNAPSHOT.exists():
@@ -207,16 +207,15 @@ def main():
             raw_t = yt_stats.get("yt_title") or nc_stats.get("nc_title") or song["title"]
             title = clean_song_title(raw_t, producer)
 
-        # YouTubeとニコ動のタイトル・タグ・概要欄から派生キャラ（亞北ネル・弱音ハク等）を含めて正確にボーカルを判定
-        video_meta_text = " ".join([
-            yt_stats.get("yt_title", ""),
+        # 動画タイトルとタグ・概要欄を分離して渡し、タイトルの表記（初音ミク・重音テト・亞北ネル）を最優先で確定
+        video_titles = f"{yt_stats.get('yt_title', '')} {nc_stats.get('nc_title', '')}".strip()
+        video_metas = " ".join([
             yt_stats.get("yt_tags", ""),
             yt_stats.get("yt_desc", ""),
-            nc_stats.get("nc_title", ""),
             nc_stats.get("nc_tags", ""),
             nc_stats.get("nc_desc", "")
         ]).strip()
-        vocal = detect_vocals(video_meta_text, song.get("vocal", ""))
+        vocal = detect_vocals(video_titles, video_metas, song.get("vocal", ""))
 
         snapshots.append({
             "song_id": sid,

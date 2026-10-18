@@ -29,11 +29,10 @@
   </nav>
 
   <main>
-    <!-- 共通ヘッダー：公開日＆過去チャート切替 -->
     <div class="chart-meta">
       <div>
         <strong id="chart-title">データ読み込み中...</strong>
-        <div class="meta-note">※各楽曲カードをクリックすると6指標の詳細内訳・動画リンク・解説が開きます</div>
+        <div class="meta-note">※各楽曲タイトルの横にある「詳細を見る」ボタンを押すと6指標の内訳・動画リンクが開きます</div>
       </div>
       <div class="archive-control">
         <label for="archive-select">📅 過去チャート切替:</label>
@@ -43,12 +42,12 @@
       </div>
     </div>
 
-    <!-- TAB 1: 週間ランキング TOP 20（トップに1〜20位を大きく表示） -->
+    <!-- TAB 1: 週間ランキング TOP 20 -->
     <section id="tab-ranking" class="tab-content active">
       <div id="ranking-container" class="ranking-list"></div>
     </section>
 
-    <!-- TAB 2: ランキングインサイト（1位〜5位のポイント構成比グラフ＆内訳表） -->
+    <!-- TAB 2: ランキングインサイト -->
     <section id="tab-insight" class="tab-content">
       <div class="chart-visual-box">
         <div class="visual-header">
@@ -79,11 +78,11 @@
     <section id="tab-method" class="tab-content">
       <div class="article-box">
         <h2>本チャートの前提と問題意識</h2>
-        <p>現在のボーカロイドにまつわる音楽シーンは、かつてのニコニコ動画単一コミュニティから、YouTubeやグローバルプラットフォームへと大きく拡大している。クリエイター・リスナー双方が国境を越える一方、単一プラットフォームのみを参照する既存チャートではシーンの全体像を捉えきれないという課題がある。</p>
-        <p>当サイト『週刊VOCALOID複合ランキング』では、YouTubeとニコニコ動画の6指標を統合・ポイント化し、毎週水曜日13:00に最新TOP 20チャートを公開する。</p>
+        <p>現在のボーカロイド（合成音声）音楽シーンは、かつてのニコニコ動画単一コミュニティから、YouTubeやグローバルプラットフォームへと大きく拡大している。クリエイター・リスナー双方が国境を越える一方、単一プラットフォームのみを参照する既存チャートではシーンの全体像を捉えきれないという課題がある。</p>
+        <p>当サイト『週刊VOCALOID複合ランキング』では、ブログ『Billion Hits!』の複合指標分析アプローチをベースに、YouTubeとニコニコ動画の6指標を統合・ポイント化し、毎週水曜日13:00に最新TOP 20チャートを公開する。</p>
 
         <h2>ランキング作成方法（6指標と補正係数）</h2>
-        <p>毎週月曜日0:00から日曜日23:59までの7日間における各指標の純増数を取得し、以下の補正係数を乗じて合算した総合ポイント順で上位20曲を算出する。</p>
+        <p>毎週月曜日0:00から日曜日23:59までの7日間における各指標の純増数（Δ）を取得し、以下の補正係数を乗じて合算した総合ポイント順で上位20曲（TOP 20）を算出する。</p>
         <table class="rule-table">
           <thead>
             <tr>

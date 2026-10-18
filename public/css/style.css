@@ -135,20 +135,17 @@ main {
   cursor: pointer;
 }
 
-/* ランキングカード（1位〜20位を大きく表示） */
+/* ランキングカード（カード自体はクリック不可にし、詳細ボタンのみで開閉） */
 .ranking-list { display: flex; flex-direction: column; gap: 16px; }
 .rank-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 22px 26px;
-  transition: background 0.2s, transform 0.15s, border-color 0.2s;
-  cursor: pointer;
+  transition: border-color 0.2s;
 }
-.rank-card:hover {
-  background: var(--bg-card-hover);
-  border-color: #475569;
-  transform: translateY(-2px);
+.rank-card.open {
+  border-color: var(--accent);
 }
 .rank-header {
   display: grid;
@@ -174,11 +171,41 @@ main {
 .diff-down { color: #f87171; }
 .diff-new { color: #38bdf8; }
 
-.song-info h3 {
-  font-size: 1.35rem;
-  font-weight: 800;
+/* 楽曲タイトル＆「詳細を見る」ボタンの横並びレイアウト */
+.song-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-bottom: 6px;
 }
+.song-title-row h3 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 0;
+}
+.detail-toggle-btn {
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--accent);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.detail-toggle-btn:hover {
+  background: var(--accent);
+  color: var(--bg-main);
+  border-color: var(--accent);
+}
+.rank-card.open .detail-toggle-btn {
+  background: var(--accent);
+  color: var(--bg-main);
+}
+
 .song-meta {
   font-size: 0.92rem;
   color: var(--text-sub);

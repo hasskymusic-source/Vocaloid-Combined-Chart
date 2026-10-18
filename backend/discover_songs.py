@@ -8,21 +8,18 @@ from datetime import datetime, timedelta, timezone
 from googleapiclient.discovery import build
 from config import MASTER_FILE, LATEST_SNAPSHOT
 
-USER_AGENT = "Mozilla/5.0 (compatible; VocaloidCombinedChartBot/8.0)"
+USER_AGENT = "Mozilla/5.0 (compatible; VocaloidCombinedChartBot/8.1)"
 
-# ボカロシーンの合成音声・派生創作キャラクター網羅辞書（日・韓・英対応）
-# ※ボカロPの「Neru」氏と混同しないよう、亞北ネルはフルネームで厳密判定
 VOCAL_SYNONYMS = {
-    # ピアプロキャラクターズ
     "初音ミク": ["初音ミク", "하츠네 미쿠", "hatsune miku", "miku"],
+    "重音テト": ["重音テト", "重音テトsv", "카사네 테토", "kasane teto", "teto"],
+    "亞北ネル": ["亞北ネル", "亜北ネル", "akita neru", "아키타 네루"],
+    "弱音ハク": ["弱音ハク", "yowane haku", "요와네 하쿠"],
     "鏡音リン": ["鏡音リン", "카가미네 린", "kagamine rin"],
     "鏡音レン": ["鏡音レン", "카가미네 렌", "kagamine len"],
     "巡音ルカ": ["巡音ルカ", "메구리네 루카", "megurine luka"],
     "MEIKO": ["meiko", "메이코", "メイコ"],
     "KAITO": ["kaito", "카이토", "カイト"],
-
-    # 重音テト・UTAU・主要創作系
-    "重音テト": ["重音テト", "重音テトsv", "카사네 테토", "kasane teto", "teto"],
     "足立レイ": ["足立レイ", "아다치 레이", "adachi rei"],
     "ナースロボ＿タイプＴ": ["ナースロボ＿タイプｔ", "ナースロボ_タイプt", "ナースロボ", "nursehoro"],
     "唄音ウタ(デフォ子)": ["唄音ウタ", "デフォ子", "utane uta", "defoko"],
@@ -36,17 +33,11 @@ VOCAL_SYNONYMS = {
     "闇音レンリ": ["闇音レンリ", "yamine renri"],
     "ゲキヤク": ["ゲキヤク", "gekiyaku"],
     "カゼヒキ": ["カゼヒキ", "kazehiki"],
-
-    # 派生・創作キャラクター（亞北ネル・弱音ハク等）
-    "亞北ネル": ["亞北ネル", "亜北ネル", "akita neru", "아키타 네루"],
-    "弱音ハク": ["弱音ハク", "yowane haku", "요와네 하쿠"],
     "咲音メイコ": ["咲音メイコ", "sakine meiko"],
     "骸音シーエ": ["骸音シーエ", "calne ca"],
     "雑音ミク": ["雑音ミク", "zatsune miku"],
     "鋼音ミク": ["鋼音ミク", "hagane miku"],
     "アカイト": ["アカイト", "akaito"],
-
-    # VOCALOID / Synthesizer V / CeVIO / VoiSona / VOICEVOX 等
     "GUMI": ["gumi", "구미", "megpoid", "メグッポイド"],
     "v_flower": ["v_flower", "flower", "플라워", "ci flower"],
     "IA": ["ia", "이아"],
@@ -140,44 +131,62 @@ def parse_iso_duration_seconds(duration_str: str) -> int:
     return int(m.group(1) or 0) * 3600 + int(m.group(2) or 0) * 60 + int(m.group(3) or 0)
 
 def detect_vocals_list(text: str) -> list:
+    """テキスト内で登場した位置順（出現順）にボーカル・キャラクター名を抽出する"""
     if not text:
         return []
     text_low = text.lower()
-    found = []
+    found_with_pos = []
+
     for canonical, syns in VOCAL_SYNONYMS.items():
+        best_pos = None
         for syn in syns:
-            # 短い英字(ia, uni, mai等)は単語境界で判定して誤検出を防止
-            if re.match(r"^[a-z0-9\s\-]+$", syn) and len(syn) <= 4:
-                if re.search(rf"\b{re.escape(syn)}\b", text_low):
-                    found.append(canonical)
-                    break
+            syn_low = syn.lower()
+            if re.match(r"^[a-z0-9\s\-]+$", syn_low) and len(syn_low) <= 4:
+                m = re.search(rf"\b{re.escape(syn_low)}\b", text_low)
+                if m:
+                    pos = m.start()
+                    if best_pos is None or pos < best_pos:
+                        best_pos = pos
             else:
-                if syn.lower() in text_low:
-                    found.append(canonical)
-                    break
-    return list(dict.fromkeys(found))
+                pos = text_low.find(syn_low)
+                if pos != -1:
+                    if best_pos is None or pos < best_pos:
+                        best_pos = pos
+        if best_pos is not None:
+            found_with_pos.append((best_pos, canonical))
 
-def detect_vocals(text: str, fallback_text: str = "") -> str:
+    # テキスト内の出現順にソート
+    found_with_pos.sort(key=lambda x: x[0])
+    return [c for _, c in found_with_pos]
+
+def detect_vocals(title_text: str, meta_text: str = "", fallback_text: str = "") -> str:
     """
-    動画のタイトル・タグ・概要欄(text)と、VocaDB等の補助情報(fallback_text)を統合してボーカル名を決定する。
-    『バゥムクゥヘン・エンドロゥル』のように動画側に「亞北ネル」が明記され、VocaDB側に代用音源の「鏡音リン」が
-    入っているケースでは、動画側の記述を優先して代用音源の混入を防ぐ。
+    【3段階優先ボーカル判定システム】
+    1. 動画タイトル(title_text)にキャラクター名が明記されていれば、それを最優先で確定する
+       （これにより、タイトルが『初音ミク・重音テト・亞北ネル』の曲に概要欄の代用音源『鏡音リン』が混ざるのを完全阻止）
+    2. タイトルにキャラ名がない曲のみ、タグ・概要欄(meta_text)やVocaDB(fallback_text)から補完する
+    3. 亞北ネル等の派生キャラが含まれ、かつタイトルに鏡音リン等がない場合は代用音源を除外する
     """
-    primary_list = detect_vocals_list(text)
-    fallback_list = detect_vocals_list(fallback_text)
+    title_vocals = detect_vocals_list(title_text)
+    meta_vocals = detect_vocals_list(meta_text)
+    fallback_vocals = detect_vocals_list(fallback_text)
 
-    # 動画タイトル・タグ・概要欄に「亞北ネル」等の派生キャラが含まれている場合、
-    # 動画側に書かれていない代用音源（鏡音リン等）はVocaDB側から足さない
-    has_derivative = any(c in DERIVATIVE_CHARACTERS for c in primary_list)
+    if title_vocals:
+        result = list(title_vocals)
+        # もしタグや概要欄にだけ派生キャラ（亞北ネル・弱音ハク等）が追加記載されていれば追加
+        for c in meta_vocals:
+            if c in DERIVATIVE_CHARACTERS and c not in result:
+                result.append(c)
+    elif meta_vocals:
+        result = list(meta_vocals)
+    else:
+        result = list(fallback_vocals)
 
-    merged = list(primary_list)
-    for c in fallback_list:
-        if c not in merged:
-            if has_derivative and c in {"鏡音リン", "鏡音レン"} and c not in primary_list:
-                continue
-            merged.append(c)
+    # 亞北ネルが含まれており、タイトル自体には「鏡音リン」と書かれていない場合、代用音源の「鏡音リン」を除去
+    if "亞北ネル" in result and "鏡音リン" in result and "鏡音リン" not in title_vocals:
+        result.remove("鏡音リン")
 
-    return "・".join(merged[:4]) if merged else "VOCALOID"
+    return "・".join(result[:4]) if result else "VOCALOID"
 
 def is_valid_vocaloid_mv(
     title: str,
@@ -294,8 +303,7 @@ def extract_vocadb_song_info(data: dict) -> dict:
     producer = artist_str.split(" feat.")[0].strip() if " feat." in artist_str else artist_str
     vocal_part = artist_str.split(" feat.")[1].strip() if " feat." in artist_str else artist_str
 
-    # PVの元タイトル群（亞北ネル等が書かれていることが多い）を第1優先、artistStringを第2優先で判定
-    vocal = detect_vocals(" ".join(pv_titles), vocal_part)
+    vocal = detect_vocals(" ".join(pv_titles), "", vocal_part)
 
     return {
         "title": data.get("name", ""),
@@ -519,7 +527,8 @@ def verify_and_purge_existing_pool(youtube, raw_items: list) -> list:
         nid = (item.get("niconico_id") or "").strip()
         title = item.get("title", "")
 
-        nc_text = ""
+        nc_title_str = ""
+        nc_meta_str = ""
         if nid:
             nc_info = get_niconico_thumbinfo(nid)
             if nc_info:
@@ -528,9 +537,11 @@ def verify_and_purge_existing_pool(youtube, raw_items: list) -> list:
                     nc_info["duration_sec"], is_niconico=True
                 ):
                     continue
-                nc_text = f"{nc_info['title']} {nc_info['tags']} {nc_info['description'][:300]}"
+                nc_title_str = nc_info["title"]
+                nc_meta_str = f"{nc_info['tags']} {nc_info['description'][:300]}"
 
-        yt_text = ""
+        yt_title_str = ""
+        yt_meta_str = ""
         if yid and yid in yt_meta:
             y_item = yt_meta[yid]
             snippet = y_item.get("snippet", {})
@@ -543,7 +554,8 @@ def verify_and_purge_existing_pool(youtube, raw_items: list) -> list:
             if not is_valid_vocaloid_mv(y_title, y_desc, y_tags, dur_sec, is_niconico=False, yt_category_id=cat_id):
                 continue
 
-            yt_text = f"{y_title} {y_tags} {y_desc[:300]}"
+            yt_title_str = y_title
+            yt_meta_str = f"{y_tags} {y_desc[:300]}"
 
             if nid and title:
                 norm_t = normalize_compare_str(title)
@@ -553,10 +565,11 @@ def verify_and_purge_existing_pool(youtube, raw_items: list) -> list:
                     if vdb.get("youtube_id") != yid:
                         item["youtube_id"] = ""
 
-        # 既存曲のボーカル表記も最新の派生キャラクター辞書（亞北ネル・弱音ハク等）で再更新
-        combined_video_text = f"{yt_text} {nc_text}".strip()
-        if combined_video_text:
-            item["vocal"] = detect_vocals(combined_video_text, item.get("vocal", ""))
+        # タイトル文字列とタグ・概要欄文字列を分けて渡し、代用音源の混入を排除
+        combined_titles = f"{yt_title_str} {nc_title_str}".strip()
+        combined_metas = f"{yt_meta_str} {nc_meta_str}".strip()
+        if combined_titles or combined_metas:
+            item["vocal"] = detect_vocals(combined_titles, combined_metas, item.get("vocal", ""))
 
         verified.append(item)
     return verified
@@ -615,7 +628,6 @@ def main():
                 target["title"] = title
             if producer and producer != "ボカロP" and target.get("producer") == "ボカロP":
                 target["producer"] = producer
-            # ボーカル表記が未設定("VOCALOID")、または派生キャラを含む新しい情報がある場合は更新
             if vocal and vocal != "VOCALOID":
                 if target.get("vocal") in ["", "VOCALOID", "VOCALOID / 合成音声"] or any(d in vocal for d in DERIVATIVE_CHARACTERS):
                     target["vocal"] = vocal
@@ -662,7 +674,7 @@ def main():
         vdb = lookup_vocadb_by_pv("NicoNicoDouga", cid)
         producer = vdb.get("producer") or nc_info["producer"] or "ボカロP"
         title = vdb.get("title") or clean_song_title(nc_info["title"], producer)
-        vocal = detect_vocals(f"{nc_info['title']} {nc_info['tags']} {nc_info['description'][:300]}", vdb.get("vocal", ""))
+        vocal = detect_vocals(nc_info["title"], f"{nc_info['tags']} {nc_info['description'][:300]}", vdb.get("vocal", ""))
         yt_id = vdb.get("youtube_id", "")
         if not yt_id:
             m = YT_ID_PATTERN.search(nc_info["description"])
@@ -700,7 +712,7 @@ def main():
                 vdb = lookup_vocadb_by_pv("Youtube", vid)
                 producer = vdb.get("producer") or channel
                 title = vdb.get("title") or clean_song_title(raw_title, producer)
-                vocal = detect_vocals(f"{raw_title} {tags} {desc[:300]}", vdb.get("vocal", ""))
+                vocal = detect_vocals(raw_title, f"{tags} {desc[:300]}", vdb.get("vocal", ""))
                 nc_id = vdb.get("niconico_id", "")
                 if not nc_id:
                     m = NC_ID_PATTERN.search(desc)

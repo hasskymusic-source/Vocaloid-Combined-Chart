@@ -10,7 +10,6 @@ const DEFAULT_WEIGHTS = {
   nc_comments: 10
 };
 
-// タブ切り替えイベント（インサイトタブを開いた時にグラフサイズを再計算）
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -133,15 +132,14 @@ function renderRankingView(data) {
       : `YouTube指標 ${c.yt_share}%（${c.yt_total.toLocaleString()}pt）、ニコニコ動画指標 ${c.nc_share}%（${c.nc_total.toLocaleString()}pt）を獲得し総合${song.rank}位にランクイン。`;
 
     const ytLink = song.youtube_id
-      ? `<a class="ext-btn yt" href="https://www.youtube.com/watch?v=${song.youtube_id}" target="_blank" rel="noopener" onclick="event.stopPropagation()">▶ YouTubeで視聴</a>`
+      ? `<a class="ext-btn yt" href="https://www.youtube.com/watch?v=${song.youtube_id}" target="_blank" rel="noopener">▶ YouTubeで視聴</a>`
       : '';
     const ncLink = song.niconico_id
-      ? `<a class="ext-btn nc" href="https://www.nicovideo.jp/watch/${song.niconico_id}" target="_blank" rel="noopener" onclick="event.stopPropagation()">▶ ニコニコ動画で視聴</a>`
+      ? `<a class="ext-btn nc" href="https://www.nicovideo.jp/watch/${song.niconico_id}" target="_blank" rel="noopener">▶ ニコニコ動画で視聴</a>`
       : '';
 
     const card = document.createElement('div');
     card.className = 'rank-card';
-    card.addEventListener('click', () => card.classList.toggle('open'));
 
     card.innerHTML = `
       <div class="rank-header">
@@ -150,7 +148,10 @@ function renderRankingView(data) {
           ${formatDiff(song.rank, song.prevRank)}
         </div>
         <div class="song-info">
-          <h3>${song.title}</h3>
+          <div class="song-title-row">
+            <h3>${song.title}</h3>
+            <button type="button" class="detail-toggle-btn">詳細を見る ▾</button>
+          </div>
           <div class="song-meta">
             <span>P: <strong>${song.producer}</strong></span>
             <span>Vocal: ${song.vocal || '-'}</span>
@@ -215,6 +216,14 @@ function renderRankingView(data) {
         </div>
       </div>
     `;
+
+    // 「詳細を見る」ボタンのクリックイベントを設定
+    const detailBtn = card.querySelector('.detail-toggle-btn');
+    detailBtn.addEventListener('click', () => {
+      const isOpen = card.classList.toggle('open');
+      detailBtn.textContent = isOpen ? '詳細を閉じる ▴' : '詳細を見る ▾';
+    });
+
     container.appendChild(card);
 
     analysisContainer.innerHTML += `
