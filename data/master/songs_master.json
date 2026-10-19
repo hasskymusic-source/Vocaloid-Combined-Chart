@@ -4272,6 +4272,118 @@
     "niconico_id": ""
   },
   {
+    "song_id": "song_sm46928401",
+    "title": "メテオラヴ/重音テト",
+    "producer": "Jelly______",
+    "vocal": "重音テト",
+    "youtube_id": "",
+    "niconico_id": "sm46928401"
+  },
+  {
+    "song_id": "song_f0-NlB0mLLw",
+    "title": "シャカシャカにしてあげる♪",
+    "producer": "takimura",
+    "vocal": "初音ミク",
+    "youtube_id": "f0-NlB0mLLw",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_5jbvXgA-boc",
+    "title": "TTTriangle/重音テト",
+    "producer": "セイブツ",
+    "vocal": "重音テト",
+    "youtube_id": "5jbvXgA-boc",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_sm45422987",
+    "title": "世界は鬱くしい。",
+    "producer": "この場所に救いなど無い.",
+    "vocal": "可不",
+    "youtube_id": "sxGRlg1zlGk",
+    "niconico_id": "sm45422987"
+  },
+  {
+    "song_id": "song_c9NTpsRumuc",
+    "title": "風鈴に影法師",
+    "producer": "天晴 - Tensei",
+    "vocal": "可不",
+    "youtube_id": "c9NTpsRumuc",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_U67ILjNFGZg",
+    "title": "刻刻",
+    "producer": "PonzuP",
+    "vocal": "可不",
+    "youtube_id": "U67ILjNFGZg",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_sm44221816",
+    "title": "メラノガスタ",
+    "producer": "栖山",
+    "vocal": "可不",
+    "youtube_id": "VJzGs1jle4w",
+    "niconico_id": "sm44221816"
+  },
+  {
+    "song_id": "song_-4e2HqYNm-Q",
+    "title": "真夜中に溺れる。",
+    "producer": "この場所に救いなど無い.",
+    "vocal": "可不・星界",
+    "youtube_id": "-4e2HqYNm-Q",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_sm45423016",
+    "title": "リスカピアノ",
+    "producer": "この場所に救いなど無い.",
+    "vocal": "可不",
+    "youtube_id": "J5_N4uIy_V4",
+    "niconico_id": "sm45423016"
+  },
+  {
+    "song_id": "song_sm46444532",
+    "title": "本当に",
+    "producer": "THØRNS",
+    "vocal": "重音テト",
+    "youtube_id": "Kybi1q3rjdk",
+    "niconico_id": "sm46444532"
+  },
+  {
+    "song_id": "song_jOZdf62hb64",
+    "title": "Overclocked",
+    "producer": "DryftiN",
+    "vocal": "重音テト",
+    "youtube_id": "jOZdf62hb64",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song__llTsFK6GZI",
+    "title": "One and Only",
+    "producer": "Rai",
+    "vocal": "重音テト",
+    "youtube_id": "_llTsFK6GZI",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_pZ1QcgbioxI",
+    "title": "BUTCHER VANITY",
+    "producer": "yasai31",
+    "vocal": "重音テト",
+    "youtube_id": "pZ1QcgbioxI",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_AeNYTESjLlI",
+    "title": "ヤラララ (YARARARA)",
+    "producer": "Tuyết Lăng Archive🎵",
+    "vocal": "重音テト",
+    "youtube_id": "AeNYTESjLlI",
+    "niconico_id": ""
+  },
+  {
     "song_id": "song_sm46934360",
     "title": "░░してよ",
     "producer": "¿?shimon",
@@ -4304,22 +4416,6 @@
     "niconico_id": ""
   },
   {
-    "song_id": "song_8O5yCI_jrNg",
-    "title": "本能",
-    "producer": "Aru",
-    "vocal": "初音ミク",
-    "youtube_id": "8O5yCI_jrNg",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_F6yOn-MqC6A",
-    "title": "蕃茄挽歌",
-    "producer": "空洞P",
-    "vocal": "VOCALOID",
-    "youtube_id": "F6yOn-MqC6A",
-    "niconico_id": ""
-  },
-  {
     "song_id": "song_VlzCgE195x4",
     "title": "442E492E287929 ~The Grand Designer~",
     "producer": "DM DOKURO",
@@ -4336,11 +4432,35 @@
     "niconico_id": ""
   },
   {
+    "song_id": "song_F6yOn-MqC6A",
+    "title": "蕃茄挽歌",
+    "producer": "空洞P",
+    "vocal": "VOCALOID",
+    "youtube_id": "F6yOn-MqC6A",
+    "niconico_id": ""
+  },
+  {
     "song_id": "song_xL9Lv1uWm3M",
     "title": "しつこく吹きつける風",
     "producer": "мису, pikmi, Synew",
     "vocal": "音街ウナ",
     "youtube_id": "xL9Lv1uWm3M",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_pRlqQZt_JzE",
+    "title": "Fortune Teller",
+    "producer": "eggtan",
+    "vocal": "音街ウナ",
+    "youtube_id": "pRlqQZt_JzE",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_LiKnXreq4JI",
+    "title": "The Proper Way to Watch Paint Dry",
+    "producer": "Rook, スーズィー",
+    "vocal": "音街ウナ",
+    "youtube_id": "LiKnXreq4JI",
     "niconico_id": ""
   },
   {
@@ -4360,11 +4480,19 @@
     "niconico_id": ""
   },
   {
-    "song_id": "song_pRlqQZt_JzE",
-    "title": "Fortune Teller",
-    "producer": "eggtan",
+    "song_id": "song_NVNQRRS1I0M",
+    "title": "Psalm 88",
+    "producer": "Lucevitous, ventus",
     "vocal": "音街ウナ",
-    "youtube_id": "pRlqQZt_JzE",
+    "youtube_id": "NVNQRRS1I0M",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_vz7zX-60D14",
+    "title": "シュガーコフィン",
+    "producer": "iroha(sasaki)",
+    "vocal": "音街ウナ",
+    "youtube_id": "vz7zX-60D14",
     "niconico_id": ""
   },
   {
@@ -4376,11 +4504,11 @@
     "niconico_id": "sm46936677"
   },
   {
-    "song_id": "song_LiKnXreq4JI",
-    "title": "The Proper Way to Watch Paint Dry",
-    "producer": "Rook, スーズィー",
+    "song_id": "song_X2_fdO6aW2c",
+    "title": "バレエダンサー",
+    "producer": "ブブゼラ",
     "vocal": "音街ウナ",
-    "youtube_id": "LiKnXreq4JI",
+    "youtube_id": "X2_fdO6aW2c",
     "niconico_id": ""
   },
   {
@@ -4389,6 +4517,14 @@
     "producer": "Gaizer Dragon",
     "vocal": "重音テト",
     "youtube_id": "7aN035DOHd8",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_JkGyMUwzxQE",
+    "title": "ただ浮かぶ脳裏のモーション",
+    "producer": "バーバパパ",
+    "vocal": "重音テト",
+    "youtube_id": "JkGyMUwzxQE",
     "niconico_id": ""
   },
   {
@@ -4408,19 +4544,27 @@
     "niconico_id": ""
   },
   {
-    "song_id": "song_vz7zX-60D14",
-    "title": "シュガーコフィン",
-    "producer": "iroha(sasaki)",
-    "vocal": "音街ウナ",
-    "youtube_id": "vz7zX-60D14",
+    "song_id": "song_0CGX4QzDFUw",
+    "title": "then I see a 67 yumeshipper Ḓ̴̡́O̸̖̦͘U̴̪̠͗B̸̪̫̍́L̸̩̝͂̐Ė̴̙̠̆",
+    "producer": "ILikeMyCheeseDri-P",
+    "vocal": "知声",
+    "youtube_id": "0CGX4QzDFUw",
     "niconico_id": ""
   },
   {
-    "song_id": "song_NVNQRRS1I0M",
-    "title": "Psalm 88",
-    "producer": "Lucevitous, ventus",
+    "song_id": "song_fcci8QAxFaQ",
+    "title": "DUST IN THE WAKE",
+    "producer": "Chorvus, スーズィー",
     "vocal": "音街ウナ",
-    "youtube_id": "NVNQRRS1I0M",
+    "youtube_id": "fcci8QAxFaQ",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_XCYtitEiC9c",
+    "title": "I WON’T CHEW YOUR FILTH!",
+    "producer": "WAVESS, スーズィー",
+    "vocal": "音街ウナ",
+    "youtube_id": "XCYtitEiC9c",
     "niconico_id": ""
   },
   {
@@ -4432,27 +4576,11 @@
     "niconico_id": ""
   },
   {
-    "song_id": "song_JkGyMUwzxQE",
-    "title": "ただ浮かぶ脳裏のモーション",
-    "producer": "バーバパパ",
-    "vocal": "重音テト",
-    "youtube_id": "JkGyMUwzxQE",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_0CGX4QzDFUw",
-    "title": "then I see a 67 yumeshipper Ḓ̴̡́O̸̖̦͘U̴̪̠͗B̸̪̫̍́L̸̩̝͂̐Ė̴̙̠̆",
-    "producer": "ILikeMyCheeseDri-P",
-    "vocal": "知声",
-    "youtube_id": "0CGX4QzDFUw",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_X2_fdO6aW2c",
-    "title": "バレエダンサー",
-    "producer": "ブブゼラ",
+    "song_id": "song_85hw3r1_YDo",
+    "title": "UnaUnaRevolution",
+    "producer": "beat_shobon, スーズィー",
     "vocal": "音街ウナ",
-    "youtube_id": "X2_fdO6aW2c",
+    "youtube_id": "85hw3r1_YDo",
     "niconico_id": ""
   },
   {
@@ -4696,14 +4824,6 @@
     "niconico_id": "sm46121265"
   },
   {
-    "song_id": "song_TbakFPc4ZTw",
-    "title": "怪獣になりたい",
-    "producer": "削除",
-    "vocal": "初音ミク",
-    "youtube_id": "TbakFPc4ZTw",
-    "niconico_id": ""
-  },
-  {
     "song_id": "song_sm45697129",
     "title": "にゅー！支配者のキャロル",
     "producer": "藤原ハガネ",
@@ -4944,14 +5064,6 @@
     "niconico_id": "sm42576236"
   },
   {
-    "song_id": "song_sm41951611",
-    "title": "一千光年",
-    "producer": "いよわ",
-    "vocal": "初音ミク・v_flower・歌愛ユキ・GUMI",
-    "youtube_id": "uB_jQ8H2Yeg",
-    "niconico_id": "sm41951611"
-  },
-  {
     "song_id": "song_sm40700016",
     "title": "海のサーチライト",
     "producer": "子牛",
@@ -4974,6 +5086,14 @@
     "vocal": "裏命",
     "youtube_id": "CZTeGMKtDq0",
     "niconico_id": "sm46935395"
+  },
+  {
+    "song_id": "song_sm46939473",
+    "title": "溺々",
+    "producer": "なそに",
+    "vocal": "足立レイ",
+    "youtube_id": "zUldBNBAlx0",
+    "niconico_id": "sm46939473"
   },
   {
     "song_id": "song_sm17520775",
@@ -5016,6 +5136,14 @@
     "niconico_id": "sm46875504"
   },
   {
+    "song_id": "song_sm7706816",
+    "title": "Paranoid Doll",
+    "producer": "Various artists",
+    "vocal": "神威がくぽ",
+    "youtube_id": "alrQFrYLW3o",
+    "niconico_id": "sm7706816"
+  },
+  {
     "song_id": "song_sm31791630",
     "title": "アンノウン・マザーグース",
     "producer": "wowaka, ヒトリエ",
@@ -5048,22 +5176,6 @@
     "niconico_id": "sm46933442"
   },
   {
-    "song_id": "song_sm46928401",
-    "title": "メテオラヴ/重音テト",
-    "producer": "Jelly______",
-    "vocal": "重音テト",
-    "youtube_id": "",
-    "niconico_id": "sm46928401"
-  },
-  {
-    "song_id": "song_sm45317076",
-    "title": "忘れものセンターにまたね！",
-    "producer": "いのうつはSA",
-    "vocal": "VOCALOID",
-    "youtube_id": "Yn-Mo8mASdA",
-    "niconico_id": "sm45317076"
-  },
-  {
     "song_id": "song_sm46932833",
     "title": "たとえ違っても",
     "producer": "Kage",
@@ -5072,20 +5184,84 @@
     "niconico_id": "sm46932833"
   },
   {
-    "song_id": "song_f0-NlB0mLLw",
-    "title": "シャカシャカにしてあげる♪",
-    "producer": "takimura",
+    "song_id": "song_sm46755151",
+    "title": "xixilili",
+    "producer": "たいぞ",
+    "vocal": "VOCALOID",
+    "youtube_id": "Z47vlqCfCH4",
+    "niconico_id": "sm46755151"
+  },
+  {
+    "song_id": "song_sm46578647",
+    "title": "未来",
+    "producer": "神様うさぎ",
     "vocal": "初音ミク",
-    "youtube_id": "f0-NlB0mLLw",
+    "youtube_id": "fdgwPD-oqIY",
+    "niconico_id": "sm46578647"
+  },
+  {
+    "song_id": "song_N61eCw4duH4",
+    "title": "〇‪✕‬‪‪罹患中/ NA9U feat.重音テトSV",
+    "producer": "NA9U / なく",
+    "vocal": "重音テト",
+    "youtube_id": "N61eCw4duH4",
     "niconico_id": ""
   },
   {
-    "song_id": "song_5jbvXgA-boc",
-    "title": "TTTriangle/重音テト",
-    "producer": "セイブツ",
-    "vocal": "重音テト",
-    "youtube_id": "5jbvXgA-boc",
+    "song_id": "song_IFQSnXheIhw",
+    "title": "知らねーよばーか　V-LAB",
+    "producer": "V-LAB",
+    "vocal": "夏色花梨",
+    "youtube_id": "IFQSnXheIhw",
     "niconico_id": ""
+  },
+  {
+    "song_id": "song_KYC-MwHfwtA",
+    "title": "落ちる木の葉に君想ふ ちょっと切ない秋ソング",
+    "producer": "Rafflesia Record",
+    "vocal": "夏色花梨",
+    "youtube_id": "KYC-MwHfwtA",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_EMbjidFaIMI",
+    "title": "限界オタクSKYHIGH！／重音テトSV",
+    "producer": "白髪源内",
+    "vocal": "重音テト",
+    "youtube_id": "EMbjidFaIMI",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_TT9YDbC9cwY",
+    "title": "灰左様なら",
+    "producer": "夏代孝明, 草餅庵庵",
+    "vocal": "VOCALOID",
+    "youtube_id": "TT9YDbC9cwY",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_sm44227880",
+    "title": "愛しの花泥棒",
+    "producer": "ふみえーる",
+    "vocal": "VOCALOID",
+    "youtube_id": "JYmiKRJRom4",
+    "niconico_id": "sm44227880"
+  },
+  {
+    "song_id": "song_qVPRrMK1Vzc",
+    "title": "瞬きと永遠",
+    "producer": "陽澄リョウ / Hizumi Ryo【VocaloidP&歌い手】",
+    "vocal": "宮舞モカ",
+    "youtube_id": "qVPRrMK1Vzc",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_sm44677326",
+    "title": "カミングアウト",
+    "producer": "ユラメ, かくりー",
+    "vocal": "可不",
+    "youtube_id": "S07XAejKPE4",
+    "niconico_id": "sm44677326"
   },
   {
     "song_id": "song_sm44669739",
@@ -5096,54 +5272,6 @@
     "niconico_id": "sm44669739"
   },
   {
-    "song_id": "song_sm45422987",
-    "title": "世界は鬱くしい。",
-    "producer": "この場所に救いなど無い.",
-    "vocal": "可不",
-    "youtube_id": "sxGRlg1zlGk",
-    "niconico_id": "sm45422987"
-  },
-  {
-    "song_id": "song_c9NTpsRumuc",
-    "title": "風鈴に影法師",
-    "producer": "天晴 - Tensei",
-    "vocal": "可不",
-    "youtube_id": "c9NTpsRumuc",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_U67ILjNFGZg",
-    "title": "刻刻",
-    "producer": "PonzuP",
-    "vocal": "可不",
-    "youtube_id": "U67ILjNFGZg",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_sm44221816",
-    "title": "メラノガスタ",
-    "producer": "栖山",
-    "vocal": "可不",
-    "youtube_id": "VJzGs1jle4w",
-    "niconico_id": "sm44221816"
-  },
-  {
-    "song_id": "song_-4e2HqYNm-Q",
-    "title": "真夜中に溺れる。",
-    "producer": "この場所に救いなど無い.",
-    "vocal": "可不・星界",
-    "youtube_id": "-4e2HqYNm-Q",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_sm45423016",
-    "title": "リスカピアノ",
-    "producer": "この場所に救いなど無い.",
-    "vocal": "可不",
-    "youtube_id": "J5_N4uIy_V4",
-    "niconico_id": "sm45423016"
-  },
-  {
     "song_id": "song_sm46712665",
     "title": "オールター",
     "producer": "Negusare",
@@ -5152,51 +5280,19 @@
     "niconico_id": "sm46712665"
   },
   {
-    "song_id": "song_sm46444532",
-    "title": "本当に",
-    "producer": "THØRNS",
+    "song_id": "song_sm46700474",
+    "title": "어딘가의 너에게",
+    "producer": "츠키유메, DID",
     "vocal": "重音テト",
-    "youtube_id": "Kybi1q3rjdk",
-    "niconico_id": "sm46444532"
+    "youtube_id": "ZUowh5-9AtQ",
+    "niconico_id": "sm46700474"
   },
   {
-    "song_id": "song_jOZdf62hb64",
-    "title": "Overclocked",
-    "producer": "DryftiN",
-    "vocal": "重音テト",
-    "youtube_id": "jOZdf62hb64",
+    "song_id": "song_XVRBW61962Y",
+    "title": "🎵 He’s a Good Soul Winner | Echo",
+    "producer": "The Real NIFB Parody",
+    "vocal": "VOCALOID",
+    "youtube_id": "XVRBW61962Y",
     "niconico_id": ""
-  },
-  {
-    "song_id": "song__llTsFK6GZI",
-    "title": "One and Only",
-    "producer": "Rai",
-    "vocal": "重音テト",
-    "youtube_id": "_llTsFK6GZI",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_pZ1QcgbioxI",
-    "title": "BUTCHER VANITY",
-    "producer": "yasai31",
-    "vocal": "重音テト",
-    "youtube_id": "pZ1QcgbioxI",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_AeNYTESjLlI",
-    "title": "ヤラララ (YARARARA)",
-    "producer": "Tuyết Lăng Archive🎵",
-    "vocal": "重音テト",
-    "youtube_id": "AeNYTESjLlI",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_sm45320196",
-    "title": "CONTRADICTIONS",
-    "producer": "darkbluecat, phantom97",
-    "vocal": "重音テト",
-    "youtube_id": "A0ih5EaG4yw",
-    "niconico_id": "sm45320196"
   }
 ]
