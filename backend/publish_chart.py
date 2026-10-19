@@ -1,6 +1,8 @@
 import os
 import re
+import sys
 import json
+import glob
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
@@ -12,7 +14,7 @@ except ImportError:
 JST = timezone(timedelta(hours=9))
 
 BASE_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = BASE_DIR.parent if BASE_DIR.name == "backend" else BASE_DIR
+PROJECT_ROOT = BASE_DIR.parent if BASE_DIR.name in ("backend", "scripts", "src") else BASE_DIR
 
 
 def resolve_config_path(attr_names, default_rel_path):
@@ -25,8 +27,8 @@ def resolve_config_path(attr_names, default_rel_path):
     return PROJECT_ROOT / default_rel_path
 
 
-DRAFT_FILE = resolve_config_path(["DRAFT_FILE", "WEEKLY_DRAFT_FILE"], "data/weekly_draft.json")
-BACKUP_DRAFT_FILE = resolve_config_path(["BACKUP_DRAFT_FILE", "WEEKLY_DRAFT_BACKUP_FILE"], "data/weekly_draft.backup.json")
+DRAFT_FILE = resolve_config_path(["DRAFT_FILE", "WEEKLY_DRAFT_FILE"], "data/drafts/weekly_draft.json")
+BACKUP_DRAFT_FILE = resolve_config_path(["BACKUP_DRAFT_FILE", "WEEKLY_DRAFT_BACKUP_FILE"], "data/drafts/weekly_draft.backup.json")
 PUBLIC_LATEST = resolve_config_path(["PUBLIC_LATEST", "LATEST_RANKING_FILE"], "public/data/latest_ranking.json")
 ARCHIVE_DIR = resolve_config_path(["ARCHIVE_DIR", "ARCHIVES_DIR"], "public/data/archives")
 ARCHIVE_INDEX = resolve_config_path(["ARCHIVE_INDEX"], "public/data/archives/archive_index.json")
@@ -85,10 +87,6 @@ CLOUDFLARE_HEADERS_CONTENT = """/*
 
 
 def inspect_and_redact_text(text, label="data"):
-    """
-    公開対象データにAPIキーが含まれていれば例外で公開を緊急停止し、
-    ローカルPCのユーザーパスが含まれていれば自動的にマスクして個人情報を保護する
-    """
     if not text:
         return text
 
@@ -151,6 +149,42 @@ def normalize_period_str(period_str, now_dt=None):
     return f"{start_d.strftime('%Y/%m/%d')} - {end_d.strftime('%Y/%m/%d')}"
 
 
+def get_release_datetime_jst(chart_data: dict) -> datetime:
+    """
+    チャートデータに設定された解禁日時（原則：publishDate の 13:00:00 JST）を返す。
+    """
+    if not isinstance(chart_data, dict):
+        return datetime.min.replace(tzinfo=JST)
+
+    pub_at_str = chart_data.get("publishAt")
+    if pub_at_str and isinstance(pub_at_str, str):
+        try:
+            cleaned = pub_at_str.strip()
+            if cleaned.endswith("Z"):
+                cleaned = cleaned[:-1] + "+00:00"
+            dt = datetime.fromisoformat(cleaned)
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=JST)
+            return dt.astimezone(JST)
+        except Exception:
+            pass
+
+    pub_date_str = chart_data.get("publishDate") or chart_data.get("archiveId") or ""
+    m = re.match(r"^(\d{4})-(\d{2})-(\d{2})$", str(pub_date_str).strip())
+    if m:
+        return datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)), 13, 0, 0, tzinfo=JST)
+
+    return datetime.min.replace(tzinfo=JST)
+
+
+def is_chart_released(chart_data: dict, now_dt: datetime = None) -> bool:
+    """現在時刻が解禁日時（水曜13:00 JST）に到達しているか判定する"""
+    if now_dt is None:
+        now_dt = datetime.now(JST)
+    release_dt = get_release_datetime_jst(chart_data)
+    return now_dt >= release_dt
+
+
 def sanitize_frontend_content(text, filename=""):
     if not text:
         return text
@@ -201,14 +235,82 @@ def sync_frontend_assets():
             print(f"[WARN] {name} の同期中に警告: {e}")
             raise
 
-    # Cloudflare Pages 用エッジキャッシュ設定 (_headers) の自動出力
     for headers_target in (PROJECT_ROOT / "_headers", PROJECT_ROOT / "public/_headers"):
         headers_target.parent.mkdir(parents=True, exist_ok=True)
         headers_target.write_text(CLOUDFLARE_HEADERS_CONTENT, encoding="utf-8")
     print("[SYNC & SECURE] Cloudflare エッジキャッシュ設定 (_headers) を更新しました")
 
 
-def update_archive_index(archive_id, period_str, publish_date):
+def rollback_unreleased_public_files(now_dt: datetime):
+    """
+    【フライング公開データの自動ロールバック保護】
+    もし水曜13:00より前に誤って公開されたデータ（例：10/19月曜に公開された 2026-10-21 分）が
+    public/data/latest_ranking.json や public/data/archives/ に存在していた場合、
+    自動的に削除して「直前の解禁済みアーカイブ」へ巻き戻す。
+    """
+    if not ARCHIVE_DIR.exists():
+        return
+
+    released_archives = []
+    for fpath in glob.glob(str(ARCHIVE_DIR / "*.json")):
+        p = Path(fpath)
+        if p.name in ("archive_index.json", "index.json"):
+            continue
+        data = load_json(p)
+        if not isinstance(data, dict):
+            continue
+        if not is_chart_released(data, now_dt):
+            print(f"[ROLLBACK] 解禁時刻前のアーカイブを本番公開フォルダから退避・削除しました: {p.name}")
+            try:
+                p.unlink()
+            except Exception:
+                pass
+        else:
+            aid = data.get("archiveId") or data.get("publishDate") or p.stem
+            released_archives.append((str(aid), data))
+
+    # archive_index.json からも未解禁エントリを除外
+    for idx_path in (ARCHIVE_INDEX, PROJECT_ROOT / "public/data/archive_index.json", PROJECT_ROOT / "data/archive_index.json"):
+        if not idx_path.exists():
+            continue
+        idx_data = load_json(idx_path, default=[])
+        is_wrapped = isinstance(idx_data, dict) and "archives" in idx_data
+        raw_list = idx_data.get("archives", []) if is_wrapped else (idx_data if isinstance(idx_data, list) else [])
+
+        filtered_list = []
+        for entry in raw_list:
+            if isinstance(entry, dict):
+                if is_chart_released(entry, now_dt):
+                    filtered_list.append(entry)
+            elif isinstance(entry, str):
+                stem = entry.replace(".json", "")
+                fake_dict = {"publishDate": stem}
+                if is_chart_released(fake_dict, now_dt):
+                    filtered_list.append(entry)
+
+        filtered_list.sort(
+            key=lambda x: (x.get("archiveId") or x.get("publishDate") or x.get("id") or "")
+            if isinstance(x, dict)
+            else str(x),
+            reverse=True,
+        )
+        save_json(idx_path, {"archives": filtered_list} if is_wrapped else filtered_list)
+
+    # public/data/latest_ranking.json が未解禁データだった場合、直前の解禁済みアーカイブに復元
+    current_public = load_json(PUBLIC_LATEST)
+    if isinstance(current_public, dict) and not is_chart_released(current_public, now_dt):
+        if released_archives:
+            released_archives.sort(key=lambda x: x[0], reverse=True)
+            latest_released_data = released_archives[0][1]
+            save_json(PUBLIC_LATEST, latest_released_data)
+            save_json(PROJECT_ROOT / "data/latest_ranking.json", latest_released_data)
+            print(
+                f"[ROLLBACK] latest_ranking.json が未解禁データだったため、"
+                f"直前の公開済みランキング ({released_archives[0][0]}) に自動復元しました。"
+            )
+
+
+def update_archive_index(archive_id, period_str, publish_date, publish_at):
     existing = load_json(ARCHIVE_INDEX, default=[])
     if isinstance(existing, dict) and "archives" in existing:
         archive_list = existing["archives"]
@@ -226,6 +328,7 @@ def update_archive_index(archive_id, period_str, publish_date):
         "file": f"{archive_id}.json",
         "period": period_str,
         "publishDate": publish_date,
+        "publishAt": publish_at,
         "label": f"{publish_date} 公開 ({period_str})",
     }
 
@@ -253,15 +356,18 @@ def update_archive_index(archive_id, period_str, publish_date):
     save_json(PROJECT_ROOT / "public/data/archive_index.json", payload)
 
 
-def main():
-    print("=== 週刊VOCALOID複合ランキング 本番公開処理開始 ===")
+def main(force_publish: bool = False):
+    if "--force" in sys.argv:
+        force_publish = True
+
+    print("=== 週刊VOCALOID複合ランキング 公開・予約管理処理開始 ===")
 
     sync_frontend_assets()
 
     draft_candidates = [
         DRAFT_FILE,
-        PROJECT_ROOT / "data/weekly_draft.json",
         PROJECT_ROOT / "data/drafts/weekly_draft.json",
+        PROJECT_ROOT / "data/weekly_draft.json",
         BACKUP_DRAFT_FILE,
     ]
     draft_data = None
@@ -279,6 +385,7 @@ def main():
     now_dt = datetime.now(JST)
     publish_date = draft_data.get("publishDate") or now_dt.strftime("%Y-%m-%d")
     archive_id = draft_data.get("archiveId") or publish_date
+    publish_at = draft_data.get("publishAt") or f"{publish_date}T13:00:00+09:00"
     period_str = normalize_period_str(draft_data.get("period"), now_dt)
     now_str = now_dt.strftime("%Y-%m-%d %H:%M")
 
@@ -293,20 +400,43 @@ def main():
     draft_data["songs"] = songs
     draft_data["ranking"] = songs
     draft_data["publishDate"] = publish_date
+    draft_data["publishAt"] = publish_at
     draft_data["archiveId"] = archive_id
     draft_data["period"] = period_str
     draft_data["updated_at"] = draft_data.get("updated_at") or now_str
-    draft_data["published_at"] = now_str
 
+    # まず手元・予約用ドラフトファイル（weekly_draft.json）をセキュリティ検査付きで保存
     save_json(used_draft_path, draft_data)
+    if DRAFT_FILE.resolve() != used_draft_path.resolve():
+        save_json(DRAFT_FILE, draft_data)
+    alt_draft = PROJECT_ROOT / "data" / "weekly_draft.json"
+    if alt_draft.resolve() != DRAFT_FILE.resolve():
+        save_json(alt_draft, draft_data)
+
+    release_dt = get_release_datetime_jst(draft_data)
+
+    # 水曜13:00 JST 解禁チェック
+    if not force_publish and now_dt < release_dt:
+        # まだ水曜13:00より前の場合は、本番公開用JSON（latest_ranking.json）を更新せず、
+        # もしフライング公開されていたデータがあれば直前の公開済みアーカイブへ自動ロールバックする
+        rollback_unreleased_public_files(now_dt)
+        print(
+            f"[SCHEDULED / 予約待機中] 解禁日時 ({release_dt.strftime('%Y-%m-%d %H:%M JST')}) より前のため、"
+            f"本番サイトの表示は前週のまま維持し、今週のランキング・執筆原稿を予約保存しました。"
+        )
+        return False
+
+    # 水曜13:00 JST 以降（または --force 指定時）は本番公開ファイルへ昇格
+    draft_data["published_at"] = now_str
     save_json(PUBLIC_LATEST, draft_data)
     save_json(PROJECT_ROOT / "data/latest_ranking.json", draft_data)
 
     archive_file = ARCHIVE_DIR / f"{archive_id}.json"
     save_json(archive_file, draft_data)
-    update_archive_index(archive_id, period_str, publish_date)
+    update_archive_index(archive_id, period_str, publish_date, publish_at)
 
-    print(f"[OK] セキュリティ検査を通過し、最新ランキングを公開しました: {PUBLIC_LATEST}")
+    print(f"[OK] 解禁日時到達を確認し、最新ランキングを本番サイトへ公開しました: {PUBLIC_LATEST}")
+    return True
 
 
 if __name__ == "__main__":

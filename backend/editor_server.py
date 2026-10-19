@@ -3,13 +3,18 @@ import shutil
 import socket
 import subprocess
 import webbrowser
+from datetime import datetime, timezone, timedelta
+from pathlib import Path
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from config import BASE_DIR, DRAFT_FILE, PUBLIC_LATEST
 from export_blog import generate_markdown_from_data, export_markdown_file
-from publish_chart import main as publish_to_public_site
+from publish_chart import main as publish_to_public_site, get_release_datetime_jst, is_chart_released
+from build_draft import generate_private_owner_report
 
+JST = timezone(timedelta(hours=9))
 START_PORT = 8765
 BACKUP_FILE = DRAFT_FILE.parent / "weekly_draft.backup.json"
+REPORT_FILE = BASE_DIR / "data" / "reports" / "latest_private_report.md"
 
 
 def run_git(args: list, check: bool = False):
@@ -45,6 +50,7 @@ def merge_user_edits(base_data: dict, user_data: dict) -> dict:
     u_sum = (user_data.get("weeklySummary") or "").strip()
     if u_sum and "初回公開）。日本国内のボカロ新譜から" not in u_sum:
         base_data["weeklySummary"] = u_sum
+        base_data["overall_commentary"] = u_sum
 
     user_songs_by_id = {}
     user_songs_by_rank = {}
@@ -70,78 +76,104 @@ def repair_state_and_rescue_draft():
     """
     起動時にコンフリクト中断状態(rebase/merge)があれば自動解除し、
     バックアップから執筆原稿を100%救出して正常なJSONに復元する。
+    さらに水曜13:00前の場合はフライング公開データの自動ロールバック保護も実行する。
     """
     backup_data = load_json_safely(BACKUP_FILE)
     current_data = load_json_safely(DRAFT_FILE)
 
-    # 進行中の rebase / merge ロックを強制解除
     run_git(["rebase", "--abort"], check=False)
     run_git(["merge", "--abort"], check=False)
 
-    # 解除後にもう一度読み込み、バックアップの執筆内容と統合
     after_abort_data = load_json_safely(DRAFT_FILE) or current_data or backup_data
     clean_data = merge_user_edits(after_abort_data, backup_data)
     if current_data:
         clean_data = merge_user_edits(clean_data, current_data)
 
     if clean_data and "songs" in clean_data:
+        DRAFT_FILE.parent.mkdir(parents=True, exist_ok=True)
         with open(DRAFT_FILE, "w", encoding="utf-8") as f:
             json.dump(clean_data, f, ensure_ascii=False, indent=2)
         shutil.copyfile(DRAFT_FILE, BACKUP_FILE)
-        publish_to_public_site()
-        shutil.copyfile(DRAFT_FILE, PUBLIC_LATEST)
+        # publish_to_public_site() 内で水曜13:00チェックおよびフライング公開の自動ロールバックを実施
+        publish_to_public_site(force_publish=False)
         export_markdown_file()
-        print("✨ Git競合状態のクリーンアップと執筆原稿の復元が完了しました。")
+        generate_private_owner_report(clean_data)
+        print("✨ Git競合状態のクリーンアップ・原稿復元・水曜13:00解禁ゲートチェックが完了しました。")
 
 
-def conflict_free_save_and_push(new_data: dict, do_push: bool) -> tuple:
+def conflict_free_save_and_push(new_data: dict, do_push: bool, force_publish: bool = False) -> tuple:
     """
-    【無衝突保存＆プッシュエンジン】
-    Gitの行マージ(pull --rebase)を使わず、メモリ上に原稿を保持したまま
-    Gitツリーを origin/main の最新状態に合わせた上でファイルを書き出してプッシュする。
+    【無衝突保存＆水曜13:00予約プッシュエンジン】
+    水曜13:00より前にプッシュした場合は、本番サイトの表示データ(public/data/latest_ranking.json)は
+    前週のまま維持し、執筆済みの weekly_draft.json だけを GitHub に予約プッシュする。
+    毎週水曜13:00になると GitHub Actions が予約された weekly_draft.json を自動で本番サイトへ公開する。
     """
     try:
-        # 1. まずローカルのバックアップに編集データを確実に退避
+        new_data["overall_commentary"] = new_data.get("weeklySummary", "")
+        new_data["ranking"] = new_data.get("songs", [])
+
         DRAFT_FILE.parent.mkdir(parents=True, exist_ok=True)
         with open(BACKUP_FILE, "w", encoding="utf-8") as f:
             json.dump(new_data, f, ensure_ascii=False, indent=2)
 
         if do_push:
-            # 2. 宙ぶらりんの rebase / merge があれば解除
             run_git(["rebase", "--abort"], check=False)
             run_git(["merge", "--abort"], check=False)
 
-            # 3. クラウド(origin/main)の最新コミットを取得し、履歴の先端に合わせる（競合を物理的にゼロにする）
             fetch_res = run_git(["fetch", "origin", "main"], check=False)
             if fetch_res.returncode == 0:
                 run_git(["reset", "--hard", "origin/main"], check=False)
 
-        # 4. 最新履歴の上から、今回の編集データ(new_data)を全ターゲットファイルへ書き出す
         with open(DRAFT_FILE, "w", encoding="utf-8") as f:
             json.dump(new_data, f, ensure_ascii=False, indent=2)
         with open(BACKUP_FILE, "w", encoding="utf-8") as f:
             json.dump(new_data, f, ensure_ascii=False, indent=2)
 
-        publish_to_public_site()
-        shutil.copyfile(DRAFT_FILE, PUBLIC_LATEST)
+        alt_draft = BASE_DIR / "data" / "weekly_draft.json"
+        if alt_draft.resolve() != DRAFT_FILE.resolve():
+            alt_draft.parent.mkdir(parents=True, exist_ok=True)
+            with open(alt_draft, "w", encoding="utf-8") as f:
+                json.dump(new_data, f, ensure_ascii=False, indent=2)
+
+        # 水曜13:00に到達しているか（または強制即時公開か）に応じて公開ファイルを制御
+        published_now = publish_to_public_site(force_publish=force_publish)
         md_path = export_markdown_file()
-        print(f"[保存完了] public/data/latest_ranking.json と {md_path.name} を更新しました。")
+        report_path = generate_private_owner_report(new_data)
+        release_dt = get_release_datetime_jst(new_data)
+        release_str = release_dt.strftime("%Y/%m/%d (水) %H:%M")
 
         if not do_push:
-            return True, "PCへの保存とサイト表示用JSONの更新が完了しました。"
+            if published_now:
+                return True, f"PCへの保存と本番用JSONの更新が完了しました。（{md_path.name} / {report_path.name} 更新済）"
+            return (
+                True,
+                f"PCの手元用ドラフトに保存しました！（解禁日時 {release_str} までは手元プレビューでのみ閲覧可能です）",
+            )
 
-        # 5. 変更をステージングしてコミット＆プッシュ
         run_git(["add", "-A"], check=True)
         status = run_git(["status", "--porcelain"], check=False)
         if status.stdout.strip():
-            run_git(["commit", "-m", "執筆スタジオから解説記事を更新・公開"], check=True)
+            commit_msg = (
+                "執筆スタジオから解説記事を本番公開"
+                if published_now
+                else f"執筆スタジオから水曜13:00公開用の予約原稿を更新 ({new_data.get('publishDate', '')}分)"
+            )
+            run_git(["commit", "-m", commit_msg], check=True)
 
         push_res = run_git(["push", "origin", "main"], check=False)
         if push_res.returncode != 0:
-            # 万が一リモート側で直前に別コミットが入った場合でも確実に通すフォールバック
             push_res = run_git(["push", "--force-with-lease", "origin", "main"], check=True)
 
-        return True, "GitHubへのプッシュが完了しました！約1分でCloudflare Pages / 本番サイトに反映されます。"
+        if published_now:
+            return True, "🚀 GitHubへのプッシュが完了しました！約1分で本番Webサイトに最新ランキングと解説が反映されます。"
+        else:
+            return (
+                True,
+                f"🕒 GitHubへの【水曜13:00 予約プッシュ】が完了しました！\n\n"
+                f"・現在の本番Webサイトは前週のランキングが維持されています（フライング公開も自動解除済）。\n"
+                f"・今回執筆した内容は {release_str} に GitHub Actions によって自動で本番Webサイトへ公開されます。\n"
+                f"・自分の手元では上部の「👁️ 手元で本番プレビュー」からいつでも最新状態を確認できます。",
+            )
 
     except Exception as e:
         err_msg = getattr(e, "stderr", "") or getattr(e, "stdout", "") or str(e)
@@ -173,6 +205,7 @@ EDITOR_HTML = """<!DOCTYPE html>
       --sub: #94a3b8;
       --accent: #38bdf8;
       --green: #22c55e;
+      --amber: #f59e0b;
       --border: #334155;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -187,7 +220,7 @@ EDITOR_HTML = """<!DOCTYPE html>
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(15, 23, 42, 0.96);
       backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--border);
       padding: 14px 24px;
@@ -197,26 +230,49 @@ EDITOR_HTML = """<!DOCTYPE html>
       flex-wrap: wrap;
       gap: 12px;
     }
-    .title-area h1 { font-size: 1.2rem; font-weight: 800; }
+    .title-area h1 { font-size: 1.18rem; font-weight: 800; }
+    .title-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
     .title-area span { font-size: 0.82rem; color: var(--sub); }
-    .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    button {
+    .schedule-badge {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 4px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      background: rgba(245, 158, 11, 0.16);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.45);
+    }
+    .schedule-badge.released {
+      background: rgba(34, 197, 94, 0.16);
+      color: #4ade80;
+      border-color: rgba(34, 197, 94, 0.45);
+    }
+    .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    button, .btn-link {
       border: none;
       border-radius: 6px;
-      padding: 9px 15px;
-      font-size: 0.86rem;
+      padding: 9px 14px;
+      font-size: 0.84rem;
       font-weight: 700;
       cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
       transition: all 0.2s;
     }
     .btn-save { background: var(--accent); color: #0f172a; }
     .btn-save:hover { opacity: 0.9; }
     .btn-publish { background: var(--green); color: #052e16; }
+    .btn-publish.scheduled { background: var(--amber); color: #1c1917; }
     .btn-publish:hover { opacity: 0.9; }
     .btn-md { background: #334155; color: var(--text); border: 1px solid var(--accent); }
     .btn-md:hover { background: #475569; }
+    .btn-preview { background: #1e293b; color: #38bdf8; border: 1px solid #38bdf8; }
+    .btn-preview:hover { background: rgba(56, 189, 248, 0.15); }
     .status-toast {
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       font-weight: 700;
       color: var(--green);
       opacity: 0;
@@ -224,7 +280,7 @@ EDITOR_HTML = """<!DOCTYPE html>
     }
     .status-toast.show { opacity: 1; }
 
-    main { max-width: 1040px; margin: 24px auto; padding: 0 20px; }
+    main { max-width: 1060px; margin: 24px auto; padding: 0 20px; }
     .summary-card, .song-card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -307,7 +363,7 @@ EDITOR_HTML = """<!DOCTYPE html>
       border: 1px solid var(--accent);
       border-radius: 12px;
       width: 100%;
-      max-width: 860px;
+      max-width: 900px;
       max-height: 88vh;
       display: flex;
       flex-direction: column;
@@ -321,7 +377,7 @@ EDITOR_HTML = """<!DOCTYPE html>
     }
     #md-preview {
       flex: 1;
-      min-height: 420px;
+      min-height: 440px;
       font-family: Consolas, Monaco, monospace;
       font-size: 0.85rem;
       white-space: pre-wrap;
@@ -332,20 +388,25 @@ EDITOR_HTML = """<!DOCTYPE html>
   <header>
     <div class="title-area">
       <h1>✍️ 週刊VOCALOID複合ランキング 執筆スタジオ</h1>
-      <span id="period-label">読み込み中...</span>
+      <div class="title-meta">
+        <span id="period-label">読み込み中...</span>
+        <span id="schedule-badge" class="schedule-badge">確認中...</span>
+      </div>
     </div>
     <div class="actions">
       <span id="toast" class="status-toast">✅ 保存完了！</span>
-      <button type="button" class="btn-md" onclick="openMarkdownModal()">📝 Markdown表示・コピー</button>
-      <button type="button" class="btn-save" onclick="saveDraft(false)">💾 PCに保存 (Ctrl+S)</button>
-      <button type="button" class="btn-publish" onclick="saveDraft(true)">🚀 保存して本番Webサイトへ公開 (Git Push)</button>
+      <a href="/preview?preview=1" target="_blank" class="btn-link btn-preview" onclick="saveDraft(false)">👁️ 手元で本番プレビュー</a>
+      <button type="button" class="btn-md" onclick="openReportModal()">📊 手元用詳細レポート</button>
+      <button type="button" class="btn-md" onclick="openMarkdownModal()">📝 ブログ用MD</button>
+      <button type="button" class="btn-save" onclick="saveDraft(false)">💾 手元に保存 (Ctrl+S)</button>
+      <button type="button" id="publish-btn" class="btn-publish scheduled" onclick="saveDraft(true)">🕒 水曜13:00公開用に予約プッシュ</button>
     </div>
   </header>
 
   <main>
     <div class="summary-card">
-      <h2>📈 今週のチャート総括（3つ目のタブ「今週のチャート総括」に反映されます）</h2>
-      <div class="helper">※「上位楽曲解説・トレンド分析」タブの先頭およびブログ記事の導入に表示される全体総括です。</div>
+      <h2>📈 今週のチャート総括（「ランキングインサイト・解説」タブの今週のトレンド総評に反映されます）</h2>
+      <div class="helper">※水曜13:00より前にプッシュしても本番サイトには出ず、毎週水曜13:00に自動で本番Webサイトへ反映されます。手元での表示確認は右上の「👁️ 手元で本番プレビュー」から行えます。</div>
       <textarea id="weekly-summary" rows="4" placeholder="今週のチャート全体の傾向や1位楽曲のポイントなどを入力..."></textarea>
     </div>
 
@@ -355,7 +416,7 @@ EDITOR_HTML = """<!DOCTYPE html>
   <div id="md-modal" class="modal-backdrop">
     <div class="modal-box">
       <div class="modal-header">
-        <h3>📝 ブログ投稿用 Markdown（data/exports/ にも保存されています）</h3>
+        <h3 id="modal-title">📝 プレビュー</h3>
         <div style="display:flex; gap:8px;">
           <button type="button" class="btn-save" onclick="copyMarkdown()">📋 全文をコピー</button>
           <button type="button" class="btn-md" onclick="closeMarkdownModal()">閉じる</button>
@@ -370,9 +431,28 @@ EDITOR_HTML = """<!DOCTYPE html>
 
     async function loadDraft() {
       const res = await fetch('/api/draft?t=' + Date.now(), { cache: 'no-store' });
-      draftData = await res.json();
+      const payload = await res.json();
+      draftData = payload.draft || payload;
+      const isReleased = Boolean(payload.isReleased);
+      const releaseStr = payload.releaseAtFormatted || (draftData.publishDate + ' 13:00 JST');
+
       document.getElementById('period-label').textContent =
         `${draftData.publishDate} 公開分（集計期間: ${draftData.period}）`;
+
+      const badgeEl = document.getElementById('schedule-badge');
+      const pubBtn = document.getElementById('publish-btn');
+      if (isReleased) {
+        badgeEl.textContent = `✅ 解禁日時到達済（${releaseStr}）`;
+        badgeEl.classList.add('released');
+        pubBtn.textContent = '🚀 保存して本番Webサイトへ即時公開 (Git Push)';
+        pubBtn.classList.remove('scheduled');
+      } else {
+        badgeEl.textContent = `🔒 本番解禁前：${releaseStr} に自動公開（現在は手元のみ閲覧可）`;
+        badgeEl.classList.remove('released');
+        pubBtn.textContent = '🕒 保存して水曜13:00公開用に予約プッシュ (Git Push)';
+        pubBtn.classList.add('scheduled');
+      }
+
       document.getElementById('weekly-summary').value = draftData.weeklySummary || '';
 
       const container = document.getElementById('songs-list');
@@ -380,8 +460,11 @@ EDITOR_HTML = """<!DOCTYPE html>
 
       (draftData.songs || []).forEach((s, idx) => {
         const total = s.total_pt || 1;
-        const ytShare = (((s.yt_total_pt || 0) / total) * 100).toFixed(1);
-        const ncShare = (((s.nc_total_pt || 0) / total) * 100).toFixed(1);
+        const pts = s.pts || {};
+        const ytPt = s.yt_total_pt !== undefined ? s.yt_total_pt : (pts.yt_total || 0);
+        const ncPt = s.nc_total_pt !== undefined ? s.nc_total_pt : (pts.nc_total || 0);
+        const ytShare = ((ytPt / total) * 100).toFixed(1);
+        const ncShare = ((ncPt / total) * 100).toFixed(1);
         const raw = s.raw || {};
 
         const ytUrl = s.youtube_id ? `https://www.youtube.com/watch?v=${s.youtube_id}` : '';
@@ -422,7 +505,7 @@ EDITOR_HTML = """<!DOCTYPE html>
 
           <div>
             <div class="field-label">
-              <span>【指標動向・楽曲解説】（各曲の「詳細を見る」内 ＆ 3つ目のタブ「上位楽曲解説・トレンド分析」に反映されます）</span>
+              <span>【指標動向・楽曲解説】（各曲の「詳細を見る」内 ＆ 2つ目のタブ「ランキングインサイト・解説」に反映されます）</span>
               <span id="char-count-${idx}">${(s.commentary || '').length} 文字</span>
             </div>
             <textarea rows="3" data-idx="${idx}" data-field="commentary"
@@ -443,19 +526,22 @@ EDITOR_HTML = """<!DOCTYPE html>
     }
 
     function collectFormData() {
-      draftData.weeklySummary = document.getElementById('weekly-summary').value.trim();
+      const summaryVal = document.getElementById('weekly-summary').value.trim();
+      draftData.weeklySummary = summaryVal;
+      draftData.overall_commentary = summaryVal;
       document.querySelectorAll('[data-idx]').forEach(el => {
         const idx = Number(el.getAttribute('data-idx'));
         const field = el.getAttribute('data-field');
         draftData.songs[idx][field] = el.value.trim();
       });
+      draftData.ranking = draftData.songs;
       return draftData;
     }
 
     async function saveDraft(doPush = false) {
       const payload = collectFormData();
       const toast = document.getElementById('toast');
-      toast.textContent = doPush ? '⏳ 同期＆GitHubへプッシュ中...' : '⏳ 保存中...';
+      toast.textContent = doPush ? '⏳ GitHubへ同期・プッシュ中...' : '⏳ 手元に保存中...';
       toast.classList.add('show');
 
       const res = await fetch('/api/save', {
@@ -466,7 +552,7 @@ EDITOR_HTML = """<!DOCTYPE html>
       const result = await res.json();
 
       if (res.ok && result.status === 'ok') {
-        toast.textContent = doPush ? '🚀 本番公開(Git Push)完了！' : '✅ PC保存＆サイト用データ更新完了！';
+        toast.textContent = doPush ? '✅ GitHubプッシュ完了！' : '✅ 手元保存完了！';
         if (doPush && result.message) {
           alert(result.message);
         }
@@ -481,7 +567,17 @@ EDITOR_HTML = """<!DOCTYPE html>
       await saveDraft(false);
       const res = await fetch('/api/markdown?t=' + Date.now(), { cache: 'no-store' });
       const data = await res.json();
+      document.getElementById('modal-title').textContent = '📝 ブログ投稿用 Markdown（data/exports/ にも保存されています）';
       document.getElementById('md-preview').value = data.markdown || '';
+      document.getElementById('md-modal').classList.add('open');
+    }
+
+    async function openReportModal() {
+      await saveDraft(false);
+      const res = await fetch('/api/report?t=' + Date.now(), { cache: 'no-store' });
+      const data = await res.json();
+      document.getElementById('modal-title').textContent = '📊 運営者手元用・ランキング詳細レポート（data/reports/latest_private_report.md）';
+      document.getElementById('md-preview').value = data.report || '';
       document.getElementById('md-modal').classList.add('open');
     }
 
@@ -493,7 +589,7 @@ EDITOR_HTML = """<!DOCTYPE html>
       const textarea = document.getElementById('md-preview');
       textarea.select();
       await navigator.clipboard.writeText(textarea.value);
-      alert('ブログ用Markdownをクリップボードにコピーしました！');
+      alert('クリップボードにコピーしました！');
     }
 
     window.addEventListener('keydown', (e) => {
@@ -514,24 +610,81 @@ class EditorHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         pass
 
+    def _serve_static_file(self, file_path: Path, content_type: str):
+        if not file_path.exists() or not file_path.is_file():
+            self.send_response(404)
+            self.end_headers()
+            return
+        self.send_response(200)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(file_path.read_bytes())
+
     def do_GET(self):
-        if self.path == "/" or self.path.startswith("/index"):
+        clean_path = self.path.split("?")[0]
+
+        if clean_path == "/" or clean_path == "/index":
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
             self.wfile.write(EDITOR_HTML.encode("utf-8"))
 
-        elif self.path.startswith("/api/draft"):
+        elif clean_path == "/preview" or clean_path == "/preview/":
+            # 手元で本番Webサイトと全く同じデザインをプレビューできるエンドポイント
+            html_file = BASE_DIR / "index.html"
+            if not html_file.exists():
+                html_file = BASE_DIR / "public" / "index.html"
+            self._serve_static_file(html_file, "text/html; charset=utf-8")
+
+        elif clean_path in ("/style.css", "/css/style.css"):
+            css_file = BASE_DIR / "style.css"
+            if not css_file.exists():
+                css_file = BASE_DIR / "public" / "style.css"
+            self._serve_static_file(css_file, "text/css; charset=utf-8")
+
+        elif clean_path in ("/app.js", "/js/app.js"):
+            js_file = BASE_DIR / "app.js"
+            if not js_file.exists():
+                js_file = BASE_DIR / "public" / "app.js"
+            self._serve_static_file(js_file, "application/javascript; charset=utf-8")
+
+        elif clean_path.startswith("/data/") or clean_path.startswith("/public/data/"):
+            # 手元プレビュー時に latest_ranking.json がリクエストされたら、最新の weekly_draft.json を返す
+            if clean_path.endswith("latest_ranking.json") or clean_path.endswith("weekly_draft.json"):
+                data = load_json_safely(DRAFT_FILE) or load_json_safely(BACKUP_FILE)
+                content = json.dumps(data, ensure_ascii=False, indent=2)
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Cache-Control", "no-store")
+                self.end_headers()
+                self.wfile.write(content.encode("utf-8"))
+                return
+
+            rel = clean_path.lstrip("/")
+            cand1 = BASE_DIR / rel
+            cand2 = BASE_DIR / "public" / rel
+            target = cand1 if cand1.exists() else cand2
+            self._serve_static_file(target, "application/json; charset=utf-8")
+
+        elif clean_path.startswith("/api/draft"):
             data = load_json_safely(DRAFT_FILE) or load_json_safely(BACKUP_FILE)
-            content = json.dumps(data, ensure_ascii=False, indent=2)
+            now_dt = datetime.now(JST)
+            rel_dt = get_release_datetime_jst(data)
+            payload = {
+                "draft": data,
+                "isReleased": is_chart_released(data, now_dt),
+                "releaseAtFormatted": rel_dt.strftime("%Y/%m/%d (水) %H:%M JST"),
+            }
+            content = json.dumps(payload, ensure_ascii=False, indent=2)
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
             self.wfile.write(content.encode("utf-8"))
 
-        elif self.path.startswith("/api/markdown"):
+        elif clean_path.startswith("/api/markdown"):
             data = load_json_safely(DRAFT_FILE) or load_json_safely(BACKUP_FILE)
             md_text = generate_markdown_from_data(data)
             self.send_response(200)
@@ -539,6 +692,16 @@ class EditorHandler(BaseHTTPRequestHandler):
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
             self.wfile.write(json.dumps({"markdown": md_text}, ensure_ascii=False).encode("utf-8"))
+
+        elif clean_path.startswith("/api/report"):
+            data = load_json_safely(DRAFT_FILE) or load_json_safely(BACKUP_FILE)
+            report_path = generate_private_owner_report(data)
+            report_text = report_path.read_text(encoding="utf-8") if report_path.exists() else ""
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(json.dumps({"report": report_text}, ensure_ascii=False).encode("utf-8"))
 
         else:
             self.send_response(404)
@@ -553,11 +716,13 @@ class EditorHandler(BaseHTTPRequestHandler):
             if "data" in req_json and "songs" in req_json["data"]:
                 new_data = req_json["data"]
                 do_push = bool(req_json.get("push", False))
+                force_pub = bool(req_json.get("forcePublish", False))
             else:
                 new_data = req_json
                 do_push = False
+                force_pub = False
 
-            ok, msg = conflict_free_save_and_push(new_data, do_push)
+            ok, msg = conflict_free_save_and_push(new_data, do_push, force_publish=force_pub)
             status_str = "ok" if ok else "error"
 
             self.send_response(200)
@@ -568,7 +733,6 @@ class EditorHandler(BaseHTTPRequestHandler):
 
 
 def main():
-    # 起動時にGitの競合ロック解除と原稿救出を自動実行
     repair_state_and_rescue_draft()
 
     if not DRAFT_FILE.exists():
@@ -579,11 +743,14 @@ def main():
     server = HTTPServer(("127.0.0.1", port), EditorHandler)
 
     url = f"http://localhost:{port}"
-    print("=" * 64)
+    preview_url = f"http://localhost:{port}/preview?preview=1"
+    print("=" * 68)
     print(f" ✍️ 執筆スタジオを起動しました: {url}")
-    print(" 競合ゼロの自動同期エンジンが有効です。")
+    print(f" 👁️ 手元専用のWebサイトプレビュー: {preview_url}")
+    print(" 🕒 水曜13:00より前のプッシュは自動的に「予約プッシュ」となり、")
+    print("    毎週水曜13:00にGitHub Actionsで本番サイトへ自動公開されます。")
     print(" 終了する時は Ctrl + C を押してください。")
-    print("=" * 64)
+    print("=" * 68)
 
     webbrowser.open(url)
 

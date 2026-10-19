@@ -60,6 +60,43 @@ function isDataSaverEnabled() {
   return Boolean(navigator.connection && navigator.connection.saveData);
 }
 
+/**
+ * 運営者の手元環境（localhost / 127.0.0.1）かどうかを判定する。
+ * 手元環境でのみ水曜13:00前のドラフトをプレビュー表示でき、
+ * 本番Webサイトでは水曜13:00 JSTまで未解禁データの表示を厳格にブロックする。
+ */
+function isLocalOwnerPreview() {
+  const host = window.location.hostname;
+  return host === "localhost" || host === "127.0.0.1";
+}
+
+/**
+ * チャートデータの解禁日時（原則：publishDate の 13:00:00 JST）に達しているか判定する
+ */
+function isChartReleasedForPublic(chartData) {
+  if (isLocalOwnerPreview()) return true;
+  if (!chartData || typeof chartData !== "object") return true;
+
+  let releaseMs = null;
+  if (chartData.publishAt && typeof chartData.publishAt === "string") {
+    const parsed = Date.parse(chartData.publishAt);
+    if (!isNaN(parsed)) {
+      releaseMs = parsed;
+    }
+  }
+
+  if (releaseMs === null) {
+    const dateStr = chartData.publishDate || chartData.archiveId || "";
+    const m = String(dateStr).trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (m) {
+      releaseMs = Date.parse(`${m[1]}-${m[2]}-${m[3]}T13:00:00+09:00`);
+    }
+  }
+
+  if (releaseMs === null || isNaN(releaseMs)) return true;
+  return Date.now() >= releaseMs;
+}
+
 function ensureChartJsLoaded() {
   if (typeof Chart !== "undefined") {
     return Promise.resolve(true);
@@ -124,10 +161,6 @@ function sanitizeArchiveFilename(rawVal) {
   return /^[A-Za-z0-9_.-]+\.json$/.test(withExt) && !withExt.includes("..") ? withExt : "";
 }
 
-/**
- * 水曜13:00のアクセス集中（スパイク）対策：
- * タイムアウト制御 ＋ ランダムジッター付き自動リトライ ＋ 重複通信防止
- */
 function sleepWithJitter(attempt) {
   const baseDelay = 220 * Math.pow(1.8, attempt);
   const jitter = Math.floor(Math.random() * 280);
@@ -156,7 +189,6 @@ async function fetchJsonSingleUrl(url, cacheMode = "no-cache", timeoutMs = 6500,
         if (res.ok) {
           return await res.json();
         }
-        // 404等のクライアントエラーはリトライせず即座に次候補へ
         if (res.status >= 400 && res.status < 500 && res.status !== 429) {
           return null;
         }
@@ -213,7 +245,6 @@ if (document.readyState === "loading") {
 
 /**
  * 1. サイト累計アクセスカウンター ＆ 記念マイルストーン感謝バナーシステム
- * （アクセス集中時に外部カウンターAPIが遅延しても3.5秒で切り離し、本体表示をブロックしない）
  */
 async function initSiteViewCounter() {
   const countEl = document.getElementById("view-count-value");
@@ -234,7 +265,7 @@ async function initSiteViewCounter() {
 
   try {
     const sessionKey = "vcc_session_counted";
-    const alreadyCounted = sessionStorage.getItem(sessionKey) === "1";
+    const alreadyCounted = sessionStorage.getItem(sessionKey) === "1" || isLocalOwnerPreview();
     const endpoint = alreadyCounted
       ? `https://api.counterapi.dev/v1/${COUNTER_NAMESPACE}/${COUNTER_KEY}/`
       : `https://api.counterapi.dev/v1/${COUNTER_NAMESPACE}/${COUNTER_KEY}/up`;
@@ -414,7 +445,6 @@ function initUtilityToolbar() {
     });
   }
 
-  // ランキング結果をX(Twitter)でシェア（URLは常に OFFICIAL_SITE_URL を使用）
   if (shareXBtn) {
     shareXBtn.addEventListener("click", () => {
       const text = buildChartSummaryText();
@@ -423,7 +453,6 @@ function initUtilityToolbar() {
     });
   }
 
-  // ランキング結果をクリップボードにコピー（URLは常に OFFICIAL_SITE_URL を使用）
   if (copySummaryBtn) {
     copySummaryBtn.addEventListener("click", async () => {
       const text = `${buildChartSummaryText()}\n${OFFICIAL_SITE_URL}`;
@@ -488,9 +517,6 @@ function getSongsArray(chartData) {
   return [];
 }
 
-/**
- * イベント委譲（「詳細を見る」「お気に入り☆」「個別楽曲Xシェア」を安全に処理）
- */
 function initRankingEventDelegation() {
   const container = document.getElementById("ranking-container");
   if (!container) return;
@@ -707,7 +733,7 @@ function normalizePeriodString(periodStr) {
 }
 
 function extractUpdateDateString(data) {
-  const rawUpdate = data.updated_at || data.published_at || data.publishDate || "";
+  const rawUpdate = data.publishDate || data.updated_at || data.published_at || "";
   if (rawUpdate && typeof rawUpdate === "string") {
     const m = rawUpdate.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
     if (m) {
@@ -718,13 +744,11 @@ function extractUpdateDateString(data) {
 }
 
 async function initChartApp() {
+  await loadArchiveIndexOnly();
   await loadAndRenderChart();
 
   try {
-    await loadArchiveIndexOnly();
     const songs = getSongsArray(currentChartData);
-    // すでに build_draft.py / publish_chart.py で chart_in_count が付与されている場合は
-    // 過去アーカイブ全件のダウンロード嵐（N+1通信）を発生させない
     const needsHistoryEnrich = songs.some(
       (s) => typeof s.chart_in_count !== "number" || s.chart_in_count < 1
     );
@@ -755,11 +779,21 @@ async function loadArchiveIndexOnly() {
   );
 
   const selectEl = document.getElementById("archive-select");
-  const archiveList = Array.isArray(indexData)
+  const rawArchiveList = Array.isArray(indexData)
     ? indexData
     : indexData && Array.isArray(indexData.archives)
     ? indexData.archives
     : [];
+
+  // 本番Webサイトでは、まだ水曜13:00 JSTに達していない未来のアーカイブをセレクトボックスからも除外
+  const archiveList = rawArchiveList.filter((item) => {
+    if (isLocalOwnerPreview()) return true;
+    if (typeof item === "string") {
+      const stem = item.replace(/\.json$/i, "");
+      return isChartReleasedForPublic({ publishDate: stem });
+    }
+    return isChartReleasedForPublic(item);
+  });
 
   cachedArchiveListMeta = archiveList;
   if (!archiveList.length) {
@@ -797,12 +831,11 @@ async function loadArchiveIndexOnly() {
       } else {
         const cleanFile = sanitizeArchiveFilename(val);
         if (!cleanFile) return;
-        // 過去のアーカイブファイルは不変データのためブラウザ・CDNキャッシュ("default")を積極活用
         const archiveData = await fetchJsonWithFallback(
           [`./data/archives/${cleanFile}`, `public/data/archives/${cleanFile}`],
           "default"
         );
-        if (archiveData) {
+        if (archiveData && isChartReleasedForPublic(archiveData)) {
           const archiveSongs = getSongsArray(archiveData);
           const archiveNeedsEnrich = archiveSongs.some(
             (s) => typeof s.chart_in_count !== "number" || s.chart_in_count < 1
@@ -848,7 +881,7 @@ async function ensureFullArchiveHistoryLoaded() {
       [`./data/archives/${cleanFile}`, `public/data/archives/${cleanFile}`],
       "default"
     );
-    if (data && getSongsArray(data).length > 0) {
+    if (data && getSongsArray(data).length > 0 && isChartReleasedForPublic(data)) {
       loadedArchives.push(data);
     }
   }
@@ -912,18 +945,53 @@ function enrichWithHistory(chartData) {
   });
 }
 
+async function loadLatestReleasedArchiveFallback() {
+  for (const item of cachedArchiveListMeta) {
+    const rawFile =
+      typeof item === "string"
+        ? item
+        : item.file || item.path || (item.archiveId ? `${item.archiveId}.json` : item.id);
+    const cleanFile = sanitizeArchiveFilename(rawFile);
+    if (!cleanFile) continue;
+    const archiveData = await fetchJsonWithFallback(
+      [`./data/archives/${cleanFile}`, `public/data/archives/${cleanFile}`],
+      "no-cache"
+    );
+    if (archiveData && isChartReleasedForPublic(archiveData)) {
+      return archiveData;
+    }
+  }
+  return null;
+}
+
 async function loadAndRenderChart() {
-  let data = await fetchJsonWithFallback(
-    [
-      "./data/latest_ranking.json",
-      "data/latest_ranking.json",
-      "public/data/latest_ranking.json",
-      "./data/weekly_draft.json",
-      "data/weekly_draft.json",
-      "latest_ranking.json",
-    ],
-    "no-cache"
-  );
+  // 手元プレビュー環境(localhost)ではドラフトも含めて読み込み、
+  // 本番環境では公開用の latest_ranking.json のみを対象とする
+  const candidateUrls = isLocalOwnerPreview()
+    ? [
+        "./data/latest_ranking.json",
+        "./data/drafts/weekly_draft.json",
+        "./data/weekly_draft.json",
+        "public/data/latest_ranking.json",
+      ]
+    : [
+        "./data/latest_ranking.json",
+        "data/latest_ranking.json",
+        "public/data/latest_ranking.json",
+        "latest_ranking.json",
+      ];
+
+  let data = await fetchJsonWithFallback(candidateUrls, "no-cache");
+
+  // 【水曜13:00 解禁ガード】
+  // 万が一本番サイトの latest_ranking.json に水曜13:00前の未解禁データが入っていた場合は、
+  // 自動的に直前の解禁済みアーカイブへフォールバックして表示する
+  if (data && !isChartReleasedForPublic(data)) {
+    const fallbackReleased = await loadLatestReleasedArchiveFallback();
+    if (fallbackReleased) {
+      data = fallbackReleased;
+    }
+  }
 
   if (data) {
     try {
@@ -932,12 +1000,14 @@ async function loadAndRenderChart() {
       // ignore storage quota errors
     }
   } else {
-    // 万が一の回線混雑・オフライン時はブラウザ内の直近キャッシュから自動復旧
     try {
       const cachedStr = localStorage.getItem(LAST_KNOWN_CHART_STORAGE_KEY);
       if (cachedStr) {
-        data = JSON.parse(cachedStr);
-        showToast("回線混雑のためキャッシュデータを表示しています");
+        const parsedCache = JSON.parse(cachedStr);
+        if (isChartReleasedForPublic(parsedCache)) {
+          data = parsedCache;
+          showToast("回線混雑のためキャッシュデータを表示しています");
+        }
       }
     } catch (_) {
       data = null;

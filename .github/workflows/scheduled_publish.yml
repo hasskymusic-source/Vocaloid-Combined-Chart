@@ -1,0 +1,51 @@
+name: Weekly Vocaloid Chart - Wednesday 13:00 JST Auto Publish
+
+on:
+  schedule:
+    # 毎週水曜日 13:00 JST (UTC 04:00) に自動起動して予約原稿を本番公開
+    - cron: '0 4 * * 3'
+  workflow_dispatch:
+    inputs:
+      force_publish:
+        description: '水曜13:00前でも強制的に即時公開する場合は true'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+
+jobs:
+  publish_reserved_chart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Publish reserved draft to public site
+        run: |
+          if [ "${{ github.event.inputs.force_publish }}" = "true" ]; then
+            python publish_chart.py --force
+          else
+            # cron起動時は水曜13:00 JSTに到達しているため自動で本番公開される
+            python publish_chart.py --force
+          fi
+          python export_blog.py
+
+      - name: Commit and push published chart
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "変更はありません。"
+          else
+            git commit -m "📅 水曜13:00 定期更新：最新ランキングと解説記事を本番公開"
+            git push origin main
+          fi

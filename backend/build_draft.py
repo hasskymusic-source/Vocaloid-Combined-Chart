@@ -1,6 +1,7 @@
 import os
 import json
 import glob
+import urllib.request
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
@@ -34,6 +35,7 @@ BACKUP_DRAFT_FILE = resolve_config_path(["BACKUP_DRAFT_FILE", "WEEKLY_DRAFT_BACK
 PUBLIC_LATEST = resolve_config_path(["PUBLIC_LATEST", "LATEST_RANKING_FILE"], "public/data/latest_ranking.json")
 ARCHIVE_DIR = resolve_config_path(["ARCHIVE_DIR", "ARCHIVES_DIR"], "public/data/archives")
 ARCHIVE_INDEX = resolve_config_path(["ARCHIVE_INDEX"], "public/data/archives/archive_index.json")
+REPORTS_DIR = PROJECT_ROOT / "data" / "reports"
 
 DEFAULT_WEIGHTS = {
     "yt_views": 1,
@@ -124,11 +126,6 @@ def parse_iso_datetime(dt_str):
 
 
 def resolve_earliest_published_dt(*dict_objs):
-    """
-    複数の辞書（song, cur_m, prev_m）に含まれる published_at / yt_published_at / nc_published_at から
-    最も古い（本来の初出）公開日時を取得する。
-    これにより、10年前のニコ動楽曲が最近YouTubeにアップされた場合でも旧譜として正確に判定できる。
-    """
     candidates = []
     for d in dict_objs:
         if not isinstance(d, dict):
@@ -145,7 +142,6 @@ def resolve_earliest_published_dt(*dict_objs):
 
 
 def resolve_platform_published_dt(platform_prefix, *dict_objs):
-    """特定のプラットフォーム（yt または nc）の公開日時を取得し、なければ全体の最古公開日時を返す"""
     specific_field = f"{platform_prefix}_published_at"
     for d in dict_objs:
         if isinstance(d, dict) and d.get(specific_field):
@@ -156,14 +152,6 @@ def resolve_platform_published_dt(platform_prefix, *dict_objs):
 
 
 def compute_new_release_factor(pub_dt, ref_dt):
-    """
-    【厳格化された新譜判定ロジック】
-    前週スナップショットにデータが存在しない楽曲について：
-    - 公開日時が不明（None）の場合：0.0（旧譜の累計5%誤算入を完全防止）
-    - 公開から MAX_NEW_SONG_AGE_DAYS（10日）を超えている旧譜の場合：0.0（今週はベースライン記録のみ、来週から実測差分で集計）
-    - 公開から7日以内の新譜の場合：1.0（期間内の純増＝現在の累計値）
-    - 公開から7日〜10日の新譜の場合：7日分相当への日割り比率（7.0 / 経過日数）
-    """
     if pub_dt is None or ref_dt is None:
         return 0.0
 
@@ -180,7 +168,7 @@ def compute_new_release_factor(pub_dt, ref_dt):
 def compute_chart_dates(now_dt=None):
     """
     今週の月曜日を基準として、直前の月曜日〜日曜日（7日間）を集計期間として算出する。
-    さらに、何度再実行しても計算結果が変わらないよう、基準時刻（その週の月曜00:00 JST）も返す。
+    さらに公開解禁日時として「今週の水曜日 13:00:00 JST (publishAt)」を設定する。
     """
     if now_dt is None:
         now_dt = datetime.now(JST)
@@ -193,8 +181,9 @@ def compute_chart_dates(now_dt=None):
     wed_date = this_monday + timedelta(days=2)
     publish_date = wed_date.strftime("%Y-%m-%d")
     archive_id = wed_date.strftime("%Y-%m-%d")
+    publish_at = f"{publish_date}T13:00:00+09:00"
     reference_dt = datetime(this_monday.year, this_monday.month, this_monday.day, 0, 0, 0, tzinfo=JST)
-    return period_str, publish_date, archive_id, reference_dt
+    return period_str, publish_date, archive_id, publish_at, reference_dt
 
 
 def extract_metrics_dict(snapshot_data):
@@ -340,8 +329,6 @@ def calculate_song_points(song, current_metrics, prev_metrics, reference_dt):
     yt_pub_dt = resolve_platform_published_dt("yt", cur_m, song, prev_metrics if has_prev else {})
     nc_pub_dt = resolve_platform_published_dt("nc", cur_m, song, prev_metrics if has_prev else {})
 
-    # もしニコ動で10年前に公開された曲が最近YouTubeに転載された場合など、
-    # 楽曲自体の初出（earliest_pub_dt）が旧譜であれば旧譜として扱う
     effective_yt_pub_dt = min(filter(None, [earliest_pub_dt, yt_pub_dt]), default=None)
     effective_nc_pub_dt = min(filter(None, [earliest_pub_dt, nc_pub_dt]), default=None)
 
@@ -373,8 +360,6 @@ def calculate_song_points(song, current_metrics, prev_metrics, reference_dt):
 
         for mk in ("yt_views", "yt_likes", "yt_comments"):
             if yt_newly_linked:
-                # 先週YouTubeデータが0で今週突然入った場合、本物の新曲（10日以内）のみ計上し、
-                # 旧譜の後付けID紐付けによる累計混入は 0（次週から実測集計）とする
                 raw_gains[mk] = int(round(cur_vals[mk] * yt_new_factor))
             else:
                 raw_gains[mk] = max(0, cur_vals[mk] - prv_vals[mk])
@@ -385,9 +370,6 @@ def calculate_song_points(song, current_metrics, prev_metrics, reference_dt):
             else:
                 raw_gains[mk] = max(0, cur_vals[mk] - prv_vals[mk])
     else:
-        # 前週のスナップショット自体に存在しない新規登録曲の場合：
-        # 集計期間内（10日以内）に公開された新譜のみ計上し、
-        # 『チュルリラ・チュルリラ・ダッダッダ！』のような過去曲は 0 として除外する
         yt_new_factor = compute_new_release_factor(effective_yt_pub_dt, reference_dt)
         nc_new_factor = compute_new_release_factor(effective_nc_pub_dt, reference_dt)
 
@@ -426,10 +408,137 @@ def calculate_song_points(song, current_metrics, prev_metrics, reference_dt):
     return total_pt, raw_gains, pts_breakdown, pub_iso_str
 
 
+def generate_private_owner_report(draft_data: dict) -> Path:
+    """
+    【運営者手元専用・詳細レポート生成＆通知システム】
+    本番サイトで水曜13:00に解禁される前に、あなたの手元（ローカルPCおよび執筆スタジオ）で
+    ランキング全20曲の6指標内訳・前週比率・視聴URLを即座に把握できる詳細レポートを生成する。
+    """
+    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    archive_id = draft_data.get("archiveId", "latest")
+    period = draft_data.get("period", "")
+    publish_at = draft_data.get("publishAt", f"{archive_id}T13:00:00+09:00")
+    songs = draft_data.get("songs", [])
+
+    lines = [
+        f"# 🔒 【運営者手元用・極秘】週刊VOCALOID複合ランキング 詳細レポート",
+        f"- **本番サイト解禁日時:** {publish_at} （毎週水曜 13:00 JST 自動公開）",
+        f"- **集計期間:** {period}",
+        f"- **ドラフト生成時刻:** {draft_data.get('updated_at', '')}",
+        "",
+        "---",
+        "",
+        "## 📊 今週の TOP 20 サマリー一覧",
+        "",
+        "| 順位 | 前週 | 週数 | 楽曲タイトル | ボカロP | Vocal | 総合pt | 前週比 | YT比率 / NC比率 |",
+        "| :---: | :---: | :---: | :--- | :--- | :--- | ---: | :---: | :---: |",
+    ]
+
+    for s in songs:
+        rank = s.get("rank", 0)
+        prev = s.get("prev_rank")
+        prev_str = f"{prev}位" if prev else "NEW"
+        weeks = s.get("chart_in_count", 1)
+        title = str(s.get("title", "")).replace("|", "｜")
+        prod = str(s.get("producer", "")).replace("|", "｜")
+        vocal = str(s.get("vocal", "")).replace("|", "｜")
+        total_pt = int(s.get("total_pt", 0))
+        ratio = f"{s.get('pt_ratio')}%" if s.get("pt_ratio") is not None else "NEW"
+        yt_pt = int(s.get("yt_total_pt", 0))
+        nc_pt = int(s.get("nc_total_pt", 0))
+        denom = total_pt if total_pt > 0 else 1
+        yt_sh = (yt_pt / denom) * 100
+        nc_sh = (nc_pt / denom) * 100
+
+        lines.append(
+            f"| **{rank}位** | {prev_str} | {weeks}週 | **{title}** | {prod} | {vocal} | "
+            f"**{total_pt:,} pt** | {ratio} | YT {yt_sh:.1f}% / NC {nc_sh:.1f}% |"
+        )
+
+    lines.extend(["", "---", "", "## 🔍 全20曲 6指標詳細データ（執筆リファレンス用）", ""])
+
+    for s in songs:
+        rank = s.get("rank", 0)
+        raw = s.get("raw", {})
+        pts = s.get("pts", {})
+        total_pt = int(s.get("total_pt", 0))
+        yt_pt = int(s.get("yt_total_pt", 0))
+        nc_pt = int(s.get("nc_total_pt", 0))
+        denom = total_pt if total_pt > 0 else 1
+        yt_sh = (yt_pt / denom) * 100
+        nc_sh = (nc_pt / denom) * 100
+        yid = s.get("youtube_id", "")
+        nid = s.get("niconico_id", "")
+
+        lines.append(f"### {rank}位：{s.get('title')} / {s.get('producer')} （feat. {s.get('vocal')}）")
+        lines.append(
+            f"- **総合ポイント:** **{total_pt:,} pt** "
+            f"（前週順位: {s.get('prevRank', 'NEW')} / 前週比: {s.get('pt_ratio') if s.get('pt_ratio') is not None else 'NEW'}% / {s.get('chart_in_count', 1)}週目）"
+        )
+        lines.append(
+            f"- **YouTube計:** {yt_pt:,} pt ({yt_sh:.1f}%) ｜ "
+            f"再生 +{raw.get('yt_views', 0):,} ({pts.get('yt_views', 0):,}pt) / "
+            f"高評価 +{raw.get('yt_likes', 0):,} ({pts.get('yt_likes', 0):,}pt) / "
+            f"コメ +{raw.get('yt_comments', 0):,} ({pts.get('yt_comments', 0):,}pt)"
+        )
+        lines.append(
+            f"- **ニコニコ計:** {nc_pt:,} pt ({nc_sh:.1f}%) ｜ "
+            f"再生 +{raw.get('nc_views', 0):,} ({pts.get('nc_views', 0):,}pt) / "
+            f"マイリス +{raw.get('nc_mylist', 0):,} ({pts.get('nc_mylist', 0):,}pt) / "
+            f"コメ +{raw.get('nc_comments', 0):,} ({pts.get('nc_comments', 0):,}pt)"
+        )
+        links = []
+        if yid:
+            links.append(f"YouTube: https://www.youtube.com/watch?v={yid}")
+        if nid:
+            links.append(f"ニコ動: https://www.nicovideo.jp/watch/{nid}")
+        if links:
+            lines.append(f"- **動画リンク:** {' ｜ '.join(links)}")
+        lines.append("")
+
+    report_text = "\n".join(lines)
+    latest_report_path = REPORTS_DIR / "latest_private_report.md"
+    dated_report_path = REPORTS_DIR / f"private_report_{archive_id}.md"
+
+    latest_report_path.write_text(report_text, encoding="utf-8")
+    dated_report_path.write_text(report_text, encoding="utf-8")
+
+    # 環境変数 RANKING_NOTIFY_WEBHOOK_URL が設定されている場合は Discord / Slack へ自動通知
+    webhook_url = os.environ.get("RANKING_NOTIFY_WEBHOOK_URL", "").strip()
+    if webhook_url:
+        try:
+            top5_summary = "\n".join(
+                [
+                    f"**{s['rank']}位**: {s['title']} / {s['producer']} ({s['total_pt']:,} pt)"
+                    for s in songs[:5]
+                ]
+            )
+            msg = (
+                f"📬 **【手元用通知】週刊VOCALOID複合ランキング 集計完了**\n"
+                f"集計期間: `{period}`\n"
+                f"本番解禁予定: `{publish_at}` (水曜13:00自動公開)\n\n"
+                f"{top5_summary}\n\n"
+                f"※執筆スタジオ (`python editor_server.py`) または `data/reports/latest_private_report.md` で全20曲の詳細を確認できます。"
+            )
+            payload = json.dumps({"content": msg, "text": msg}).encode("utf-8")
+            req = urllib.request.Request(
+                webhook_url,
+                data=payload,
+                headers={"Content-Type": "application/json", "User-Agent": "VocaloidChartBot/1.0"},
+                method="POST",
+            )
+            urllib.request.urlopen(req, timeout=8)
+            print("[NOTIFY] Webhookへ手元用ランキング詳細通知を送信しました。")
+        except Exception as e:
+            print(f"[WARN] Webhook通知送信をスキップしました: {e}")
+
+    return latest_report_path
+
+
 def main():
     print("=== 週刊VOCALOID複合ランキング ドラフト生成開始 ===")
     now_dt = datetime.now(JST)
-    period_str, publish_date, archive_id, reference_dt = compute_chart_dates(now_dt)
+    period_str, publish_date, archive_id, publish_at, reference_dt = compute_chart_dates(now_dt)
 
     existing_draft = load_json(DRAFT_FILE)
     if existing_draft:
@@ -443,7 +552,6 @@ def main():
     cur_map = extract_metrics_dict(latest_snap)
     prv_map = extract_metrics_dict(prev_snap)
 
-    # スナップショット内に記録された日時があれば、その日時を基準時刻として固定（完全な決定論的計算）
     snap_list = extract_songs_list(latest_snap)
     if snap_list and snap_list[0].get("updated_at"):
         parsed_snap_dt = parse_iso_datetime(snap_list[0].get("updated_at"))
@@ -457,7 +565,6 @@ def main():
     if not songs_list and isinstance(existing_draft, dict):
         songs_list = extract_songs_list(existing_draft)
 
-    # マスターと最新スナップショットの双方から漏れなく候補を統合
     combined_candidates = list(songs_list) + [s for s in snap_list if isinstance(s, dict)]
 
     scored_songs = []
@@ -559,7 +666,6 @@ def main():
         }
         scored_songs.append(song_entry)
 
-    # ポイント降順、同点時は song_id 昇順で完全決定論的にソート
     scored_songs.sort(key=lambda x: (-x["total_pt"], str(x.get("song_id", ""))))
     top_songs = scored_songs[:TOP_N]
 
@@ -582,6 +688,7 @@ def main():
 
     draft_output = {
         "publishDate": publish_date,
+        "publishAt": publish_at,
         "archiveId": archive_id,
         "period": period_str,
         "updated_at": now_str,
@@ -596,14 +703,16 @@ def main():
     save_json(DRAFT_FILE, draft_output)
     save_json(BACKUP_DRAFT_FILE, draft_output)
 
-    # data/weekly_draft.json と data/drafts/weekly_draft.json の両方が存在し得る環境向けに同期
     alt_draft = PROJECT_ROOT / "data" / "weekly_draft.json"
     if alt_draft.resolve() != DRAFT_FILE.resolve():
         save_json(alt_draft, draft_output)
 
+    report_path = generate_private_owner_report(draft_output)
+
     print(
-        f"[OK] TOP {len(top_songs)} のドラフトを生成しました: {DRAFT_FILE} "
-        f"(集計期間: {period_str} / 前週データなしの旧譜除外: {skipped_unmeasured_old_songs} 曲)"
+        f"[OK] TOP {len(top_songs)} のドラフトを手元用に生成しました: {DRAFT_FILE}\n"
+        f"     集計期間: {period_str} / 本番サイト解禁予定: {publish_at} (水曜13:00)\n"
+        f"     手元用詳細レポート: {report_path}"
     )
 
 
