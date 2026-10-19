@@ -47,6 +47,52 @@ body {
   letter-spacing: 0;
 }
 
+/* 記念マイルストーン感謝バナー */
+.milestone-banner {
+  background: linear-gradient(90deg, rgba(0, 210, 255, 0.16) 0%, rgba(59, 130, 246, 0.22) 50%, rgba(0, 210, 255, 0.16) 100%);
+  border-bottom: 1px solid var(--accent-cyan);
+  padding: 0.6rem 1.25rem;
+}
+
+.milestone-banner-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.milestone-badge {
+  background: var(--accent-cyan);
+  color: #0f172a;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 0.1rem 0.5rem;
+  border-radius: 0;
+  flex-shrink: 0;
+}
+
+.milestone-text {
+  flex: 1;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.milestone-close-btn {
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 0.1rem 0.4rem;
+}
+
+.milestone-close-btn:hover {
+  color: var(--text-primary);
+}
+
 /* Header */
 .site-header {
   background: linear-gradient(180deg, #131c31 0%, #0f172a 100%);
@@ -64,13 +110,40 @@ body {
   gap: 1rem;
 }
 
+.brand-top-line {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.25rem;
+}
+
 .brand-badge {
   display: inline-block;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   color: var(--accent-cyan);
-  margin-bottom: 0.25rem;
+}
+
+/* サイト累計アクセスカウンターバッジ */
+.view-counter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(0, 210, 255, 0.08);
+  border: 1px solid rgba(0, 210, 255, 0.35);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.1rem 0.55rem;
+  border-radius: 2px;
+}
+
+.view-counter-badge strong {
+  color: var(--accent-cyan);
+  font-weight: 800;
 }
 
 .site-title {
@@ -95,7 +168,7 @@ body {
 .archive-box {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 3px;
+  border-radius: 2px;
   padding: 0.5rem 0.9rem;
   display: flex;
   flex-direction: column;
@@ -181,7 +254,7 @@ body {
   border-bottom-color: var(--accent-cyan);
 }
 
-/* スクロール誘導バッジ（タブ横・テーブル上・画面下部） */
+/* スクロール誘導バッジ（シャープなエッジに統一） */
 .scroll-hint-pill {
   position: absolute;
   right: 0.25rem;
@@ -190,7 +263,7 @@ body {
   background: rgba(19, 28, 49, 0.95);
   color: var(--accent-cyan);
   border: 1px solid rgba(0, 210, 255, 0.45);
-  border-radius: 999px;
+  border-radius: 2px;
   padding: 0.18rem 0.6rem;
   font-size: 0.7rem;
   font-weight: 700;
@@ -220,7 +293,7 @@ body {
   background: rgba(0, 210, 255, 0.12);
   color: var(--accent-cyan);
   border: 1px solid rgba(0, 210, 255, 0.4);
-  border-radius: 999px;
+  border-radius: 2px;
   padding: 0.2rem 0.7rem;
   font-size: 0.74rem;
   font-weight: 700;
@@ -239,7 +312,7 @@ body {
   background: rgba(19, 28, 49, 0.92);
   color: var(--accent-cyan);
   border: 1px solid rgba(0, 210, 255, 0.5);
-  border-radius: 999px;
+  border-radius: 2px;
   padding: 0.35rem 0.95rem;
   font-size: 0.76rem;
   font-weight: 700;
@@ -273,7 +346,15 @@ body {
 }
 
 .section-header {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.section-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 .section-title {
@@ -283,7 +364,115 @@ body {
   padding-left: 0.75rem;
 }
 
-/* 週間ランキング TOP 20 カード（PC & タブレット用レイアウト：641px以上で適用） */
+/* クイックアクションバー（TOP 20連続再生・SNSシェア・結果コピー） */
+.quick-action-bar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.action-btn:hover {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.yt-playlist-btn {
+  background: rgba(239, 68, 68, 0.14);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #fca5a5;
+}
+
+.yt-playlist-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: #ef4444;
+  color: #ffffff;
+}
+
+/* 便利ツールバー（検索・並び替え・お気に入りフィルタ） */
+.utility-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.search-box-wrap {
+  flex: 1;
+  min-width: 220px;
+}
+
+.ranking-search-input {
+  width: 100%;
+  background: #0f172a;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.86rem;
+  outline: none;
+}
+
+.ranking-search-input:focus {
+  border-color: var(--accent-cyan);
+}
+
+.filter-controls-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.ranking-sort-select {
+  background: #0f172a;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+}
+
+.fav-filter-btn {
+  background: #0f172a;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.fav-filter-btn.active,
+.fav-filter-btn:hover {
+  color: #facc15;
+  border-color: rgba(250, 204, 21, 0.55);
+  background: rgba(250, 204, 21, 0.1);
+}
+
+/* 週間ランキング TOP 20 カード（シャープデザイン） */
 .ranking-list {
   display: flex;
   flex-direction: column;
@@ -293,7 +482,7 @@ body {
 .rank-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 3px;
+  border-radius: 2px;
   overflow: hidden;
   transition: border-color 0.2s;
 }
@@ -362,7 +551,7 @@ body {
   width: 112px;
   height: 63px;
   object-fit: cover;
-  border-radius: 3px;
+  border-radius: 2px;
   border: 1px solid var(--border-color);
   display: block;
 }
@@ -386,11 +575,36 @@ body {
   color: var(--text-primary);
 }
 
+.card-inline-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.fav-star-btn {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  padding: 0.1rem 0.45rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.fav-star-btn.favorited,
+.fav-star-btn:hover {
+  color: #facc15;
+  border-color: rgba(250, 204, 21, 0.55);
+  background: rgba(250, 204, 21, 0.1);
+}
+
 /* 「詳細を見る ▾」ボタン */
 .detail-toggle-btn {
   background: rgba(0, 210, 255, 0.1);
   color: var(--accent-cyan);
   border: 1px solid rgba(0, 210, 255, 0.35);
+  border-radius: 2px;
   padding: 0.15rem 0.6rem;
   font-size: 0.75rem;
   font-weight: 700;
@@ -419,7 +633,7 @@ body {
 .metric-stacked-bar {
   height: 6px;
   background: #0f172a;
-  border-radius: 999px;
+  border-radius: 0;
   overflow: hidden;
   display: flex;
   width: 100%;
@@ -500,6 +714,7 @@ body {
 .detail-box {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
+  border-radius: 2px;
   padding: 1rem;
 }
 
@@ -536,7 +751,7 @@ body {
   display: inline-block;
   width: 10px;
   height: 10px;
-  border-radius: 50%;
+  border-radius: 0;
   flex-shrink: 0;
 }
 
@@ -546,6 +761,7 @@ body {
   font-weight: 700;
   text-decoration: none;
   padding: 0.4rem 0.8rem;
+  border-radius: 2px;
 }
 
 .yt-link {
@@ -560,11 +776,34 @@ body {
   border: 1px solid rgba(96, 165, 250, 0.35);
 }
 
+.detail-share-row {
+  margin-top: 0.85rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.share-song-x-btn {
+  background: rgba(0, 210, 255, 0.1);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(0, 210, 255, 0.35);
+  border-radius: 2px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.share-song-x-btn:hover {
+  background: rgba(0, 210, 255, 0.22);
+  color: #ffffff;
+}
+
 .commentary-box {
   margin-top: 1rem;
   background: rgba(0, 210, 255, 0.06);
   border-left: 3px solid var(--accent-cyan);
   padding: 0.85rem 1rem;
+  border-radius: 0;
 }
 
 .commentary-box h5 {
@@ -577,7 +816,7 @@ body {
 .insight-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 3px;
+  border-radius: 2px;
   padding: 1.75rem;
   margin-bottom: 1.75rem;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
@@ -646,6 +885,7 @@ body {
 .fallback-chart-bar-track {
   height: 18px;
   background: #0b1120;
+  border-radius: 0;
   overflow: hidden;
 }
 
@@ -757,6 +997,7 @@ body {
   color: var(--accent-cyan);
   border: 1px solid rgba(0, 210, 255, 0.4);
   background: rgba(0, 210, 255, 0.1);
+  border-radius: 2px;
 }
 
 .col-chart-in {
@@ -816,7 +1057,7 @@ body {
 
 .commentary-card {
   border: 1px solid var(--border-color);
-  border-radius: 3px;
+  border-radius: 2px;
   padding: 1.1rem;
   background: #121b2d;
 }
@@ -835,6 +1076,7 @@ body {
   font-weight: 800;
   font-size: 0.8rem;
   padding: 0.15rem 0.55rem;
+  border-radius: 0;
 }
 
 .commentary-song-title {
@@ -850,6 +1092,56 @@ body {
 .commentary-song-pt {
   font-weight: 700;
   color: var(--accent-cyan);
+}
+
+/* ページ上部へ戻るボタン & トースト通知 */
+.back-to-top-btn {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  background: rgba(19, 28, 49, 0.92);
+  color: var(--accent-cyan);
+  border: 1px solid var(--accent-cyan);
+  border-radius: 2px;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  z-index: 45;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+
+.back-to-top-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.toast-notification {
+  position: fixed;
+  bottom: 3.8rem;
+  right: 1.25rem;
+  background: #131c31;
+  color: var(--text-primary);
+  border-left: 4px solid var(--accent-cyan);
+  border-top: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 2px;
+  padding: 0.6rem 1rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  z-index: 60;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.toast-notification.visible {
+  opacity: 1;
 }
 
 .loading-cell,
@@ -887,7 +1179,6 @@ body {
     font-size: 0.68rem;
   }
 
-  /* スマホで「週刊VOCALOID™複合ランキング」が途中で不自然に改行されないよう自動調整 */
   .site-title {
     font-size: clamp(1.22rem, 5.4vw, 1.55rem);
     line-height: 1.25;
@@ -929,12 +1220,38 @@ body {
   .section-title,
   .insight-section-title {
     font-size: 1.08rem;
-    margin-bottom: 0.85rem;
   }
 
-  /* スマホ用ランキングカード：
-     上段に [順位] [サムネイル] [ポイント]、
-     下段（横幅100%）に [楽曲タイトル(1〜2行) + 詳細ボタン + P/Vocal + 6指標バー] を配置 */
+  .quick-action-bar {
+    width: 100%;
+  }
+
+  .action-btn {
+    flex: 1;
+    text-align: center;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.74rem;
+  }
+
+  .utility-toolbar {
+    padding: 0.6rem;
+    gap: 0.5rem;
+  }
+
+  .filter-controls-wrap {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .ranking-sort-select {
+    flex: 1;
+    font-size: 0.78rem;
+  }
+
+  .fav-filter-btn {
+    font-size: 0.78rem;
+  }
+
   .ranking-list {
     gap: 0.75rem;
   }
@@ -975,7 +1292,7 @@ body {
   .rank-thumb {
     width: 84px;
     height: 47px;
-    border-radius: 3px;
+    border-radius: 2px;
   }
 
   .rank-points-col {
@@ -999,7 +1316,6 @@ body {
     margin-top: 0.1rem;
   }
 
-  /* タイトル・メタ情報・6指標バーにカードの横幅100%を確保 */
   .rank-info-col {
     grid-area: info;
     width: 100%;
@@ -1016,7 +1332,6 @@ body {
     margin-bottom: 0.25rem;
   }
 
-  /* 楽曲タイトルを広い横幅で1〜2行に綺麗に収める */
   .song-title {
     font-size: 1rem;
     line-height: 1.38;
@@ -1033,7 +1348,6 @@ body {
     flex-shrink: 0;
     padding: 0.22rem 0.55rem;
     font-size: 0.72rem;
-    margin-top: 0.05rem;
   }
 
   .song-meta {
@@ -1047,7 +1361,6 @@ body {
     height: 7px;
   }
 
-  /* 詳細パネルのスマホ最適化 */
   .rank-detail-panel {
     padding: 0.9rem;
   }
@@ -1061,7 +1374,6 @@ body {
     padding: 0.8rem;
   }
 
-  /* インサイトカード・テーブルのスマホ余白調整 */
   .insight-card {
     padding: 1.1rem 0.9rem;
     margin-bottom: 1.1rem;

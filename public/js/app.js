@@ -1,11 +1,29 @@
 window.__VOCALOID_APP_LOADED__ = true;
 
+/**
+ * 運営者用設定：
+ * 任意の感謝メッセージ（「1,000,000 view ありがとうございます！」など）を常時表示したい場合は
+ * 下記の SITE_ANNOUNCEMENT_MESSAGE にテキストを入力してください。
+ * 空文字 "" の場合は、累計ビュー数が節目の大台に達したときに自動で記念バナーが表示されます。
+ */
+const SITE_ANNOUNCEMENT_MESSAGE = "";
+const COUNTER_NAMESPACE = "vocaloid-combined-chart";
+const COUNTER_KEY = "total-site-views";
+const MILESTONE_THRESHOLDS = [1000000, 500000, 100000, 50000, 10000, 5000, 1000];
+
 let insightChartInstance = null;
 let currentChartData = null;
 let archiveHistoryCache = [];
 let archiveHistoryLoaded = false;
 let chartJsLoadingPromise = null;
 
+// フィルタ・ソート・お気に入り状態
+let currentSearchQuery = "";
+let currentSortMode = "rank";
+let showFavoritesOnly = false;
+let favoriteSongKeys = new Set();
+
+const FAVORITES_STORAGE_KEY = "vcc_favorite_songs_v1";
 const MOBILE_MEDIA_QUERY = "(max-width: 640px)";
 
 const WEIGHTS = {
@@ -35,9 +53,6 @@ function isDataSaverEnabled() {
   return Boolean(navigator.connection && navigator.connection.saveData);
 }
 
-/**
- * セキュリティ検証付きの Chart.js 動的ローダー
- */
 function ensureChartJsLoaded() {
   if (typeof Chart !== "undefined") {
     return Promise.resolve(true);
@@ -58,9 +73,6 @@ function ensureChartJsLoaded() {
   return chartJsLoadingPromise;
 }
 
-/**
- * セキュリティ関数: 動画IDおよび外部URLのホワイトリスト検証（XSS / スキーム注入対策）
- */
 function sanitizeYoutubeId(rawId) {
   if (!rawId || typeof rawId !== "string") return "";
   const trimmed = rawId.trim();
@@ -88,7 +100,7 @@ function sanitizeThumbnailUrl(rawUrl, fallbackYtId) {
         return parsed.href;
       }
     } catch (_) {
-      // 不正なURLは破棄してフォールバックへ
+      // ignore invalid URL
     }
   }
   const safeYt = sanitizeYoutubeId(fallbackYtId);
@@ -103,9 +115,13 @@ function sanitizeArchiveFilename(rawVal) {
 }
 
 function startApp() {
+  loadFavoritesFromStorage();
   initTabs();
+  initUtilityToolbar();
   initRankingEventDelegation();
   initScrollHints();
+  initBackToTopButton();
+  initSiteViewCounter();
   initChartApp();
 
   if (!isSmartphoneViewport() && !isDataSaverEnabled()) {
@@ -120,6 +136,269 @@ if (document.readyState === "loading") {
   startApp();
 }
 
+/**
+ * 1. サイト累計アクセスカウンター ＆ 記念マイルストーン感謝バナーシステム
+ */
+async function initSiteViewCounter() {
+  const countEl = document.getElementById("view-count-value");
+  const bannerEl = document.getElementById("milestone-banner");
+  const bannerTextEl = document.getElementById("milestone-text");
+  const closeBtn = document.getElementById("milestone-close-btn");
+
+  if (closeBtn && bannerEl) {
+    closeBtn.addEventListener("click", () => {
+      bannerEl.style.display = "none";
+    });
+  }
+
+  // 運営者カスタム感謝メッセージが設定されている場合は最優先で表示
+  if (SITE_ANNOUNCEMENT_MESSAGE && bannerEl && bannerTextEl) {
+    bannerTextEl.textContent = SITE_ANNOUNCEMENT_MESSAGE;
+    bannerEl.style.display = "block";
+  }
+
+  try {
+    const sessionKey = "vcc_session_counted";
+    const alreadyCounted = sessionStorage.getItem(sessionKey) === "1";
+    const endpoint = alreadyCounted
+      ? `https://api.counterapi.dev/v1/${COUNTER_NAMESPACE}/${COUNTER_KEY}/`
+      : `https://api.counterapi.dev/v1/${COUNTER_NAMESPACE}/${COUNTER_KEY}/up`;
+
+    const res = await fetch(endpoint, { cache: "no-store" });
+    if (res.ok) {
+      const data = await res.json();
+      const views = typeof data.count === "number" ? data.count : parseInt(data.count, 10);
+      if (!isNaN(views) && views > 0) {
+        sessionStorage.setItem(sessionKey, "1");
+        localStorage.setItem("vcc_last_known_views", String(views));
+        if (countEl) {
+          countEl.textContent = Number(views).toLocaleString();
+        }
+        checkAndShowMilestoneBanner(views);
+        return;
+      }
+    }
+  } catch (_) {
+    // 外部カウンターAPIがオフライン等の場合はローカルキャッシュへフォールバック
+  }
+
+  const fallbackViews = parseInt(localStorage.getItem("vcc_last_known_views") || "1", 10);
+  if (countEl) {
+    countEl.textContent = Number(fallbackViews).toLocaleString();
+  }
+}
+
+function checkAndShowMilestoneBanner(views) {
+  if (SITE_ANNOUNCEMENT_MESSAGE) return;
+  const bannerEl = document.getElementById("milestone-banner");
+  const bannerTextEl = document.getElementById("milestone-text");
+  if (!bannerEl || !bannerTextEl) return;
+
+  // JSONデータ側に milestone_message がある場合も対応
+  if (currentChartData && currentChartData.milestone_message) {
+    bannerTextEl.textContent = currentChartData.milestone_message;
+    bannerEl.style.display = "block";
+    return;
+  }
+
+  for (const threshold of MILESTONE_THRESHOLDS) {
+    if (views >= threshold && views < threshold * 1.15) {
+      bannerTextEl.textContent = `🎉 累計 ${Number(threshold).toLocaleString()} Views 突破ありがとうございます！これからも週刊VOCALOID™複合ランキングをよろしくお願いいたします。`;
+      bannerEl.style.display = "block";
+      break;
+    }
+  }
+}
+
+/**
+ * 2. お気に入り（ローカルブックマーク）管理システム
+ */
+function loadFavoritesFromStorage() {
+  try {
+    const raw = localStorage.getItem(FAVORITES_STORAGE_KEY);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) {
+        favoriteSongKeys = new Set(arr);
+      }
+    }
+  } catch (_) {
+    favoriteSongKeys = new Set();
+  }
+  updateFavCountBadge();
+}
+
+function saveFavoritesToStorage() {
+  try {
+    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(Array.from(favoriteSongKeys)));
+  } catch (_) {
+    // ignore storage quota errors
+  }
+  updateFavCountBadge();
+}
+
+function getPrimarySongKey(song) {
+  if (!song || typeof song !== "object") return "";
+  return String(
+    song.song_id || song.id || song.youtube_id || song.niconico_id || `${song.title}__${song.producer}`
+  );
+}
+
+function isSongFavorited(song) {
+  const key = getPrimarySongKey(song);
+  return key ? favoriteSongKeys.has(key) : false;
+}
+
+function toggleFavoriteSong(songKey) {
+  if (!songKey) return;
+  if (favoriteSongKeys.has(songKey)) {
+    favoriteSongKeys.delete(songKey);
+    showToast("お気に入りから解除しました");
+  } else {
+    favoriteSongKeys.add(songKey);
+    showToast("★ お気に入りに保存しました");
+  }
+  saveFavoritesToStorage();
+  if (currentChartData) {
+    renderRankingView(getSongsArray(currentChartData));
+  }
+}
+
+function updateFavCountBadge() {
+  const countSpan = document.getElementById("fav-count-num");
+  const favBtn = document.getElementById("fav-filter-btn");
+  if (countSpan) {
+    countSpan.textContent = String(favoriteSongKeys.size);
+  }
+  if (favBtn) {
+    favBtn.classList.toggle("active", showFavoritesOnly);
+    favBtn.setAttribute("aria-pressed", showFavoritesOnly ? "true" : "false");
+  }
+}
+
+/**
+ * 3. 検索・ソート・YouTube連続再生・SNSシェアの便利ツールバー初期化
+ */
+function initUtilityToolbar() {
+  const searchInput = document.getElementById("ranking-search-input");
+  const sortSelect = document.getElementById("ranking-sort-select");
+  const favFilterBtn = document.getElementById("fav-filter-btn");
+  const ytPlaylistBtn = document.getElementById("yt-playlist-btn");
+  const shareXBtn = document.getElementById("share-x-btn");
+  const copySummaryBtn = document.getElementById("copy-summary-btn");
+
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      currentSearchQuery = (e.target.value || "").trim().toLowerCase();
+      if (currentChartData) {
+        renderRankingView(getSongsArray(currentChartData));
+      }
+    });
+  }
+
+  if (sortSelect) {
+    sortSelect.addEventListener("change", (e) => {
+      currentSortMode = e.target.value || "rank";
+      if (currentChartData) {
+        renderRankingView(getSongsArray(currentChartData));
+      }
+    });
+  }
+
+  if (favFilterBtn) {
+    favFilterBtn.addEventListener("click", () => {
+      showFavoritesOnly = !showFavoritesOnly;
+      updateFavCountBadge();
+      if (currentChartData) {
+        renderRankingView(getSongsArray(currentChartData));
+      }
+    });
+  }
+
+  // 今週のTOP 20 YouTube一括連続再生ボタン
+  if (ytPlaylistBtn) {
+    ytPlaylistBtn.addEventListener("click", () => {
+      const songs = getSongsArray(currentChartData);
+      const ytIds = songs
+        .slice(0, 20)
+        .map((s) => sanitizeYoutubeId(s.youtube_id))
+        .filter(Boolean);
+
+      if (!ytIds.length) {
+        showToast("再生可能なYouTube動画が見つかりません");
+        return;
+      }
+      const playlistUrl = `https://www.youtube.com/watch_videos?video_ids=${ytIds.join(",")}`;
+      window.open(playlistUrl, "_blank", "noopener,noreferrer");
+    });
+  }
+
+  // 今週のチャート全体をX(Twitter)でシェア
+  if (shareXBtn) {
+    shareXBtn.addEventListener("click", () => {
+      const text = buildChartSummaryText();
+      const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`;
+      window.open(shareUrl, "_blank", "noopener,noreferrer");
+    });
+  }
+
+  // 今週のチャート結果をクリップボードにコピー
+  if (copySummaryBtn) {
+    copySummaryBtn.addEventListener("click", async () => {
+      const text = `${buildChartSummaryText()}\n${window.location.href}`;
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast("📋 今週のランキング結果をコピーしました！");
+      } catch (_) {
+        showToast("コピーに失敗しました");
+      }
+    });
+  }
+}
+
+function buildChartSummaryText() {
+  if (!currentChartData) {
+    return "週刊VOCALOID™複合ランキング TOP 20 #週刊VOCALOID複合ランキング #vocanew #ボカロ";
+  }
+  const period = normalizePeriodString(currentChartData.period || "");
+  const top3 = getSongsArray(currentChartData).slice(0, 3);
+  const lines = top3.map(
+    (s, i) => `${i + 1}位: ${s.title} / ${s.producer} (${Number(s.total_pt || 0).toLocaleString()} pt)`
+  );
+  return `【週刊VOCALOID™複合ランキング】\n集計期間: ${period}\n\n${lines.join("\n")}\n\n#週刊VOCALOID複合ランキング #ボカロ`;
+}
+
+function showToast(message) {
+  const toastEl = document.getElementById("toast-notification");
+  if (!toastEl) return;
+  toastEl.textContent = message;
+  toastEl.classList.add("visible");
+  clearTimeout(toastEl._hideTimer);
+  toastEl._hideTimer = setTimeout(() => {
+    toastEl.classList.remove("visible");
+  }, 2600);
+}
+
+/**
+ * 4. ページ最上部へ戻るフローティングボタン制御
+ */
+function initBackToTopButton() {
+  const btn = document.getElementById("back-to-top-btn");
+  if (!btn) return;
+
+  window.addEventListener(
+    "scroll",
+    () => {
+      btn.classList.toggle("visible", window.scrollY > 360);
+    },
+    { passive: true }
+  );
+
+  btn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
+
 function getSongsArray(chartData) {
   if (!chartData) return [];
   if (Array.isArray(chartData)) return chartData;
@@ -129,19 +408,41 @@ function getSongsArray(chartData) {
 }
 
 /**
- * インライン onclick を排除し、安全なイベント委譲で「詳細を見る」ボタンを制御
+ * イベント委譲（「詳細を見る」「お気に入り☆」「個別楽曲Xシェア」を安全に処理）
  */
 function initRankingEventDelegation() {
   const container = document.getElementById("ranking-container");
   if (!container) return;
 
   container.addEventListener("click", (e) => {
-    const btn = e.target.closest(".detail-toggle-btn");
-    if (!btn) return;
-    e.stopPropagation();
-    const rank = parseInt(btn.getAttribute("data-rank"), 10);
-    if (!isNaN(rank)) {
-      toggleRankDetail(rank);
+    const detailBtn = e.target.closest(".detail-toggle-btn");
+    if (detailBtn) {
+      e.stopPropagation();
+      const rank = parseInt(detailBtn.getAttribute("data-rank"), 10);
+      if (!isNaN(rank)) {
+        toggleRankDetail(rank);
+      }
+      return;
+    }
+
+    const favBtn = e.target.closest(".fav-star-btn");
+    if (favBtn) {
+      e.stopPropagation();
+      const songKey = favBtn.getAttribute("data-song-key");
+      toggleFavoriteSong(songKey);
+      return;
+    }
+
+    const shareSongBtn = e.target.closest(".share-song-x-btn");
+    if (shareSongBtn) {
+      e.stopPropagation();
+      const rank = shareSongBtn.getAttribute("data-rank");
+      const title = shareSongBtn.getAttribute("data-title");
+      const producer = shareSongBtn.getAttribute("data-producer");
+      const pt = shareSongBtn.getAttribute("data-pt");
+      const text = `『${title}』(${producer}) が「週刊VOCALOID™複合ランキング」で今週 ${rank}位 (${pt} pt) にランクイン！\n#週刊VOCALOID複合ランキング #ボカロ`;
+      const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`;
+      window.open(shareUrl, "_blank", "noopener,noreferrer");
     }
   });
 }
@@ -290,7 +591,7 @@ async function fetchJsonWithFallback(urls) {
         return await res.json();
       }
     } catch (_) {
-      // 次の候補URLを試行
+      // try next url
     }
   }
   return null;
@@ -552,6 +853,15 @@ function renderAllViews(data) {
     }
   }
 
+  if (data.milestone_message) {
+    const bannerEl = document.getElementById("milestone-banner");
+    const bannerTextEl = document.getElementById("milestone-text");
+    if (bannerEl && bannerTextEl) {
+      bannerTextEl.textContent = data.milestone_message;
+      bannerEl.style.display = "block";
+    }
+  }
+
   const ranking = getSongsArray(data);
   renderRankingView(ranking);
   renderInsightTable(ranking);
@@ -670,6 +980,49 @@ function getOptimizedThumbnailAttrs(song, index) {
   };
 }
 
+/**
+ * フィルタ・ソートを適用したランキングリストの取得
+ */
+function getFilteredAndSortedSongs(ranking) {
+  let list = ranking.slice(0, 20).map((s, i) => ({
+    ...s,
+    _origRank: parseInt(s.rank, 10) || i + 1,
+  }));
+
+  if (showFavoritesOnly) {
+    list = list.filter((s) => isSongFavorited(s));
+  }
+
+  if (currentSearchQuery) {
+    list = list.filter((s) => {
+      const hay = `${s.title || ""} ${s.producer || ""} ${s.vocal || ""}`.toLowerCase();
+      return hay.includes(currentSearchQuery);
+    });
+  }
+
+  if (currentSortMode === "pt_ratio") {
+    list.sort((a, b) => (b.pt_ratio || 0) - (a.pt_ratio || 0));
+  } else if (currentSortMode === "chart_in") {
+    list.sort((a, b) => (b.chart_in_count || 1) - (a.chart_in_count || 1));
+  } else if (currentSortMode === "yt_share") {
+    list.sort((a, b) => {
+      const ba = getPointsBreakdown(a);
+      const bb = getPointsBreakdown(b);
+      return bb.yt_total / bb.calcSum - ba.yt_total / ba.calcSum;
+    });
+  } else if (currentSortMode === "nc_share") {
+    list.sort((a, b) => {
+      const ba = getPointsBreakdown(a);
+      const bb = getPointsBreakdown(b);
+      return bb.nc_total / bb.calcSum - ba.nc_total / ba.calcSum;
+    });
+  } else {
+    list.sort((a, b) => a._origRank - b._origRank);
+  }
+
+  return list;
+}
+
 function renderRankingView(ranking) {
   const container = document.getElementById("ranking-container");
   if (!container) return;
@@ -679,10 +1032,15 @@ function renderRankingView(ranking) {
     return;
   }
 
-  container.innerHTML = ranking
-    .slice(0, 20)
+  const displayList = getFilteredAndSortedSongs(ranking);
+  if (!displayList.length) {
+    container.innerHTML = `<div class="empty-state">条件に一致する楽曲が見つかりませんでした。</div>`;
+    return;
+  }
+
+  container.innerHTML = displayList
     .map((song, idx) => {
-      const rankNum = parseInt(song.rank, 10) || idx + 1;
+      const rankNum = song._origRank || parseInt(song.rank, 10) || idx + 1;
       const bd = getPointsBreakdown(song);
       const raw = song.raw || {};
       const denom = bd.calcSum;
@@ -700,6 +1058,8 @@ function renderRankingView(ranking) {
       const thumbInfo = getOptimizedThumbnailAttrs(song, idx);
       const safeYtId = sanitizeYoutubeId(song.youtube_id);
       const safeNcId = sanitizeNiconicoId(song.niconico_id);
+      const songKey = getPrimarySongKey(song);
+      const isFav = isSongFavorited(song);
 
       return `
       <article class="rank-card rank-${rankNum}" data-rank="${rankNum}">
@@ -731,12 +1091,21 @@ function renderRankingView(ranking) {
           <div class="rank-info-col">
             <div class="song-title-row">
               <h3 class="song-title">${escapeHtml(song.title)}</h3>
-              <button
-                type="button"
-                id="detail-btn-${rankNum}"
-                class="detail-toggle-btn"
-                data-rank="${rankNum}"
-              >詳細を見る ▾</button>
+              <div class="card-inline-actions">
+                <button
+                  type="button"
+                  class="fav-star-btn ${isFav ? "favorited" : ""}"
+                  data-song-key="${escapeHtml(songKey)}"
+                  title="${isFav ? "お気に入り解除" : "お気に入りに保存"}"
+                  aria-label="お気に入り"
+                >${isFav ? "★" : "☆"}</button>
+                <button
+                  type="button"
+                  id="detail-btn-${rankNum}"
+                  class="detail-toggle-btn"
+                  data-rank="${rankNum}"
+                >詳細を見る ▾</button>
+              </div>
             </div>
             <div class="song-meta">
               <span class="song-producer">${escapeHtml(song.producer)}</span>
@@ -808,6 +1177,17 @@ function renderRankingView(ranking) {
                   : ""
               }
             </div>
+          </div>
+
+          <div class="detail-share-row">
+            <button
+              type="button"
+              class="share-song-x-btn"
+              data-rank="${rankNum}"
+              data-title="${escapeHtml(song.title)}"
+              data-producer="${escapeHtml(song.producer)}"
+              data-pt="${Number(bd.total_pt).toLocaleString()}"
+            >𝕏 この楽曲のランクインをシェアする</button>
           </div>
 
           ${

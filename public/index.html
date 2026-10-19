@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- セキュリティヘッダー: CSP / Referrer / MIME Sniffing 対策 -->
+  <!-- セキュリティヘッダー: CSP（アクセスカウンターAPI・解析ツールの通信を安全に許可） -->
   <meta
     http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' https://i.ytimg.com https://img.cdn.nimg.jp https://nicovideo.cdn.nimg.jp data:; connect-src 'self'; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none';"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' https://i.ytimg.com https://img.youtube.com https://img.cdn.nimg.jp https://nicovideo.cdn.nimg.jp data:; connect-src 'self' https://api.counterapi.dev https://cloudflareinsights.com https://*.google-analytics.com; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none';"
   />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <title>週刊VOCALOID™複合ランキング</title>
-  <!-- 外部CSSのマルチパス読み込み（カスタムされた style.css を優先適用） -->
+  <!-- 外部CSSのマルチパス読み込み -->
   <link rel="stylesheet" href="./style.css" />
   <link rel="stylesheet" href="./css/style.css" />
-  <!-- 万が一外部CSSが読み込めない場合でも最低限の階層構造を保つコアフォールバック -->
+  <!-- 最低限の表示制御フォールバック -->
   <style>
     .tm-mark {
       font-size: 0.45em;
@@ -32,10 +32,24 @@
   </style>
 </head>
 <body>
+  <!-- 記念マイルストーン感謝バナー（条件達成時またはカスタム設定時に表示） -->
+  <div id="milestone-banner" class="milestone-banner" style="display: none;" role="status">
+    <div class="milestone-banner-inner">
+      <span class="milestone-badge">MILESTONE</span>
+      <span id="milestone-text" class="milestone-text"></span>
+      <button type="button" id="milestone-close-btn" class="milestone-close-btn" aria-label="閉じる">✕</button>
+    </div>
+  </div>
+
   <header class="site-header">
     <div class="header-inner">
       <div class="brand-area">
-        <span class="brand-badge">WEEKLY VOCALOID COMBINED RANKING</span>
+        <div class="brand-top-line">
+          <span class="brand-badge">WEEKLY VOCALOID COMBINED RANKING</span>
+          <span id="site-view-counter" class="view-counter-badge" title="サイト累計アクセス数">
+            TOTAL VIEWS: <strong id="view-count-value">---</strong>
+          </span>
+        </div>
         <h1 class="site-title">週刊VOCALOID<sup class="tm-mark">TM</sup>複合ランキング</h1>
         <p class="site-subtitle">YouTube × ニコニコ動画 6指標統合ボカロチャート</p>
       </div>
@@ -69,9 +83,46 @@
   <main class="main-container">
     <!-- タブ1: 週間ランキング TOP 20 -->
     <section id="tab-ranking" class="tab-content active">
-      <div class="section-header">
+      <div class="section-header section-header-flex">
         <h2 class="section-title">週間ランキング TOP 20</h2>
+        <div class="quick-action-bar">
+          <button type="button" id="yt-playlist-btn" class="action-btn yt-playlist-btn" title="今週のTOP 20をYouTubeで連続再生">
+            ▶ TOP 20 連続再生
+          </button>
+          <button type="button" id="share-x-btn" class="action-btn share-x-btn" title="今週のランキングをXでシェア">
+            𝕏 今週のチャートをシェア
+          </button>
+          <button type="button" id="copy-summary-btn" class="action-btn copy-summary-btn" title="ランキング結果をテキストでコピー">
+            📋 結果をコピー
+          </button>
+        </div>
       </div>
+
+      <!-- 便利ツールバー：検索・並び替え・お気に入りフィルタ -->
+      <div class="utility-toolbar" aria-label="検索・並び替えツール">
+        <div class="search-box-wrap">
+          <input
+            type="search"
+            id="ranking-search-input"
+            class="ranking-search-input"
+            placeholder="曲名・ボカロP・ボーカル名（初音ミク、重音テト等）で検索..."
+            autocomplete="off"
+          />
+        </div>
+        <div class="filter-controls-wrap">
+          <select id="ranking-sort-select" class="ranking-sort-select" aria-label="並び替え">
+            <option value="rank">順位順 (デフォルト)</option>
+            <option value="pt_ratio">前週比率が高い順</option>
+            <option value="chart_in">チャートイン回数順</option>
+            <option value="yt_share">YouTube比率が高い順</option>
+            <option value="nc_share">ニコ動比率が高い順</option>
+          </select>
+          <button type="button" id="fav-filter-btn" class="fav-filter-btn" aria-pressed="false">
+            ☆ お気に入り (<span id="fav-count-num">0</span>)
+          </button>
+        </div>
+      </div>
+
       <div id="ranking-container" class="ranking-list">
         <div class="loading-state">ランキングデータを読み込んでいます...</div>
       </div>
@@ -212,6 +263,14 @@
   <div id="vertical-scroll-hint" class="vertical-scroll-hint" aria-hidden="true">
     <span>▾ スクロールして表示</span>
   </div>
+
+  <!-- ページ上部へ戻るフローティングボタン -->
+  <button type="button" id="back-to-top-btn" class="back-to-top-btn" aria-label="ページ上部へ戻る">
+    ▲ TOP
+  </button>
+
+  <!-- トースト通知（コピー完了時などに表示） -->
+  <div id="toast-notification" class="toast-notification" role="status" aria-live="polite"></div>
 
   <footer class="site-footer">
     <p>&copy; 週刊VOCALOID<sup class="tm-mark">TM</sup>複合ランキング All Rights Reserved.</p>
