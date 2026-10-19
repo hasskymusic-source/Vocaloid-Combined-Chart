@@ -4,29 +4,61 @@ import shutil
 import time
 import xml.etree.ElementTree as ET
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from config import MASTER_FILE, PREV_SNAPSHOT, LATEST_SNAPSHOT
 from discover_songs import clean_song_title, detect_vocals, search_youtube_id_web_strict
 from googleapiclient.discovery import build
 
-USER_AGENT = "Mozilla/5.0 (compatible; VocaloidCombinedChartBot/8.1)"
+USER_AGENT = "Mozilla/5.0 (compatible; VocaloidCombinedChartBot/8.2)"
+JST = timezone(timedelta(hours=9))
+
+
+def get_monday_date_str(dt_str: str) -> str:
+    """ISO日時文字列から、その日時が属する週の月曜日の日付(YYYY-MM-DD)を返す"""
+    if not dt_str:
+        return ""
+    try:
+        cleaned = dt_str.strip()
+        if cleaned.endswith("Z"):
+            cleaned = cleaned[:-1] + "+00:00"
+        dt = datetime.fromisoformat(cleaned)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=JST)
+        else:
+            dt = dt.astimezone(JST)
+        d = dt.date()
+        monday = d - timedelta(days=d.weekday())
+        return monday.strftime("%Y-%m-%d")
+    except Exception:
+        return ""
+
 
 def rotate_snapshots_if_needed():
+    """
+    【週次スナップショット保護ローテーション】
+    latest_monday.json の記録日が「今週より前の週」である場合のみ prev_monday.json にローテーションする。
+    同じ週の途中でテストや改修のために再実行した際は prev_monday.json を絶対に上書きしない。
+    """
     if not LATEST_SNAPSHOT.exists():
         return
     try:
         with open(LATEST_SNAPSHOT, "r", encoding="utf-8") as f:
             data = json.load(f)
-        if not data or len(data) < 10:
+        if not data or not isinstance(data, list) or len(data) < 5:
             return
-        updated_str = data[0].get("updated_at")
-        if updated_str:
-            last_dt = datetime.fromisoformat(updated_str)
-            if datetime.now() - last_dt >= timedelta(days=5):
-                shutil.copyfile(LATEST_SNAPSHOT, PREV_SNAPSHOT)
-                print("前週のスナップショットを prev_monday.json にローテーションしました。")
+        updated_str = data[0].get("updated_at", "")
+        last_monday_str = get_monday_date_str(updated_str)
+        now_monday_str = get_monday_date_str(datetime.now(JST).isoformat())
+
+        if last_monday_str and now_monday_str and last_monday_str < now_monday_str:
+            PREV_SNAPSHOT.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(LATEST_SNAPSHOT, PREV_SNAPSHOT)
+            print(f"前週のスナップショット ({last_monday_str}週) を prev_monday.json にローテーションしました。")
+        else:
+            print(f"同一週 ({now_monday_str}週) の実行のため、prev_monday.json を保護（維持）しました。")
     except Exception as e:
         print(f"Snapshot rotation check skipped: {e}")
+
 
 def fetch_youtube_stats_batch(youtube_ids: list, api_key: str) -> dict:
     result = {}
@@ -37,7 +69,7 @@ def fetch_youtube_stats_batch(youtube_ids: list, api_key: str) -> dict:
     valid_ids = list(dict.fromkeys([yid for yid in youtube_ids if yid]))
 
     for i in range(0, len(valid_ids), 50):
-        chunk = valid_ids[i:i+50]
+        chunk = valid_ids[i:i + 50]
         for attempt in range(2):
             try:
                 res = youtube.videos().list(
@@ -60,9 +92,10 @@ def fetch_youtube_stats_batch(youtube_ids: list, api_key: str) -> dict:
                     }
                 break
             except Exception as e:
-                print(f"YouTube Batch API Warning (attempt {attempt+1}): {e}")
+                print(f"YouTube Batch API Warning (attempt {attempt + 1}): {e}")
                 time.sleep(1)
     return result
+
 
 def fetch_niconico_thumbinfo(niconico_id: str) -> dict:
     if not niconico_id:
@@ -86,8 +119,9 @@ def fetch_niconico_thumbinfo(niconico_id: str) -> dict:
                     "nc_author": thumb.findtext("user_nickname", "")
                 }
         except Exception:
-            time.sleep(0.5)
+            time.sleep(0.4)
     return {}
+
 
 def fetch_niconico_stats_hybrid(niconico_ids: list) -> dict:
     result = {}
@@ -99,7 +133,7 @@ def fetch_niconico_stats_hybrid(niconico_ids: list) -> dict:
     headers = {"User-Agent": USER_AGENT}
 
     for i in range(0, len(valid_ids), 40):
-        chunk = valid_ids[i:i+40]
+        chunk = valid_ids[i:i + 40]
         params = {
             "q": "",
             "targets": "",
@@ -129,12 +163,21 @@ def fetch_niconico_stats_hybrid(niconico_ids: list) -> dict:
             pass
 
     for cid in valid_ids:
-        if cid not in result or result[cid]["nc_views"] == 0:
+        if cid not in result or result[cid]["nc_views"] == 0 or not result[cid].get("nc_published_at"):
             info = fetch_niconico_thumbinfo(cid)
             if info:
                 result[cid] = info
 
     return result
+
+
+def pick_earliest_iso(dt_str1: str, dt_str2: str, dt_str3: str = "") -> str:
+    """複数の公開日時文字列のうち、最も古い（本来の初出）日時文字列を返す"""
+    valid = [s.strip() for s in (dt_str1, dt_str2, dt_str3) if s and str(s).strip()]
+    if not valid:
+        return ""
+    return min(valid)
+
 
 def main():
     api_key = os.environ.get("YOUTUBE_API_KEY")
@@ -146,6 +189,23 @@ def main():
 
     with open(MASTER_FILE, "r", encoding="utf-8") as f:
         songs = json.load(f)
+
+    # 前週のスナップショットを読み込み、前週すでに計測されていた曲かどうかを判定できるようにする
+    prev_yt_ids = set()
+    prev_nc_ids = set()
+    if PREV_SNAPSHOT.exists():
+        try:
+            with open(PREV_SNAPSHOT, "r", encoding="utf-8") as pf:
+                prev_data = json.load(pf)
+            if isinstance(prev_data, list):
+                for p_item in prev_data:
+                    if isinstance(p_item, dict):
+                        if p_item.get("youtube_id"):
+                            prev_yt_ids.add(p_item["youtube_id"])
+                        if p_item.get("niconico_id"):
+                            prev_nc_ids.add(p_item["niconico_id"])
+        except Exception:
+            pass
 
     yt_ids = [s.get("youtube_id") for s in songs if s.get("youtube_id")]
     nc_ids = [s.get("niconico_id") for s in songs if s.get("niconico_id")]
@@ -174,6 +234,7 @@ def main():
     snapshots = []
     seen_yt = set()
     seen_nc = set()
+    now_iso = datetime.now(JST).isoformat()
 
     for song in songs:
         sid = song["song_id"]
@@ -207,7 +268,6 @@ def main():
             raw_t = yt_stats.get("yt_title") or nc_stats.get("nc_title") or song["title"]
             title = clean_song_title(raw_t, producer)
 
-        # 動画タイトルとタグ・概要欄を分離して渡し、タイトルの表記（初音ミク・重音テト・亞北ネル）を最優先で確定
         video_titles = f"{yt_stats.get('yt_title', '')} {nc_stats.get('nc_title', '')}".strip()
         video_metas = " ".join([
             yt_stats.get("yt_tags", ""),
@@ -217,6 +277,10 @@ def main():
         ]).strip()
         vocal = detect_vocals(video_titles, video_metas, song.get("vocal", ""))
 
+        yt_pub = yt_stats.get("yt_published_at", "")
+        nc_pub = nc_stats.get("nc_published_at", "")
+        earliest_pub = pick_earliest_iso(yt_pub, nc_pub, song.get("published_at", ""))
+
         snapshots.append({
             "song_id": sid,
             "title": title,
@@ -224,21 +288,23 @@ def main():
             "vocal": vocal,
             "youtube_id": yid,
             "niconico_id": nid,
-            "yt_published_at": yt_stats.get("yt_published_at", ""),
-            "nc_published_at": nc_stats.get("nc_published_at", ""),
+            "published_at": earliest_pub,
+            "yt_published_at": yt_pub,
+            "nc_published_at": nc_pub,
             "yt_views": yt_views,
             "yt_likes": yt_likes,
             "yt_comments": yt_comments,
             "nc_views": nc_views,
             "nc_mylist": nc_mylist,
             "nc_comments": nc_comments,
-            "updated_at": datetime.now().isoformat()
+            "updated_at": now_iso
         })
 
     LATEST_SNAPSHOT.parent.mkdir(parents=True, exist_ok=True)
     with open(LATEST_SNAPSHOT, "w", encoding="utf-8") as f:
         json.dump(snapshots, f, ensure_ascii=False, indent=2)
     print(f"全 {len(snapshots)} 曲の6指標データ取得が完了しました。")
+
 
 if __name__ == "__main__":
     main()

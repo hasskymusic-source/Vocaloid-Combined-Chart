@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, timezone
 from googleapiclient.discovery import build
 from config import MASTER_FILE, LATEST_SNAPSHOT
 
-USER_AGENT = "Mozilla/5.0 (compatible; VocaloidCombinedChartBot/8.1)"
+USER_AGENT = "Mozilla/5.0 (compatible; VocaloidCombinedChartBot/8.2)"
 
 VOCAL_SYNONYMS = {
     "初音ミク": ["初音ミク", "하츠네 미쿠", "hatsune miku", "miku"],
@@ -122,6 +122,7 @@ YT_ID_PATTERN = re.compile(r"(?:youtube\.com/watch\?v=|youtu\.be/)([A-Za-z0-9_-]
 NC_ID_PATTERN = re.compile(r"(sm\d{7,9})")
 ISO_DURATION_RE = re.compile(r"PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?")
 
+
 def parse_iso_duration_seconds(duration_str: str) -> int:
     if not duration_str:
         return 0
@@ -129,6 +130,7 @@ def parse_iso_duration_seconds(duration_str: str) -> int:
     if not m:
         return 0
     return int(m.group(1) or 0) * 3600 + int(m.group(2) or 0) * 60 + int(m.group(3) or 0)
+
 
 def detect_vocals_list(text: str) -> list:
     """テキスト内で登場した位置順（出現順）にボーカル・キャラクター名を抽出する"""
@@ -155,15 +157,14 @@ def detect_vocals_list(text: str) -> list:
         if best_pos is not None:
             found_with_pos.append((best_pos, canonical))
 
-    # テキスト内の出現順にソート
     found_with_pos.sort(key=lambda x: x[0])
     return [c for _, c in found_with_pos]
+
 
 def detect_vocals(title_text: str, meta_text: str = "", fallback_text: str = "") -> str:
     """
     【3段階優先ボーカル判定システム】
     1. 動画タイトル(title_text)にキャラクター名が明記されていれば、それを最優先で確定する
-       （これにより、タイトルが『初音ミク・重音テト・亞北ネル』の曲に概要欄の代用音源『鏡音リン』が混ざるのを完全阻止）
     2. タイトルにキャラ名がない曲のみ、タグ・概要欄(meta_text)やVocaDB(fallback_text)から補完する
     3. 亞北ネル等の派生キャラが含まれ、かつタイトルに鏡音リン等がない場合は代用音源を除外する
     """
@@ -173,7 +174,6 @@ def detect_vocals(title_text: str, meta_text: str = "", fallback_text: str = "")
 
     if title_vocals:
         result = list(title_vocals)
-        # もしタグや概要欄にだけ派生キャラ（亞北ネル・弱音ハク等）が追加記載されていれば追加
         for c in meta_vocals:
             if c in DERIVATIVE_CHARACTERS and c not in result:
                 result.append(c)
@@ -182,11 +182,11 @@ def detect_vocals(title_text: str, meta_text: str = "", fallback_text: str = "")
     else:
         result = list(fallback_vocals)
 
-    # 亞北ネルが含まれており、タイトル自体には「鏡音リン」と書かれていない場合、代用音源の「鏡音リン」を除去
     if "亞北ネル" in result and "鏡音リン" in result and "鏡音リン" not in title_vocals:
         result.remove("鏡音リン")
 
     return "・".join(result[:4]) if result else "VOCALOID"
+
 
 def is_valid_vocaloid_mv(
     title: str,
@@ -226,8 +226,10 @@ def is_valid_vocaloid_mv(
     )
     return has_vocal
 
+
 def normalize_compare_str(s: str) -> str:
     return re.sub(r"[\s\*\-\_・／/!！?？'\"「」『』【】\[\]()（）pPチャンネルchannelofficialmvpv]", "", s.lower())
+
 
 def clean_song_title(raw_title: str, producer: str = "") -> str:
     t = raw_title.strip()
@@ -281,6 +283,7 @@ def clean_song_title(raw_title: str, producer: str = "") -> str:
     t = re.sub(r"\s*(?:オリジナル曲PV|オリジナル曲|オリジナルPV|Official\s*MV|Music\s*Video|MV|PV)$", "", t, flags=re.IGNORECASE)
     return t.strip() or raw_title.strip()
 
+
 def extract_vocadb_song_info(data: dict) -> dict:
     if not data or not isinstance(data, dict):
         return {}
@@ -290,10 +293,13 @@ def extract_vocadb_song_info(data: dict) -> dict:
     yt_id = ""
     nc_id = ""
     pv_titles = []
+    pv_dates = []
     for pv in data.get("pvs", []):
         if pv.get("pvType") == "Original" and not pv.get("disabled", False):
             if pv.get("name"):
                 pv_titles.append(pv["name"])
+            if pv.get("publishDate"):
+                pv_dates.append(str(pv["publishDate"]))
             if pv.get("service") == "Youtube" and not yt_id:
                 yt_id = pv.get("pvId", "")
             elif pv.get("service") == "NicoNicoDouga" and not nc_id:
@@ -304,14 +310,17 @@ def extract_vocadb_song_info(data: dict) -> dict:
     vocal_part = artist_str.split(" feat.")[1].strip() if " feat." in artist_str else artist_str
 
     vocal = detect_vocals(" ".join(pv_titles), "", vocal_part)
+    pub_date = data.get("publishDate") or (min(pv_dates) if pv_dates else "")
 
     return {
         "title": data.get("name", ""),
         "producer": producer,
         "vocal": vocal,
         "youtube_id": yt_id,
-        "niconico_id": nc_id
+        "niconico_id": nc_id,
+        "published_at": pub_date
     }
+
 
 def lookup_vocadb_by_pv(service: str, pv_id: str) -> dict:
     if not pv_id:
@@ -329,10 +338,11 @@ def lookup_vocadb_by_pv(service: str, pv_id: str) -> dict:
         pass
     return {}
 
+
 def crawl_vocadb_global_and_domestic() -> list:
     results = []
     now = datetime.now(timezone.utc)
-    for days in [14, 45, 120, 365, 1800]:
+    for days in [14, 45, 120, 365]:
         after_str = (now - timedelta(days=days)).strftime("%Y-%m-%dT00:00:00Z")
         params = {
             "songTypes": "Original",
@@ -360,13 +370,14 @@ def crawl_vocadb_global_and_domestic() -> list:
     print(f"VocaDB グローバル＆国内トレンド収集: {len(results)} 件取得")
     return results
 
+
 def crawl_niconico_comprehensive() -> list:
     nc_ids = []
     headers = {"User-Agent": USER_AGENT}
 
     rss_urls = [
         "https://www.nicovideo.jp/tag/VOCALOID?sort=h&rss=2.0&lang=ja-jp",
-        "https://www.nicovideo.jp/tag/VOCALOID?sort=m&order=d&rss=2.0&lang=ja-jp",
+        "https://www.nicovideo.jp/tag/VOCALOID?sort=f&order=d&rss=2.0&lang=ja-jp",
         "https://www.nicovideo.jp/tag/%E3%83%9C%E3%82%AB%E3%83%AD%E3%82%AA%E3%83%AA%E3%82%B8%E3%83%8A%E3%83%AB%E6%9B%B2?sort=h&rss=2.0&lang=ja-jp",
         "https://www.nicovideo.jp/tag/%E3%83%9F%E3%82%AF%E3%82%AA%E3%83%AA%E3%82%B8%E3%83%8A%E3%83%AB%E6%9B%B2?sort=h&rss=2.0&lang=ja-jp",
         "https://www.nicovideo.jp/tag/%E3%83%86%E3%83%88%E3%82%AA%E3%83%AA%E3%82%B8%E3%83%8A%E3%83%AB%E6%9B%B2?sort=h&rss=2.0&lang=ja-jp",
@@ -417,6 +428,7 @@ def crawl_niconico_comprehensive() -> list:
     print(f"ニコニコ動画 マルチ期間トレンド収集: {len(nc_ids)} 件取得")
     return nc_ids[:160]
 
+
 def search_youtube_id_web_strict(target_title: str, target_producer: str, existing_yt_ids: set) -> str:
     norm_title = normalize_compare_str(target_title)
     norm_prod = normalize_compare_str(target_producer)
@@ -444,12 +456,13 @@ def search_youtube_id_web_strict(target_title: str, target_producer: str, existi
                     continue
                 norm_vtitle = normalize_compare_str(vtitle)
                 if norm_title in norm_vtitle:
-                    if len(norm_title) <= 2 and norm_prod and norm_prod not in norm_vtitle:
+                    if len(norm_title) <= 3 and norm_prod and norm_prod not in norm_vtitle:
                         continue
                     return vid
     except Exception:
         pass
     return ""
+
 
 def crawl_youtube_multilingual_zero_quota() -> list:
     queries = [
@@ -483,6 +496,7 @@ def crawl_youtube_multilingual_zero_quota() -> list:
     print(f"YouTube 日韓英マルチリンガル探索: {len(yt_ids)} 件取得")
     return yt_ids
 
+
 def get_niconico_thumbinfo(nc_id: str) -> dict:
     if not nc_id:
         return {}
@@ -509,11 +523,12 @@ def get_niconico_thumbinfo(nc_id: str) -> dict:
         pass
     return {}
 
+
 def verify_and_purge_existing_pool(youtube, raw_items: list) -> list:
     yt_ids = list(dict.fromkeys([x.get("youtube_id") for x in raw_items if x.get("youtube_id")]))
     yt_meta = {}
     for i in range(0, len(yt_ids), 50):
-        chunk = yt_ids[i:i+50]
+        chunk = yt_ids[i:i + 50]
         try:
             res = youtube.videos().list(part="snippet,contentDetails", id=",".join(chunk)).execute()
             for item in res.get("items", []):
@@ -529,6 +544,7 @@ def verify_and_purge_existing_pool(youtube, raw_items: list) -> list:
 
         nc_title_str = ""
         nc_meta_str = ""
+        nc_pub_str = ""
         if nid:
             nc_info = get_niconico_thumbinfo(nid)
             if nc_info:
@@ -539,9 +555,11 @@ def verify_and_purge_existing_pool(youtube, raw_items: list) -> list:
                     continue
                 nc_title_str = nc_info["title"]
                 nc_meta_str = f"{nc_info['tags']} {nc_info['description'][:300]}"
+                nc_pub_str = nc_info.get("published_at", "")
 
         yt_title_str = ""
         yt_meta_str = ""
+        yt_pub_str = ""
         if yid and yid in yt_meta:
             y_item = yt_meta[yid]
             snippet = y_item.get("snippet", {})
@@ -550,6 +568,7 @@ def verify_and_purge_existing_pool(youtube, raw_items: list) -> list:
             y_title = snippet.get("title", "")
             y_desc = snippet.get("description", "")
             y_tags = " ".join(snippet.get("tags", []))
+            yt_pub_str = snippet.get("publishedAt", "")
 
             if not is_valid_vocaloid_mv(y_title, y_desc, y_tags, dur_sec, is_niconico=False, yt_category_id=cat_id):
                 continue
@@ -565,14 +584,21 @@ def verify_and_purge_existing_pool(youtube, raw_items: list) -> list:
                     if vdb.get("youtube_id") != yid:
                         item["youtube_id"] = ""
 
-        # タイトル文字列とタグ・概要欄文字列を分けて渡し、代用音源の混入を排除
         combined_titles = f"{yt_title_str} {nc_title_str}".strip()
         combined_metas = f"{yt_meta_str} {nc_meta_str}".strip()
         if combined_titles or combined_metas:
             item["vocal"] = detect_vocals(combined_titles, combined_metas, item.get("vocal", ""))
 
+        pub_candidates = [
+            s for s in (item.get("published_at", ""), item.get("yt_published_at", ""), item.get("nc_published_at", ""), yt_pub_str, nc_pub_str)
+            if s and str(s).strip()
+        ]
+        if pub_candidates:
+            item["published_at"] = min(pub_candidates)
+
         verified.append(item)
     return verified
+
 
 def main():
     api_key = os.environ.get("YOUTUBE_API_KEY")
@@ -587,7 +613,9 @@ def main():
         if path.exists():
             try:
                 with open(path, "r", encoding="utf-8") as f:
-                    raw_loaded.extend(json.load(f))
+                    loaded = json.load(f)
+                    if isinstance(loaded, list):
+                        raw_loaded.extend(loaded)
             except Exception:
                 pass
 
@@ -604,6 +632,7 @@ def main():
         title = clean_song_title(entry.get("title", ""), entry.get("producer", ""))
         producer = (entry.get("producer") or "ボカロP").strip()
         vocal = entry.get("vocal") or "VOCALOID"
+        pub_at = (entry.get("published_at") or entry.get("yt_published_at") or entry.get("nc_published_at") or "").strip()
 
         if not yid and not nid:
             return
@@ -631,6 +660,9 @@ def main():
             if vocal and vocal != "VOCALOID":
                 if target.get("vocal") in ["", "VOCALOID", "VOCALOID / 合成音声"] or any(d in vocal for d in DERIVATIVE_CHARACTERS):
                     target["vocal"] = vocal
+            if pub_at:
+                existing_pub = target.get("published_at", "")
+                target["published_at"] = min(existing_pub, pub_at) if existing_pub else pub_at
             return
 
         if yid and yid in by_yt:
@@ -646,7 +678,8 @@ def main():
             "producer": producer,
             "vocal": vocal,
             "youtube_id": yid,
-            "niconico_id": nid
+            "niconico_id": nid,
+            "published_at": pub_at
         }
         pool.append(new_item)
         if yid:
@@ -687,13 +720,14 @@ def main():
             "producer": producer,
             "vocal": vocal,
             "youtube_id": yt_id,
-            "niconico_id": cid
+            "niconico_id": cid,
+            "published_at": nc_info.get("published_at") or vdb.get("published_at", "")
         })
 
     yt_candidates = crawl_youtube_multilingual_zero_quota()
     new_yt_ids = [vid for vid in yt_candidates if vid not in by_yt]
     for i in range(0, len(new_yt_ids), 50):
-        chunk = new_yt_ids[i:i+50]
+        chunk = new_yt_ids[i:i + 50]
         try:
             v_res = youtube.videos().list(part="snippet,contentDetails", id=",".join(chunk)).execute()
             for item in v_res.get("items", []):
@@ -705,6 +739,7 @@ def main():
                 desc = snippet.get("description", "")
                 tags = " ".join(snippet.get("tags", []))
                 channel = snippet.get("channelTitle", "ボカロP")
+                yt_pub = snippet.get("publishedAt", "")
 
                 if not is_valid_vocaloid_mv(raw_title, desc, tags, dur_sec, is_niconico=False, yt_category_id=cat_id):
                     continue
@@ -725,7 +760,8 @@ def main():
                     "producer": producer,
                     "vocal": vocal,
                     "youtube_id": vid,
-                    "niconico_id": nc_id
+                    "niconico_id": nc_id,
+                    "published_at": vdb.get("published_at") or yt_pub
                 })
         except Exception as e:
             print(f"YouTube multilingual batch check error: {e}")
@@ -765,6 +801,7 @@ def main():
 
     both_paired = sum(1 for s in pool if s.get("youtube_id") and s.get("niconico_id"))
     print(f"厳格検証プール更新完了: 全 {len(pool)} 曲 (両サイトペア済: {both_paired} 曲 / 新規補完: {repaired_count} 曲)")
+
 
 if __name__ == "__main__":
     main()
