@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- セキュリティヘッダー: CSP（アクセスカウンターAPI・解析ツールの通信を安全に許可） -->
+  <!-- セキュリティヘッダー: CSP -->
   <meta
     http-equiv="Content-Security-Policy"
     content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' https://i.ytimg.com https://img.youtube.com https://img.cdn.nimg.jp https://nicovideo.cdn.nimg.jp data:; connect-src 'self' https://api.counterapi.dev https://cloudflareinsights.com https://*.google-analytics.com; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none';"
   />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <link rel="canonical" href="https://weekly-vocaloid-combined-chart.com" />
   <title>週刊VOCALOID™複合ランキング</title>
   <!-- 外部CSSのマルチパス読み込み -->
   <link rel="stylesheet" href="./style.css" />
@@ -44,12 +45,7 @@
   <header class="site-header">
     <div class="header-inner">
       <div class="brand-area">
-        <div class="brand-top-line">
-          <span class="brand-badge">WEEKLY VOCALOID COMBINED RANKING</span>
-          <span id="site-view-counter" class="view-counter-badge" title="サイト累計アクセス数">
-            TOTAL VIEWS: <strong id="view-count-value">---</strong>
-          </span>
-        </div>
+        <span class="brand-badge">WEEKLY VOCALOID COMBINED RANKING</span>
         <h1 class="site-title">週刊VOCALOID<sup class="tm-mark">TM</sup>複合ランキング</h1>
         <p class="site-subtitle">YouTube × ニコニコ動画 6指標統合ボカロチャート</p>
       </div>
@@ -70,8 +66,7 @@
     <div class="tab-nav-wrapper" id="tab-nav-wrapper">
       <nav class="tab-nav" id="tab-nav" aria-label="メインナビゲーション">
         <button class="tab-btn active" data-tab="tab-ranking">週間ランキング TOP 20</button>
-        <button class="tab-btn" data-tab="tab-insight">ランキングインサイト</button>
-        <button class="tab-btn" data-tab="tab-analysis">上位楽曲解説・トレンド分析</button>
+        <button class="tab-btn" data-tab="tab-insight">ランキングインサイト・解説</button>
         <button class="tab-btn" data-tab="tab-method">ランキングについて</button>
       </nav>
       <div class="scroll-hint-pill tab-scroll-hint" id="tab-scroll-hint" aria-hidden="true">
@@ -89,8 +84,8 @@
           <button type="button" id="yt-playlist-btn" class="action-btn yt-playlist-btn" title="今週のTOP 20をYouTubeで連続再生">
             ▶ TOP 20 連続再生
           </button>
-          <button type="button" id="share-x-btn" class="action-btn share-x-btn" title="今週のランキングをXでシェア">
-            𝕏 今週のチャートをシェア
+          <button type="button" id="share-x-btn" class="action-btn share-x-btn" title="今週のランキング結果をXでシェア">
+            𝕏 ランキング結果をシェア
           </button>
           <button type="button" id="copy-summary-btn" class="action-btn copy-summary-btn" title="ランキング結果をテキストでコピー">
             📋 結果をコピー
@@ -128,7 +123,7 @@
       </div>
     </section>
 
-    <!-- タブ2: ランキングインサイト（TOP 10） -->
+    <!-- タブ2: ランキングインサイト・解説（旧タブ2と旧タブ3を統合） -->
     <section id="tab-insight" class="tab-content">
       <div class="insight-card">
         <h2 class="insight-section-title">TOP 10 ポイント構成比（6指標内訳）</h2>
@@ -161,10 +156,7 @@
           </table>
         </div>
       </div>
-    </section>
 
-    <!-- タブ3: 上位楽曲解説・トレンド分析 -->
-    <section id="tab-analysis" class="tab-content">
       <div class="insight-card">
         <h2 class="insight-section-title">今週のトレンド総評</h2>
         <div id="overall-commentary" class="overall-commentary-box">
@@ -180,7 +172,7 @@
       </div>
     </section>
 
-    <!-- タブ4: ランキングについて -->
+    <!-- タブ3: ランキングについて -->
     <section id="tab-method" class="tab-content">
       <div class="insight-card">
         <h2 class="insight-section-title">集計方法・ポイント計算式について</h2>
@@ -256,6 +248,16 @@
           </p>
         </div>
       </div>
+
+      <!-- 一番下に新たなカードを作成し、その中で TOTAL VIEWS を小さく表示 -->
+      <div class="insight-card site-stats-card">
+        <div class="site-stats-inner">
+          <span class="site-stats-label">サイト累計アクセス数</span>
+          <span id="site-view-counter" class="view-counter-small" title="サイト累計アクセス数">
+            TOTAL VIEWS: <strong id="view-count-value">---</strong>
+          </span>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -269,7 +271,7 @@
     ▲ TOP
   </button>
 
-  <!-- トースト通知（コピー完了時などに表示） -->
+  <!-- トースト通知 -->
   <div id="toast-notification" class="toast-notification" role="status" aria-live="polite"></div>
 
   <footer class="site-footer">

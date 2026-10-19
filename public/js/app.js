@@ -2,9 +2,13 @@ window.__VOCALOID_APP_LOADED__ = true;
 
 /**
  * 運営者用設定：
+ * シェア時に使用する公式公開URL（.pages.dev が外部に出ないよう固定）
+ */
+const OFFICIAL_SITE_URL = "https://weekly-vocaloid-combined-chart.com";
+
+/**
  * 任意の感謝メッセージ（「1,000,000 view ありがとうございます！」など）を常時表示したい場合は
  * 下記の SITE_ANNOUNCEMENT_MESSAGE にテキストを入力してください。
- * 空文字 "" の場合は、累計ビュー数が節目の大台に達したときに自動で記念バナーが表示されます。
  */
 const SITE_ANNOUNCEMENT_MESSAGE = "";
 const COUNTER_NAMESPACE = "vocaloid-combined-chart";
@@ -151,7 +155,6 @@ async function initSiteViewCounter() {
     });
   }
 
-  // 運営者カスタム感謝メッセージが設定されている場合は最優先で表示
   if (SITE_ANNOUNCEMENT_MESSAGE && bannerEl && bannerTextEl) {
     bannerTextEl.textContent = SITE_ANNOUNCEMENT_MESSAGE;
     bannerEl.style.display = "block";
@@ -194,7 +197,6 @@ function checkAndShowMilestoneBanner(views) {
   const bannerTextEl = document.getElementById("milestone-text");
   if (!bannerEl || !bannerTextEl) return;
 
-  // JSONデータ側に milestone_message がある場合も対応
   if (currentChartData && currentChartData.milestone_message) {
     bannerTextEl.textContent = currentChartData.milestone_message;
     bannerEl.style.display = "block";
@@ -315,7 +317,6 @@ function initUtilityToolbar() {
     });
   }
 
-  // 今週のTOP 20 YouTube一括連続再生ボタン
   if (ytPlaylistBtn) {
     ytPlaylistBtn.addEventListener("click", () => {
       const songs = getSongsArray(currentChartData);
@@ -333,19 +334,19 @@ function initUtilityToolbar() {
     });
   }
 
-  // 今週のチャート全体をX(Twitter)でシェア
+  // ランキング結果をX(Twitter)でシェア（URLは常に OFFICIAL_SITE_URL を使用）
   if (shareXBtn) {
     shareXBtn.addEventListener("click", () => {
       const text = buildChartSummaryText();
-      const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`;
+      const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(OFFICIAL_SITE_URL)}`;
       window.open(shareUrl, "_blank", "noopener,noreferrer");
     });
   }
 
-  // 今週のチャート結果をクリップボードにコピー
+  // ランキング結果をクリップボードにコピー（URLは常に OFFICIAL_SITE_URL を使用）
   if (copySummaryBtn) {
     copySummaryBtn.addEventListener("click", async () => {
-      const text = `${buildChartSummaryText()}\n${window.location.href}`;
+      const text = `${buildChartSummaryText()}\n${OFFICIAL_SITE_URL}`;
       try {
         await navigator.clipboard.writeText(text);
         showToast("📋 今週のランキング結果をコピーしました！");
@@ -441,7 +442,7 @@ function initRankingEventDelegation() {
       const producer = shareSongBtn.getAttribute("data-producer");
       const pt = shareSongBtn.getAttribute("data-pt");
       const text = `『${title}』(${producer}) が「週刊VOCALOID™複合ランキング」で今週 ${rank}位 (${pt} pt) にランクイン！\n#週刊VOCALOID複合ランキング #ボカロ`;
-      const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`;
+      const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(OFFICIAL_SITE_URL)}`;
       window.open(shareUrl, "_blank", "noopener,noreferrer");
     }
   });
@@ -980,9 +981,6 @@ function getOptimizedThumbnailAttrs(song, index) {
   };
 }
 
-/**
- * フィルタ・ソートを適用したランキングリストの取得
- */
 function getFilteredAndSortedSongs(ranking) {
   let list = ranking.slice(0, 20).map((s, i) => ({
     ...s,
