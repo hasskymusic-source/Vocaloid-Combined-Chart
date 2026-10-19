@@ -20,6 +20,7 @@ let currentChartData = null;
 let archiveHistoryCache = [];
 let archiveHistoryLoaded = false;
 let chartJsLoadingPromise = null;
+const inflightJsonRequests = new Map();
 
 // フィルタ・ソート・お気に入り状態
 let currentSearchQuery = "";
@@ -28,6 +29,8 @@ let showFavoritesOnly = false;
 let favoriteSongKeys = new Set();
 
 const FAVORITES_STORAGE_KEY = "vcc_favorite_songs_v1";
+const LAST_KNOWN_CHART_STORAGE_KEY = "vcc_latest_chart_cache_v1";
+const ARCHIVE_HISTORY_SESSION_KEY = "vcc_archive_history_session_v1";
 const MOBILE_MEDIA_QUERY = "(max-width: 640px)";
 
 const WEIGHTS = {
@@ -71,7 +74,10 @@ function ensureChartJsLoaded() {
     script.referrerPolicy = "no-referrer";
     script.async = true;
     script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
+    script.onerror = () => {
+      chartJsLoadingPromise = null;
+      resolve(false);
+    };
     document.head.appendChild(script);
   });
   return chartJsLoadingPromise;
@@ -118,6 +124,71 @@ function sanitizeArchiveFilename(rawVal) {
   return /^[A-Za-z0-9_.-]+\.json$/.test(withExt) && !withExt.includes("..") ? withExt : "";
 }
 
+/**
+ * 水曜13:00のアクセス集中（スパイク）対策：
+ * タイムアウト制御 ＋ ランダムジッター付き自動リトライ ＋ 重複通信防止
+ */
+function sleepWithJitter(attempt) {
+  const baseDelay = 220 * Math.pow(1.8, attempt);
+  const jitter = Math.floor(Math.random() * 280);
+  return new Promise((resolve) => setTimeout(resolve, baseDelay + jitter));
+}
+
+async function fetchJsonSingleUrl(url, cacheMode = "no-cache", timeoutMs = 6500, maxRetries = 2) {
+  const requestKey = `${cacheMode}::${url}`;
+  if (inflightJsonRequests.has(requestKey)) {
+    return inflightJsonRequests.get(requestKey);
+  }
+
+  const task = (async () => {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+      const timerId = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
+
+      try {
+        const res = await fetch(url, {
+          cache: cacheMode,
+          credentials: "same-origin",
+          signal: controller ? controller.signal : undefined,
+        });
+        if (timerId) clearTimeout(timerId);
+
+        if (res.ok) {
+          return await res.json();
+        }
+        // 404等のクライアントエラーはリトライせず即座に次候補へ
+        if (res.status >= 400 && res.status < 500 && res.status !== 429) {
+          return null;
+        }
+      } catch (_) {
+        if (timerId) clearTimeout(timerId);
+      }
+
+      if (attempt < maxRetries) {
+        await sleepWithJitter(attempt);
+      }
+    }
+    return null;
+  })();
+
+  inflightJsonRequests.set(requestKey, task);
+  try {
+    return await task;
+  } finally {
+    inflightJsonRequests.delete(requestKey);
+  }
+}
+
+async function fetchJsonWithFallback(urls, cacheMode = "no-cache") {
+  for (const url of urls) {
+    const data = await fetchJsonSingleUrl(url, cacheMode);
+    if (data) {
+      return data;
+    }
+  }
+  return null;
+}
+
 function startApp() {
   loadFavoritesFromStorage();
   initTabs();
@@ -129,7 +200,7 @@ function startApp() {
   initChartApp();
 
   if (!isSmartphoneViewport() && !isDataSaverEnabled()) {
-    const idleFn = window.requestIdleCallback || ((cb) => setTimeout(cb, 1200));
+    const idleFn = window.requestIdleCallback || ((cb) => setTimeout(cb, 1500));
     idleFn(() => ensureChartJsLoaded());
   }
 }
@@ -142,6 +213,7 @@ if (document.readyState === "loading") {
 
 /**
  * 1. サイト累計アクセスカウンター ＆ 記念マイルストーン感謝バナーシステム
+ * （アクセス集中時に外部カウンターAPIが遅延しても3.5秒で切り離し、本体表示をブロックしない）
  */
 async function initSiteViewCounter() {
   const countEl = document.getElementById("view-count-value");
@@ -167,7 +239,15 @@ async function initSiteViewCounter() {
       ? `https://api.counterapi.dev/v1/${COUNTER_NAMESPACE}/${COUNTER_KEY}/`
       : `https://api.counterapi.dev/v1/${COUNTER_NAMESPACE}/${COUNTER_KEY}/up`;
 
-    const res = await fetch(endpoint, { cache: "no-store" });
+    const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+    const timerId = controller ? setTimeout(() => controller.abort(), 3500) : null;
+
+    const res = await fetch(endpoint, {
+      cache: "no-store",
+      signal: controller ? controller.signal : undefined,
+    });
+    if (timerId) clearTimeout(timerId);
+
     if (res.ok) {
       const data = await res.json();
       const views = typeof data.count === "number" ? data.count : parseInt(data.count, 10);
@@ -182,7 +262,7 @@ async function initSiteViewCounter() {
       }
     }
   } catch (_) {
-    // 外部カウンターAPIがオフライン等の場合はローカルキャッシュへフォールバック
+    // 外部カウンターAPIがオフラインまたは高負荷制限中の場合はローカルキャッシュへフォールバック
   }
 
   const fallbackViews = parseInt(localStorage.getItem("vcc_last_known_views") || "1", 10);
@@ -584,20 +664,6 @@ function refreshAllScrollHints() {
   }
 }
 
-async function fetchJsonWithFallback(urls) {
-  for (const url of urls) {
-    try {
-      const res = await fetch(url, { cache: "no-store", credentials: "same-origin" });
-      if (res.ok) {
-        return await res.json();
-      }
-    } catch (_) {
-      // try next url
-    }
-  }
-  return null;
-}
-
 function getSongIdentityKeys(song) {
   if (!song || typeof song !== "object") return [];
   const keys = [];
@@ -657,11 +723,13 @@ async function initChartApp() {
   try {
     await loadArchiveIndexOnly();
     const songs = getSongsArray(currentChartData);
+    // すでに build_draft.py / publish_chart.py で chart_in_count が付与されている場合は
+    // 過去アーカイブ全件のダウンロード嵐（N+1通信）を発生させない
     const needsHistoryEnrich = songs.some(
       (s) => typeof s.chart_in_count !== "number" || s.chart_in_count < 1
     );
 
-    if (needsHistoryEnrich || (!isSmartphoneViewport() && !isDataSaverEnabled())) {
+    if (needsHistoryEnrich) {
       await ensureFullArchiveHistoryLoaded();
       if (currentChartData) {
         enrichWithHistory(currentChartData);
@@ -676,12 +744,15 @@ async function initChartApp() {
 let cachedArchiveListMeta = [];
 
 async function loadArchiveIndexOnly() {
-  const indexData = await fetchJsonWithFallback([
-    "./data/archives/archive_index.json",
-    "./data/archive_index.json",
-    "public/data/archives/archive_index.json",
-    "public/data/archive_index.json",
-  ]);
+  const indexData = await fetchJsonWithFallback(
+    [
+      "./data/archives/archive_index.json",
+      "./data/archive_index.json",
+      "public/data/archives/archive_index.json",
+      "public/data/archive_index.json",
+    ],
+    "no-cache"
+  );
 
   const selectEl = document.getElementById("archive-select");
   const archiveList = Array.isArray(indexData)
@@ -726,13 +797,20 @@ async function loadArchiveIndexOnly() {
       } else {
         const cleanFile = sanitizeArchiveFilename(val);
         if (!cleanFile) return;
-        const archiveData = await fetchJsonWithFallback([
-          `./data/archives/${cleanFile}`,
-          `public/data/archives/${cleanFile}`,
-        ]);
+        // 過去のアーカイブファイルは不変データのためブラウザ・CDNキャッシュ("default")を積極活用
+        const archiveData = await fetchJsonWithFallback(
+          [`./data/archives/${cleanFile}`, `public/data/archives/${cleanFile}`],
+          "default"
+        );
         if (archiveData) {
-          await ensureFullArchiveHistoryLoaded();
-          enrichWithHistory(archiveData);
+          const archiveSongs = getSongsArray(archiveData);
+          const archiveNeedsEnrich = archiveSongs.some(
+            (s) => typeof s.chart_in_count !== "number" || s.chart_in_count < 1
+          );
+          if (archiveNeedsEnrich) {
+            await ensureFullArchiveHistoryLoaded();
+            enrichWithHistory(archiveData);
+          }
           currentChartData = archiveData;
           renderAllViews(archiveData);
         }
@@ -745,6 +823,19 @@ async function ensureFullArchiveHistoryLoaded() {
   if (archiveHistoryLoaded || !cachedArchiveListMeta.length) return;
   archiveHistoryLoaded = true;
 
+  try {
+    const cachedRaw = sessionStorage.getItem(ARCHIVE_HISTORY_SESSION_KEY);
+    if (cachedRaw) {
+      const parsed = JSON.parse(cachedRaw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        archiveHistoryCache = parsed;
+        return;
+      }
+    }
+  } catch (_) {
+    // ignore sessionStorage error
+  }
+
   const loadedArchives = [];
   for (const item of cachedArchiveListMeta) {
     const rawFile =
@@ -753,15 +844,21 @@ async function ensureFullArchiveHistoryLoaded() {
         : item.file || item.path || (item.archiveId ? `${item.archiveId}.json` : item.id);
     const cleanFile = sanitizeArchiveFilename(rawFile);
     if (!cleanFile) continue;
-    const data = await fetchJsonWithFallback([
-      `./data/archives/${cleanFile}`,
-      `public/data/archives/${cleanFile}`,
-    ]);
+    const data = await fetchJsonWithFallback(
+      [`./data/archives/${cleanFile}`, `public/data/archives/${cleanFile}`],
+      "default"
+    );
     if (data && getSongsArray(data).length > 0) {
       loadedArchives.push(data);
     }
   }
   archiveHistoryCache = loadedArchives;
+
+  try {
+    sessionStorage.setItem(ARCHIVE_HISTORY_SESSION_KEY, JSON.stringify(loadedArchives));
+  } catch (_) {
+    // ignore quota error
+  }
 }
 
 function enrichWithHistory(chartData) {
@@ -816,19 +913,41 @@ function enrichWithHistory(chartData) {
 }
 
 async function loadAndRenderChart() {
-  const data = await fetchJsonWithFallback([
-    "./data/latest_ranking.json",
-    "data/latest_ranking.json",
-    "public/data/latest_ranking.json",
-    "./data/weekly_draft.json",
-    "data/weekly_draft.json",
-    "latest_ranking.json",
-  ]);
+  let data = await fetchJsonWithFallback(
+    [
+      "./data/latest_ranking.json",
+      "data/latest_ranking.json",
+      "public/data/latest_ranking.json",
+      "./data/weekly_draft.json",
+      "data/weekly_draft.json",
+      "latest_ranking.json",
+    ],
+    "no-cache"
+  );
+
+  if (data) {
+    try {
+      localStorage.setItem(LAST_KNOWN_CHART_STORAGE_KEY, JSON.stringify(data));
+    } catch (_) {
+      // ignore storage quota errors
+    }
+  } else {
+    // 万が一の回線混雑・オフライン時はブラウザ内の直近キャッシュから自動復旧
+    try {
+      const cachedStr = localStorage.getItem(LAST_KNOWN_CHART_STORAGE_KEY);
+      if (cachedStr) {
+        data = JSON.parse(cachedStr);
+        showToast("回線混雑のためキャッシュデータを表示しています");
+      }
+    } catch (_) {
+      data = null;
+    }
+  }
 
   if (!data) {
     const container = document.getElementById("ranking-container");
     if (container) {
-      container.innerHTML = `<div class="error-state">ランキングデータの読み込みに失敗しました。</div>`;
+      container.innerHTML = `<div class="error-state">ランキングデータの読み込みに失敗しました。再読み込みをお試しください。</div>`;
     }
     return;
   }

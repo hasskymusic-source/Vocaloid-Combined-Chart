@@ -46,6 +46,43 @@ LOCAL_PATH_PATTERNS = [
     re.compile(r"/Users/[^/\"\'\s]+"),
 ]
 
+# 水曜13:00のアクセス集中をCloudflareエッジで高速吸収するキャッシュ＆セキュリティヘッダー定義
+CLOUDFLARE_HEADERS_CONTENT = """/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+
+/index.html
+  Cache-Control: public, max-age=0, s-maxage=60, stale-while-revalidate=86400
+
+/app.js
+  Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=86400
+
+/js/app.js
+  Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=86400
+
+/style.css
+  Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=86400
+
+/css/style.css
+  Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=86400
+
+/data/latest_ranking.json
+  Cache-Control: public, max-age=30, s-maxage=60, stale-while-revalidate=86400
+
+/public/data/latest_ranking.json
+  Cache-Control: public, max-age=30, s-maxage=60, stale-while-revalidate=86400
+
+/data/archive_index.json
+  Cache-Control: public, max-age=60, s-maxage=120, stale-while-revalidate=86400
+
+/data/archives/archive_index.json
+  Cache-Control: public, max-age=60, s-maxage=120, stale-while-revalidate=86400
+
+/data/archives/*
+  Cache-Control: public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800
+"""
+
 
 def inspect_and_redact_text(text, label="data"):
     """
@@ -164,6 +201,12 @@ def sync_frontend_assets():
             print(f"[WARN] {name} の同期中に警告: {e}")
             raise
 
+    # Cloudflare Pages 用エッジキャッシュ設定 (_headers) の自動出力
+    for headers_target in (PROJECT_ROOT / "_headers", PROJECT_ROOT / "public/_headers"):
+        headers_target.parent.mkdir(parents=True, exist_ok=True)
+        headers_target.write_text(CLOUDFLARE_HEADERS_CONTENT, encoding="utf-8")
+    print("[SYNC & SECURE] Cloudflare エッジキャッシュ設定 (_headers) を更新しました")
+
 
 def update_archive_index(archive_id, period_str, publish_date):
     existing = load_json(ARCHIVE_INDEX, default=[])
@@ -240,6 +283,13 @@ def main():
     now_str = now_dt.strftime("%Y-%m-%d %H:%M")
 
     songs = draft_data.get("ranking") or draft_data.get("songs") or []
+    for idx, s in enumerate(songs, start=1):
+        if isinstance(s, dict):
+            if not s.get("rank"):
+                s["rank"] = idx
+            if not isinstance(s.get("chart_in_count"), int) or s.get("chart_in_count", 0) < 1:
+                s["chart_in_count"] = 1
+
     draft_data["songs"] = songs
     draft_data["ranking"] = songs
     draft_data["publishDate"] = publish_date
