@@ -4464,14 +4464,6 @@
     "niconico_id": ""
   },
   {
-    "song_id": "song_sm46933442",
-    "title": "Day by Day",
-    "producer": "さんま",
-    "vocal": "初音ミク",
-    "youtube_id": "UHx3SH3xyWE",
-    "niconico_id": "sm46933442"
-  },
-  {
     "song_id": "song_QXOQyTCO4kc",
     "title": "ピエニウム feat.重音テトSV",
     "producer": "本人希望つくし",
@@ -4485,6 +4477,78 @@
     "producer": "Vocaloid Archival",
     "vocal": "VOCALOID",
     "youtube_id": "uLaOZVeCsb0",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_sm46941186",
+    "title": "椿",
+    "producer": "丹羽",
+    "vocal": "重音テト",
+    "youtube_id": "",
+    "niconico_id": "sm46941186"
+  },
+  {
+    "song_id": "song_sm46940537",
+    "title": "Faraway, So Close feat.初音ミク",
+    "producer": "ぽちゃろふ",
+    "vocal": "初音ミク",
+    "youtube_id": "PkMidgaRuLA",
+    "niconico_id": "sm46940537"
+  },
+  {
+    "song_id": "song_sm46928401",
+    "title": "メテオラヴ/重音テト",
+    "producer": "Jelly______",
+    "vocal": "重音テト",
+    "youtube_id": "",
+    "niconico_id": "sm46928401"
+  },
+  {
+    "song_id": "song_sm10244728",
+    "title": "おちゃめ機能",
+    "producer": "ゴジマジＰ",
+    "vocal": "重音テト",
+    "youtube_id": "IzotoFg75O4",
+    "niconico_id": "sm10244728"
+  },
+  {
+    "song_id": "song_sm46907654",
+    "title": "ナイトウォーカー",
+    "producer": "神尾けい",
+    "vocal": "重音テト",
+    "youtube_id": "hOEXU4uynPE",
+    "niconico_id": "sm46907654"
+  },
+  {
+    "song_id": "song_w-yqipvEuKM",
+    "title": "嘘",
+    "producer": "___ official",
+    "vocal": "重音テト",
+    "youtube_id": "w-yqipvEuKM",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_NwmTG1kPNOM",
+    "title": "IQ84",
+    "producer": "Uruha",
+    "vocal": "可不",
+    "youtube_id": "NwmTG1kPNOM",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_f98zHUNlPoY",
+    "title": "세츠나 트립",
+    "producer": "우타이노",
+    "vocal": "GUMI",
+    "youtube_id": "f98zHUNlPoY",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_s8akv55bT5Y",
+    "title": "39tuary",
+    "producer": "타레",
+    "vocal": "VOCALOID",
+    "youtube_id": "s8akv55bT5Y",
     "niconico_id": ""
   },
   {
@@ -5160,6 +5224,14 @@
     "niconico_id": "sm42576236"
   },
   {
+    "song_id": "song_sm41951611",
+    "title": "一千光年",
+    "producer": "いよわ",
+    "vocal": "初音ミク・v_flower・歌愛ユキ・GUMI",
+    "youtube_id": "uB_jQ8H2Yeg",
+    "niconico_id": "sm41951611"
+  },
+  {
     "song_id": "song_sm46902260",
     "title": "キミになっていく！",
     "producer": "OSTER project",
@@ -5182,22 +5254,6 @@
     "vocal": "音街ウナ",
     "youtube_id": "qXkkhP0d_iM",
     "niconico_id": "sm39374094"
-  },
-  {
-    "song_id": "song_sm46941186",
-    "title": "椿",
-    "producer": "丹羽",
-    "vocal": "重音テト",
-    "youtube_id": "",
-    "niconico_id": "sm46941186"
-  },
-  {
-    "song_id": "song_sm46935395",
-    "title": "落園 (feat. 裏命)",
-    "producer": "_Asagi",
-    "vocal": "裏命",
-    "youtube_id": "CZTeGMKtDq0",
-    "niconico_id": "sm46935395"
   },
   {
     "song_id": "song_sm17520775",
@@ -5224,36 +5280,20 @@
     "niconico_id": "sm46907113"
   },
   {
-    "song_id": "song_sm46940537",
-    "title": "Faraway, So Close feat.初音ミク",
-    "producer": "ぽちゃろふ",
-    "vocal": "初音ミク",
-    "youtube_id": "PkMidgaRuLA",
-    "niconico_id": "sm46940537"
-  },
-  {
-    "song_id": "song_sm46875504",
-    "title": "カメレオン",
-    "producer": "らげボーイ",
-    "vocal": "初音ミク",
-    "youtube_id": "BOrdMrh4uKg",
-    "niconico_id": "sm46875504"
-  },
-  {
-    "song_id": "song_sm7706816",
-    "title": "Paranoid Doll",
-    "producer": "Various artists",
-    "vocal": "神威がくぽ",
-    "youtube_id": "alrQFrYLW3o",
-    "niconico_id": "sm7706816"
-  },
-  {
     "song_id": "song_sm45571052",
     "title": "ワルツ・ロサ・テスタロッサ",
     "producer": "nyanyannya",
     "vocal": "神威がくぽ",
     "youtube_id": "403XN7xT9ZA",
     "niconico_id": "sm45571052"
+  },
+  {
+    "song_id": "song_sm46939618",
+    "title": "近視眼 ー 重音テト",
+    "producer": "かつめ",
+    "vocal": "重音テト",
+    "youtube_id": "",
+    "niconico_id": "sm46939618"
   },
   {
     "song_id": "song_sm46843617",
@@ -5280,35 +5320,19 @@
     "niconico_id": "sm44044139"
   },
   {
-    "song_id": "song_sm46928401",
-    "title": "メテオラヴ/重音テト",
-    "producer": "Jelly______",
-    "vocal": "重音テト",
-    "youtube_id": "",
-    "niconico_id": "sm46928401"
+    "song_id": "song_sm46932833",
+    "title": "たとえ違っても",
+    "producer": "Kage",
+    "vocal": "宮舞モカ",
+    "youtube_id": "PsHr5gE8TyI",
+    "niconico_id": "sm46932833"
   },
   {
-    "song_id": "song_sm10244728",
-    "title": "おちゃめ機能",
-    "producer": "ゴジマジＰ",
+    "song_id": "song_iF_LBvW5iqs",
+    "title": "バチスフィア",
+    "producer": "まうすぷーん",
     "vocal": "重音テト",
-    "youtube_id": "IzotoFg75O4",
-    "niconico_id": "sm10244728"
-  },
-  {
-    "song_id": "song_sm46907654",
-    "title": "ナイトウォーカー",
-    "producer": "神尾けい",
-    "vocal": "重音テト",
-    "youtube_id": "hOEXU4uynPE",
-    "niconico_id": "sm46907654"
-  },
-  {
-    "song_id": "song_w-yqipvEuKM",
-    "title": "嘘",
-    "producer": "___ official",
-    "vocal": "重音テト",
-    "youtube_id": "w-yqipvEuKM",
+    "youtube_id": "iF_LBvW5iqs",
     "niconico_id": ""
   },
   {
@@ -5320,11 +5344,11 @@
     "niconico_id": "sm44677326"
   },
   {
-    "song_id": "song_NwmTG1kPNOM",
-    "title": "IQ84",
-    "producer": "Uruha",
+    "song_id": "song_JRpVury4vG4",
+    "title": "嘘つきの神様／可不",
+    "producer": "わたがし ☁︎。",
     "vocal": "可不",
-    "youtube_id": "NwmTG1kPNOM",
+    "youtube_id": "JRpVury4vG4",
     "niconico_id": ""
   },
   {
@@ -5336,19 +5360,51 @@
     "niconico_id": "sm46712665"
   },
   {
-    "song_id": "song_f98zHUNlPoY",
-    "title": "세츠나 트립",
-    "producer": "우타이노",
-    "vocal": "GUMI",
-    "youtube_id": "f98zHUNlPoY",
+    "song_id": "song_sm44669868",
+    "title": "生命",
+    "producer": "オヨイダキビス",
+    "vocal": "足立レイ",
+    "youtube_id": "wysR1-SDn4Y",
+    "niconico_id": "sm44669868"
+  },
+  {
+    "song_id": "song_sm46930887",
+    "title": "Blood Taste",
+    "producer": "Reiven",
+    "vocal": "重音テト",
+    "youtube_id": "RpZCBKs_MLw",
+    "niconico_id": "sm46930887"
+  },
+  {
+    "song_id": "song_r-TriVmNtQ8",
+    "title": "말할 수 없어",
+    "producer": "시청자",
+    "vocal": "重音テト",
+    "youtube_id": "r-TriVmNtQ8",
     "niconico_id": ""
   },
   {
-    "song_id": "song_s8akv55bT5Y",
-    "title": "39tuary",
-    "producer": "타레",
-    "vocal": "VOCALOID",
-    "youtube_id": "s8akv55bT5Y",
+    "song_id": "song_-OxpWOJf6o0",
+    "title": "천명 되는 법",
+    "producer": "MajimagaeP / 마지마게P",
+    "vocal": "初音ミク・重音テト",
+    "youtube_id": "-OxpWOJf6o0",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_sm45295328",
+    "title": "マイブーム",
+    "producer": "リトマスP",
+    "vocal": "初音ミク・重音テト",
+    "youtube_id": "4MFVhTR6hZo",
+    "niconico_id": "sm45295328"
+  },
+  {
+    "song_id": "song_tMNOMd6GdPw",
+    "title": "ダンデリコ",
+    "producer": "٭ 𝚔𝚘𝚖𝚖𝚞𝚗𝚒𝚔𝚎_𝚜𝚊𝚟𝚊 ٭",
+    "vocal": "鏡音リン",
+    "youtube_id": "tMNOMd6GdPw",
     "niconico_id": ""
   }
 ]
