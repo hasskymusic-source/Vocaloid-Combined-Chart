@@ -51,8 +51,6 @@
     .rank-detail-panel { display: none; }
     .rank-detail-panel.open { display: block; }
   </style>
-  <!-- Chart.js 正規UMDビルド -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
   <header class="site-header">
@@ -76,12 +74,17 @@
       </div>
     </div>
 
-    <nav class="tab-nav" aria-label="メインナビゲーション">
-      <button class="tab-btn active" data-tab="tab-ranking">週間ランキング TOP 20</button>
-      <button class="tab-btn" data-tab="tab-insight">ランキングインサイト</button>
-      <button class="tab-btn" data-tab="tab-analysis">上位楽曲解説・トレンド分析</button>
-      <button class="tab-btn" data-tab="tab-method">ランキングについて</button>
-    </nav>
+    <div class="tab-nav-wrapper" id="tab-nav-wrapper">
+      <nav class="tab-nav" id="tab-nav" aria-label="メインナビゲーション">
+        <button class="tab-btn active" data-tab="tab-ranking">週間ランキング TOP 20</button>
+        <button class="tab-btn" data-tab="tab-insight">ランキングインサイト</button>
+        <button class="tab-btn" data-tab="tab-analysis">上位楽曲解説・トレンド分析</button>
+        <button class="tab-btn" data-tab="tab-method">ランキングについて</button>
+      </nav>
+      <div class="scroll-hint-pill tab-scroll-hint" id="tab-scroll-hint" aria-hidden="true">
+        <span>スクロールして表示 ➔</span>
+      </div>
+    </div>
   </header>
 
   <main class="main-container">
@@ -107,7 +110,7 @@
 
       <div class="insight-card">
         <h2 class="insight-section-title">TOP 10 プラットフォーム別・指標構成比データ</h2>
-        <div id="insight-table-container" class="table-responsive">
+        <div id="insight-table-container" class="table-responsive" data-scroll-hint="true">
           <table class="insight-table">
             <thead>
               <tr>
@@ -154,7 +157,7 @@
         <p class="method-lead">
           「週刊VOCALOID<sup class="tm-mark">TM</sup>複合ランキング」は、YouTubeとニコニコ動画の2大プラットフォームにおける週間純増数（月曜〜日曜の7日間）を取得し、ボカロリスナーの視聴・支持行動を多角的に反映して算出する複合チャートです。
         </p>
-        <div class="table-responsive">
+        <div class="table-responsive" data-scroll-hint="true">
           <table class="insight-table method-table">
             <thead>
               <tr>
@@ -225,6 +228,11 @@
       </div>
     </section>
   </main>
+
+  <!-- スマホ向け：画面下方向の動的スクロール誘導ピル -->
+  <div id="vertical-scroll-hint" class="vertical-scroll-hint" aria-hidden="true">
+    <span>▾ スクロールして表示</span>
+  </div>
 
   <footer class="site-footer">
     <p>&copy; 週刊VOCALOID<sup class="tm-mark">TM</sup>複合ランキング All Rights Reserved.</p>

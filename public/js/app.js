@@ -3,6 +3,10 @@ window.__VOCALOID_APP_LOADED__ = true;
 let insightChartInstance = null;
 let currentChartData = null;
 let archiveHistoryCache = [];
+let archiveHistoryLoaded = false;
+let chartJsLoadingPromise = null;
+
+const MOBILE_MEDIA_QUERY = "(max-width: 640px)";
 
 const WEIGHTS = {
   yt_views: 1,
@@ -14,7 +18,6 @@ const WEIGHTS = {
   nc_comments: 10,
 };
 
-// 6指標の統一カラーパレット
 const METRIC_COLORS = {
   yt_views: "#ef4444",    // 赤: YouTube再生
   yt_likes: "#f97316",    // 橙: YouTube高評価
@@ -24,9 +27,46 @@ const METRIC_COLORS = {
   nc_comments: "#8b5cf6", // 紫: ニコ動コメント
 };
 
+function isSmartphoneViewport() {
+  return window.matchMedia && window.matchMedia(MOBILE_MEDIA_QUERY).matches;
+}
+
+function isDataSaverEnabled() {
+  return Boolean(navigator.connection && navigator.connection.saveData);
+}
+
+/**
+ * スマホ表示時の初期読み込み速度を落とさないための Chart.js 動的ローダー
+ * ランキングインサイトタブを開いたとき、またはPCのアイドル時にのみ読み込む
+ */
+function ensureChartJsLoaded() {
+  if (typeof Chart !== "undefined") {
+    return Promise.resolve(true);
+  }
+  if (chartJsLoadingPromise) {
+    return chartJsLoadingPromise;
+  }
+  chartJsLoadingPromise = new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js";
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.head.appendChild(script);
+  });
+  return chartJsLoadingPromise;
+}
+
 function startApp() {
   initTabs();
+  initScrollHints();
   initChartApp();
+
+  // PC・タブレット表示時のみ、ブラウザのアイドル時間にChart.jsを事前準備
+  if (!isSmartphoneViewport() && !isDataSaverEnabled()) {
+    const idleFn = window.requestIdleCallback || ((cb) => setTimeout(cb, 1200));
+    idleFn(() => ensureChartJsLoaded());
+  }
 }
 
 if (document.readyState === "loading") {
@@ -48,7 +88,7 @@ function initTabs() {
   const tabContents = document.querySelectorAll(".tab-content");
 
   tabButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
       const targetId = btn.getAttribute("data-tab");
       tabButtons.forEach((b) => b.classList.remove("active"));
       tabContents.forEach((c) => c.classList.remove("active"));
@@ -59,15 +99,132 @@ function initTabs() {
         targetEl.classList.add("active");
       }
 
+      // スマホでタップしたタブが画面端で見切れている場合、スムーズに中央へスクロール
+      if (typeof btn.scrollIntoView === "function") {
+        btn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      }
+
       if (targetId === "tab-insight" && currentChartData) {
+        await ensureChartJsLoaded();
         requestAnimationFrame(() => {
           setTimeout(() => {
             renderTop10InsightChart(getSongsArray(currentChartData));
+            refreshAllScrollHints();
           }, 20);
         });
+      } else {
+        requestAnimationFrame(() => refreshAllScrollHints());
       }
     });
   });
+}
+
+/**
+ * 画面に収まっていない部分（横スクロール可能なタブ・表、および縦スクロール領域）に
+ * 「スクロールして表示」ガイドを動的に表示・制御するシステム
+ */
+function initScrollHints() {
+  // 1. タブナビゲーションの横スクロール監視
+  const tabNav = document.getElementById("tab-nav");
+  const tabHint = document.getElementById("tab-scroll-hint");
+  const tabWrapper = document.getElementById("tab-nav-wrapper");
+
+  const updateTabHint = () => {
+    if (!tabNav || !tabHint || !tabWrapper) return;
+    const maxScroll = tabNav.scrollWidth - tabNav.clientWidth;
+    const canScrollRight = maxScroll > 8 && tabNav.scrollLeft < maxScroll - 12;
+    tabHint.classList.toggle("visible", canScrollRight);
+    tabWrapper.classList.toggle("has-overflow-right", canScrollRight);
+  };
+
+  if (tabNav) {
+    tabNav.addEventListener("scroll", updateTabHint, { passive: true });
+    if (tabHint) {
+      tabHint.addEventListener("click", () => {
+        tabNav.scrollBy({ left: 160, behavior: "smooth" });
+      });
+    }
+  }
+
+  // 2. テーブル（.table-responsive）の横スクロール監視と動的バッジ注入
+  const setupTableScrollHints = () => {
+    const containers = document.querySelectorAll(".table-responsive");
+    containers.forEach((container) => {
+      if (!container.dataset.hintInitialized) {
+        container.dataset.hintInitialized = "true";
+        const badge = document.createElement("div");
+        badge.className = "table-scroll-indicator";
+        badge.innerHTML = `<span>⇄ スクロールして表示</span>`;
+        badge.addEventListener("click", () => {
+          container.scrollBy({ left: 180, behavior: "smooth" });
+        });
+        container.parentElement.insertBefore(badge, container);
+
+        const updateTableHint = () => {
+          const maxScroll = container.scrollWidth - container.clientWidth;
+          const isOverflowing = maxScroll > 8;
+          const hasScrolled = container.scrollLeft > 24;
+          badge.classList.toggle("visible", isOverflowing && !hasScrolled);
+          container.classList.toggle("is-scrollable", isOverflowing && container.scrollLeft < maxScroll - 8);
+        };
+
+        container.addEventListener("scroll", updateTableHint, { passive: true });
+        container._updateScrollHint = updateTableHint;
+      }
+      if (typeof container._updateScrollHint === "function") {
+        container._updateScrollHint();
+      }
+    });
+  };
+
+  // 3. スマホ向け：画面下方向のスクロール誘導ピル制御
+  const vHint = document.getElementById("vertical-scroll-hint");
+  let userHasScrolledVertically = false;
+
+  const updateVerticalHint = () => {
+    if (!vHint) return;
+    if (!isSmartphoneViewport()) {
+      vHint.classList.remove("visible");
+      return;
+    }
+    const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+    if (window.scrollY > 80) {
+      userHasScrolledVertically = true;
+    }
+    const shouldShow = !userHasScrolledVertically && scrollableHeight > 220 && window.scrollY <= 80;
+    vHint.classList.toggle("visible", shouldShow);
+  };
+
+  if (vHint) {
+    vHint.addEventListener("click", () => {
+      window.scrollBy({ top: Math.round(window.innerHeight * 0.65), behavior: "smooth" });
+    });
+  }
+
+  window.addEventListener("scroll", updateVerticalHint, { passive: true });
+  window.addEventListener(
+    "resize",
+    () => {
+      updateTabHint();
+      setupTableScrollHints();
+      updateVerticalHint();
+    },
+    { passive: true }
+  );
+
+  window._refreshScrollHintsInternal = () => {
+    updateTabHint();
+    setupTableScrollHints();
+    updateVerticalHint();
+  };
+
+  setTimeout(window._refreshScrollHintsInternal, 80);
+}
+
+function refreshAllScrollHints() {
+  if (typeof window._refreshScrollHintsInternal === "function") {
+    window._refreshScrollHintsInternal();
+  }
 }
 
 async function fetchJsonWithFallback(urls) {
@@ -95,13 +252,11 @@ function getSongIdentityKeys(song) {
   return keys;
 }
 
-/**
- * 集計期間文字列の正規化（例: "2026/10/12 - 2026/10/19" のように月曜〜月曜の7日差になっている場合、
- * 終了日を前日の日曜 "2026/10/12 - 2026/10/18" に自動補正する）
- */
 function normalizePeriodString(periodStr) {
   if (!periodStr || typeof periodStr !== "string") return "";
-  const match = periodStr.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})\s*[\-~〜]\s*(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+  const match = periodStr.match(
+    /(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})\s*[\-~〜]\s*(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/
+  );
   if (!match) return periodStr;
 
   const y1 = parseInt(match[1], 10);
@@ -115,7 +270,6 @@ function normalizePeriodString(periodStr) {
   const endDt = new Date(Date.UTC(y2, m2 - 1, d2));
   const diffDays = Math.round((endDt - startDt) / 86400000);
 
-  // 開始日から7日後（月曜〜翌月曜＝8日間）になっている場合は1日引いて日曜日（月曜〜日曜＝7日間）にする
   if (diffDays === 7) {
     endDt.setUTCDate(endDt.getUTCDate() - 1);
   }
@@ -129,9 +283,6 @@ function normalizePeriodString(periodStr) {
   return `${fmt(startDt)} - ${fmt(endDt)}`;
 }
 
-/**
- * 更新日の抽出とフォーマット（YYYY/MM/DD 形式）
- */
 function extractUpdateDateString(data) {
   const rawUpdate = data.updated_at || data.published_at || data.publishDate || "";
   if (rawUpdate && typeof rawUpdate === "string") {
@@ -147,17 +298,28 @@ async function initChartApp() {
   await loadAndRenderChart();
 
   try {
-    await loadArchiveHistory();
-    if (currentChartData) {
-      enrichWithHistory(currentChartData);
-      renderAllViews(currentChartData);
+    await loadArchiveIndexOnly();
+    // すでに全曲に chart_in_count が付与されている場合、スマホでは不要な過去アーカイブ全件通信を省略して高速化
+    const songs = getSongsArray(currentChartData);
+    const needsHistoryEnrich = songs.some(
+      (s) => typeof s.chart_in_count !== "number" || s.chart_in_count < 1
+    );
+
+    if (needsHistoryEnrich || (!isSmartphoneViewport() && !isDataSaverEnabled())) {
+      await ensureFullArchiveHistoryLoaded();
+      if (currentChartData) {
+        enrichWithHistory(currentChartData);
+        renderAllViews(currentChartData);
+      }
     }
   } catch (err) {
     console.warn("アーカイブ履歴の補完をスキップしました:", err);
   }
 }
 
-async function loadArchiveHistory() {
+let cachedArchiveListMeta = [];
+
+async function loadArchiveIndexOnly() {
   const indexData = await fetchJsonWithFallback([
     "./data/archives/archive_index.json",
     "./data/archive_index.json",
@@ -172,6 +334,7 @@ async function loadArchiveHistory() {
     ? indexData.archives
     : [];
 
+  cachedArchiveListMeta = archiveList;
   if (!archiveList.length) {
     return;
   }
@@ -211,6 +374,7 @@ async function loadArchiveHistory() {
           val,
         ]);
         if (archiveData) {
+          await ensureFullArchiveHistoryLoaded();
           enrichWithHistory(archiveData);
           currentChartData = archiveData;
           renderAllViews(archiveData);
@@ -218,9 +382,14 @@ async function loadArchiveHistory() {
       }
     });
   }
+}
+
+async function ensureFullArchiveHistoryLoaded() {
+  if (archiveHistoryLoaded || !cachedArchiveListMeta.length) return;
+  archiveHistoryLoaded = true;
 
   const loadedArchives = [];
-  for (const item of archiveList) {
+  for (const item of cachedArchiveListMeta) {
     const rawFile =
       typeof item === "string"
         ? item
@@ -241,7 +410,7 @@ async function loadArchiveHistory() {
 
 function enrichWithHistory(chartData) {
   const songs = getSongsArray(chartData);
-  if (!songs.length) return;
+  if (!songs.length || !archiveHistoryCache.length) return;
 
   const targetKey =
     chartData.archiveId || chartData.publishDate || chartData.period || chartData.updated_at || "";
@@ -332,9 +501,16 @@ function renderAllViews(data) {
 
   const ranking = getSongsArray(data);
   renderRankingView(ranking);
-  renderTop10InsightChart(ranking);
   renderInsightTable(ranking);
   renderCommentaryView(data, ranking);
+
+  // インサイトタブが開いている場合のみ即座にグラフを描画
+  const insightSection = document.getElementById("tab-insight");
+  if (insightSection && insightSection.classList.contains("active")) {
+    ensureChartJsLoaded().then(() => renderTop10InsightChart(ranking));
+  }
+
+  requestAnimationFrame(() => refreshAllScrollHints());
 }
 
 function getPointsBreakdown(song) {
@@ -428,11 +604,27 @@ function formatPointRatioHTML(song) {
 }
 
 /**
- * 週間ランキング TOP 20 カード描画
- * - 1枚目の画像の細長くスマートな横並びレイアウト＆順位とタイトルの間のサムネイル表示を復活
- * - タイトル右隣に「詳細を見る ▾」ボタンを配置（ボタンを押したときだけ詳細パネルを開閉）
- * - バーは6指標それぞれのpt割合で6色（赤・橙・黄・青・水・紫）に塗り分け
+ * スマホの通信量を抑えるためのサムネイルURL選択＆遅延読み込み属性生成
  */
+function getOptimizedThumbnailAttrs(song, index) {
+  let thumbUrl =
+    song.thumbnail ||
+    (song.youtube_id ? `https://i.ytimg.com/vi/${song.youtube_id}/mqdefault.jpg` : "");
+
+  if (!thumbUrl) return null;
+
+  // ファーストビューに入る上位3曲は優先取得、4位以降は遅延読み込みで初期表示を高速化
+  const isAboveFold = index < 3;
+  const loadingAttr = isAboveFold ? "eager" : "lazy";
+  const priorityAttr = isAboveFold ? `fetchpriority="high"` : `fetchpriority="low"`;
+
+  return {
+    url: thumbUrl,
+    loadingAttr,
+    priorityAttr,
+  };
+}
+
 function renderRankingView(ranking) {
   const container = document.getElementById("ranking-container");
   if (!container) return;
@@ -444,12 +636,11 @@ function renderRankingView(ranking) {
 
   container.innerHTML = ranking
     .slice(0, 20)
-    .map((song) => {
+    .map((song, idx) => {
       const bd = getPointsBreakdown(song);
       const raw = song.raw || {};
       const denom = bd.calcSum;
 
-      // 6指標それぞれの割合（%）
       const pYtViews = ((bd.yt_views / denom) * 100).toFixed(2);
       const pYtLikes = ((bd.yt_likes / denom) * 100).toFixed(2);
       const pYtComments = ((bd.yt_comments / denom) * 100).toFixed(2);
@@ -457,13 +648,10 @@ function renderRankingView(ranking) {
       const pNcMylists = ((bd.nc_mylists / denom) * 100).toFixed(2);
       const pNcComments = ((bd.nc_comments / denom) * 100).toFixed(2);
 
-      // プラットフォーム合計割合（%）
       const ytPercent = bd.total_pt > 0 ? ((bd.yt_total / bd.total_pt) * 100).toFixed(1) : "0.0";
       const ncPercent = bd.total_pt > 0 ? ((bd.nc_total / bd.total_pt) * 100).toFixed(1) : "0.0";
       const chartInCount = song.chart_in_count || 1;
-      const thumbUrl =
-        song.thumbnail ||
-        (song.youtube_id ? `https://i.ytimg.com/vi/${song.youtube_id}/mqdefault.jpg` : "");
+      const thumbInfo = getOptimizedThumbnailAttrs(song, idx);
 
       return `
       <article class="rank-card rank-${song.rank}" data-rank="${song.rank}">
@@ -475,9 +663,18 @@ function renderRankingView(ranking) {
           </div>
 
           ${
-            thumbUrl
+            thumbInfo
               ? `<div class="rank-thumb-col">
-                   <img src="${escapeHtml(thumbUrl)}" alt="${escapeHtml(song.title)}" class="rank-thumb" loading="lazy" />
+                   <img
+                     src="${escapeHtml(thumbInfo.url)}"
+                     alt="${escapeHtml(song.title)}"
+                     class="rank-thumb"
+                     width="112"
+                     height="63"
+                     loading="${thumbInfo.loadingAttr}"
+                     decoding="async"
+                     ${thumbInfo.priorityAttr}
+                   />
                  </div>`
               : ""
           }
@@ -591,12 +788,18 @@ window.toggleRankDetail = function (rank, event) {
       btn.textContent = isOpen ? "閉じる ▴" : "詳細を見る ▾";
       btn.classList.toggle("open", isOpen);
     }
+    // スマホで詳細パネルを開いた際、パネル下部が画面外にはみ出していればスムーズに少しスクロールして見せる
+    if (isOpen && isSmartphoneViewport()) {
+      setTimeout(() => {
+        const rect = panel.getBoundingClientRect();
+        if (rect.bottom > window.innerHeight) {
+          panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+      }, 60);
+    }
   }
 };
 
-/**
- * ランキングインサイト：TOP 10 ポイント構成比（6指標内訳）グラフ描画
- */
 function renderTop10InsightChart(ranking) {
   const wrapper = document.getElementById("insight-chart-wrapper") || document.querySelector(".chart-wrapper");
   if (!wrapper) return;
@@ -604,7 +807,12 @@ function renderTop10InsightChart(ranking) {
   const top10 = ranking.slice(0, 10);
   if (!top10.length) return;
 
-  const labels = top10.map((s) => `${s.rank}位: ${s.title}`);
+  const isMobile = isSmartphoneViewport();
+  const labels = top10.map((s) => {
+    const titleStr = String(s.title || "");
+    const shortTitle = isMobile && titleStr.length > 10 ? titleStr.slice(0, 10) + "…" : titleStr;
+    return `${s.rank}位: ${shortTitle}`;
+  });
   const breakdowns = top10.map((s) => getPointsBreakdown(s));
 
   let canvas = document.getElementById("top5Chart") || document.getElementById("top20Chart");
@@ -663,13 +871,17 @@ function renderTop10InsightChart(ranking) {
           indexAxis: "y",
           responsive: true,
           maintainAspectRatio: false,
-          animation: { duration: 350 },
+          animation: { duration: isMobile ? 200 : 350 },
           scales: {
             x: {
               stacked: true,
               ticks: {
                 color: "#94a3b8",
+                font: { size: isMobile ? 10 : 12 },
                 callback: function (value) {
+                  if (isMobile && value >= 10000) {
+                    return Math.round(value / 10000) + "万";
+                  }
                   return Number(value).toLocaleString() + " pt";
                 },
               },
@@ -677,14 +889,19 @@ function renderTop10InsightChart(ranking) {
             },
             y: {
               stacked: true,
-              ticks: { color: "#f8fafc", font: { size: 12, weight: "600" } },
+              ticks: { color: "#f8fafc", font: { size: isMobile ? 11 : 12, weight: "600" } },
               grid: { display: false },
             },
           },
           plugins: {
             legend: {
               position: "top",
-              labels: { color: "#e2e8f0", boxWidth: 14, padding: 14 },
+              labels: {
+                color: "#e2e8f0",
+                boxWidth: isMobile ? 10 : 14,
+                padding: isMobile ? 8 : 14,
+                font: { size: isMobile ? 11 : 12 },
+              },
             },
             tooltip: {
               callbacks: {

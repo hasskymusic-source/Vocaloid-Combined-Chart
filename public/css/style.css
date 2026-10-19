@@ -128,13 +128,35 @@ body {
   color: var(--text-primary);
 }
 
-/* Tabs */
-.tab-nav {
+/* Tabs & 動的スクロールヒント */
+.tab-nav-wrapper {
+  position: relative;
   max-width: 1200px;
   margin: 0 auto;
+}
+
+.tab-nav-wrapper.has-overflow-right::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 56px;
+  height: calc(100% - 3px);
+  background: linear-gradient(90deg, rgba(15, 23, 42, 0) 0%, #0f172a 85%);
+  pointer-events: none;
+}
+
+.tab-nav {
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.tab-nav::-webkit-scrollbar {
+  display: none;
 }
 
 .tab-btn {
@@ -157,6 +179,82 @@ body {
 .tab-btn.active {
   color: var(--accent-cyan);
   border-bottom-color: var(--accent-cyan);
+}
+
+/* スクロール誘導バッジ（タブ横・テーブル上・画面下部） */
+.scroll-hint-pill {
+  position: absolute;
+  right: 0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(19, 28, 49, 0.95);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(0, 210, 255, 0.45);
+  border-radius: 999px;
+  padding: 0.18rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
+}
+
+.scroll-hint-pill.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.table-scroll-indicator {
+  display: none;
+  justify-content: flex-end;
+  margin-bottom: 0.45rem;
+}
+
+.table-scroll-indicator span {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(0, 210, 255, 0.12);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(0, 210, 255, 0.4);
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.table-scroll-indicator.visible {
+  display: flex;
+}
+
+.vertical-scroll-hint {
+  position: fixed;
+  bottom: 1.1rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: rgba(19, 28, 49, 0.92);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(0, 210, 255, 0.5);
+  border-radius: 999px;
+  padding: 0.35rem 0.95rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  backdrop-filter: blur(6px);
+}
+
+.vertical-scroll-hint.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
 }
 
 /* Main */
@@ -185,7 +283,7 @@ body {
   padding-left: 0.75rem;
 }
 
-/* 週間ランキング TOP 20 カード（1枚目画像の細長くスマートな横並びレイアウト） */
+/* 週間ランキング TOP 20 カード（PC & タブレット用レイアウト：641px以上で適用） */
 .ranking-list {
   display: flex;
   flex-direction: column;
@@ -264,6 +362,7 @@ body {
   width: 112px;
   height: 63px;
   object-fit: cover;
+  border-radius: 3px;
   border: 1px solid var(--border-color);
   display: block;
 }
@@ -316,7 +415,7 @@ body {
   margin-bottom: 0.45rem;
 }
 
-/* スリムな6指標内訳バー */
+/* 6指標内訳バー */
 .metric-stacked-bar {
   height: 6px;
   background: #0f172a;
@@ -401,7 +500,6 @@ body {
 .detail-box {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 3px;
   padding: 1rem;
 }
 
@@ -448,7 +546,6 @@ body {
   font-weight: 700;
   text-decoration: none;
   padding: 0.4rem 0.8rem;
-  border-radius: 3px;
 }
 
 .yt-link {
@@ -480,7 +577,7 @@ body {
 .insight-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
+  border-radius: 3px;
   padding: 1.75rem;
   margin-bottom: 1.75rem;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
@@ -567,8 +664,10 @@ body {
 
 /* テーブル */
 .table-responsive {
+  position: relative;
   width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .insight-table {
@@ -771,16 +870,217 @@ body {
   margin-top: 3rem;
 }
 
-@media (max-width: 768px) {
-  .rank-card-summary {
-    flex-wrap: wrap;
+/* ==========================================================================
+   スマートフォン専用UI（画面幅 640px 以下のみ適用 / タブレット縦向き 768px 等は除外）
+   ========================================================================== */
+@media (max-width: 640px) {
+  .site-header {
+    padding: 1rem 0.9rem 0;
   }
-  .rank-points-col {
+
+  .header-inner {
+    margin-bottom: 0.85rem;
+    gap: 0.75rem;
+  }
+
+  .brand-badge {
+    font-size: 0.68rem;
+  }
+
+  /* スマホで「週刊VOCALOID™複合ランキング」が途中で不自然に改行されないよう自動調整 */
+  .site-title {
+    font-size: clamp(1.22rem, 5.4vw, 1.55rem);
+    line-height: 1.25;
+    white-space: nowrap;
+  }
+
+  .site-subtitle {
+    font-size: 0.78rem;
+  }
+
+  .header-controls {
     width: 100%;
-    text-align: left;
-    border-top: 1px solid var(--border-color);
-    padding-top: 0.5rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
   }
+
+  .period-box,
+  .archive-box {
+    width: 100%;
+    padding: 0.45rem 0.75rem;
+  }
+
+  .period-value,
+  .archive-select {
+    font-size: 0.82rem;
+  }
+
+  .tab-btn {
+    padding: 0.65rem 0.9rem;
+    font-size: 0.84rem;
+  }
+
+  .main-container {
+    margin: 1.15rem auto;
+    padding: 0 0.75rem;
+  }
+
+  .section-title,
+  .insight-section-title {
+    font-size: 1.08rem;
+    margin-bottom: 0.85rem;
+  }
+
+  /* スマホ用ランキングカード：
+     上段に [順位] [サムネイル] [ポイント]、
+     下段（横幅100%）に [楽曲タイトル(1〜2行) + 詳細ボタン + P/Vocal + 6指標バー] を配置 */
+  .ranking-list {
+    gap: 0.75rem;
+  }
+
+  .rank-card-summary {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    grid-template-areas:
+      "rank thumb points"
+      "info info info";
+    align-items: center;
+    gap: 0.65rem 0.7rem;
+    padding: 0.85rem 0.9rem;
+  }
+
+  .rank-number-col {
+    grid-area: rank;
+    min-width: 54px;
+    align-items: flex-start;
+    gap: 0.1rem;
+  }
+
+  .rank-number {
+    font-size: 1.3rem;
+    line-height: 1.1;
+  }
+
+  .rank-diff,
+  .chart-in-mini {
+    font-size: 0.68rem;
+    white-space: nowrap;
+  }
+
+  .rank-thumb-col {
+    grid-area: thumb;
+  }
+
+  .rank-thumb {
+    width: 84px;
+    height: 47px;
+    border-radius: 3px;
+  }
+
+  .rank-points-col {
+    grid-area: points;
+    min-width: 0;
+    text-align: right;
+    justify-self: end;
+  }
+
+  .total-points {
+    font-size: 1.12rem;
+    line-height: 1.2;
+  }
+
+  .total-points small {
+    font-size: 0.72rem;
+  }
+
+  .points-sub-row {
+    font-size: 0.7rem;
+    margin-top: 0.1rem;
+  }
+
+  /* タイトル・メタ情報・6指標バーにカードの横幅100%を確保 */
+  .rank-info-col {
+    grid-area: info;
+    width: 100%;
+    padding-top: 0.55rem;
+    border-top: 1px solid rgba(38, 51, 77, 0.7);
+  }
+
+  .song-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+    margin-bottom: 0.25rem;
+  }
+
+  /* 楽曲タイトルを広い横幅で1〜2行に綺麗に収める */
+  .song-title {
+    font-size: 1rem;
+    line-height: 1.38;
+    flex: 1;
+    min-width: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+  }
+
+  .detail-toggle-btn {
+    flex-shrink: 0;
+    padding: 0.22rem 0.55rem;
+    font-size: 0.72rem;
+    margin-top: 0.05rem;
+  }
+
+  .song-meta {
+    font-size: 0.78rem;
+    gap: 0.35rem 0.65rem;
+    margin-bottom: 0.45rem;
+    line-height: 1.35;
+  }
+
+  .metric-stacked-bar {
+    height: 7px;
+  }
+
+  /* 詳細パネルのスマホ最適化 */
+  .rank-detail-panel {
+    padding: 0.9rem;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .detail-box {
+    padding: 0.8rem;
+  }
+
+  /* インサイトカード・テーブルのスマホ余白調整 */
+  .insight-card {
+    padding: 1.1rem 0.9rem;
+    margin-bottom: 1.1rem;
+  }
+
+  .chart-wrapper {
+    height: 380px;
+  }
+
+  .insight-table th,
+  .insight-table td {
+    padding: 0.65rem 0.75rem;
+    font-size: 0.82rem;
+  }
+
+  .col-song {
+    min-width: 180px;
+  }
+
   .fallback-chart-row {
     grid-template-columns: 1fr;
     gap: 0.25rem;
