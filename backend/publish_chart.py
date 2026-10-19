@@ -31,6 +31,42 @@ PUBLIC_LATEST = resolve_config_path(["PUBLIC_LATEST", "LATEST_RANKING_FILE"], "p
 ARCHIVE_DIR = resolve_config_path(["ARCHIVE_DIR", "ARCHIVES_DIR"], "public/data/archives")
 ARCHIVE_INDEX = resolve_config_path(["ARCHIVE_INDEX"], "public/data/archives/archive_index.json")
 
+# 漏洩防止パターン（Google APIキー / GitHub Token / 秘密鍵）
+SECRET_PATTERNS = [
+    (re.compile(r"AIza[0-9A-Za-z\-_]{35}"), "Google/YouTube API Key"),
+    (re.compile(r"gh[pousr]_[0-9A-Za-z]{36,255}"), "GitHub Personal Access Token"),
+    (re.compile(r"github_pat_[0-9A-Za-z_]{50,255}"), "GitHub Fine-grained Token"),
+    (re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"), "Private Key"),
+]
+
+# PCローカルパス（ユーザー名・本名流出防止）パターン
+LOCAL_PATH_PATTERNS = [
+    re.compile(r"[A-Za-z]:\\Users\\[^\\\"\'\s]+", re.IGNORECASE),
+    re.compile(r"[A-Za-z]:/Users/[^/\"\'\s]+", re.IGNORECASE),
+    re.compile(r"/Users/[^/\"\'\s]+"),
+]
+
+
+def inspect_and_redact_text(text, label="data"):
+    """
+    公開対象データにAPIキーが含まれていれば例外で公開を緊急停止し、
+    ローカルPCのユーザーパスが含まれていれば自動的にマスクして個人情報を保護する
+    """
+    if not text:
+        return text
+
+    for regex, secret_name in SECRET_PATTERNS:
+        if regex.search(text):
+            raise RuntimeError(
+                f"[SECURITY BLOCK] {label} 内に機密情報 ({secret_name}) の混入を検知したため、公開処理を緊急停止しました。"
+            )
+
+    redacted = text
+    for path_regex in LOCAL_PATH_PATTERNS:
+        redacted = path_regex.sub("[REDACTED_PATH]", redacted)
+
+    return redacted
+
 
 def load_json(filepath, default=None):
     path_obj = Path(filepath)
@@ -47,15 +83,13 @@ def load_json(filepath, default=None):
 def save_json(filepath, data):
     path_obj = Path(filepath)
     path_obj.parent.mkdir(parents=True, exist_ok=True)
+    raw_json = json.dumps(data, ensure_ascii=False, indent=2)
+    safe_json = inspect_and_redact_text(raw_json, label=str(path_obj.name))
     with open(path_obj, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+        f.write(safe_json + "\n")
 
 
 def normalize_period_str(period_str, now_dt=None):
-    """
-    集計期間が月曜〜翌月曜（7日差＝8日間、例: 2026/10/12 - 2026/10/19）になっている場合、
-    終了日を1日引いて月曜〜日曜（例: 2026/10/12 - 2026/10/18）に正規化する
-    """
     if now_dt is None:
         now_dt = datetime.now(JST)
     if not period_str or not isinstance(period_str, str):
@@ -80,12 +114,13 @@ def normalize_period_str(period_str, now_dt=None):
     return f"{start_d.strftime('%Y/%m/%d')} - {end_d.strftime('%Y/%m/%d')}"
 
 
-def sanitize_frontend_content(text):
+def sanitize_frontend_content(text, filename=""):
     if not text:
         return text
     cleaned = text.strip()
     cleaned = re.sub(r"^```[a-zA-Z0-9_-]*\r?\n", "", cleaned)
     cleaned = re.sub(r"\r?\n```$", "", cleaned)
+    cleaned = inspect_and_redact_text(cleaned, label=filename)
     return cleaned + "\n"
 
 
@@ -120,13 +155,14 @@ def sync_frontend_assets():
         newest_file = max(existing, key=lambda p: p.stat().st_mtime)
         try:
             raw_content = newest_file.read_text(encoding="utf-8")
-            clean_content = sanitize_frontend_content(raw_content)
+            clean_content = sanitize_frontend_content(raw_content, filename=name)
             for target in public_targets[name]:
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_text(clean_content, encoding="utf-8")
-            print(f"[SYNC] {name} を最新状態に同期・検証しました (source: {newest_file.relative_to(PROJECT_ROOT)})")
+            print(f"[SYNC & SECURE] {name} を検証・同期しました (source: {newest_file.relative_to(PROJECT_ROOT)})")
         except Exception as e:
             print(f"[WARN] {name} の同期中に警告: {e}")
+            raise
 
 
 def update_archive_index(archive_id, period_str, publish_date):
@@ -212,20 +248,15 @@ def main():
     draft_data["updated_at"] = draft_data.get("updated_at") or now_str
     draft_data["published_at"] = now_str
 
-    # 補正した期間をドラフト側にも保存しておく
     save_json(used_draft_path, draft_data)
-
-    # 最新ランキング JSON の保存
     save_json(PUBLIC_LATEST, draft_data)
     save_json(PROJECT_ROOT / "data/latest_ranking.json", draft_data)
 
-    # アーカイブ JSON の保存とインデックス更新
     archive_file = ARCHIVE_DIR / f"{archive_id}.json"
     save_json(archive_file, draft_data)
     update_archive_index(archive_id, period_str, publish_date)
 
-    print(f"[OK] 最新ランキングを公開しました: {PUBLIC_LATEST} (集計期間: {period_str})")
-    print(f"[OK] アーカイブを保存しました: {archive_file}")
+    print(f"[OK] セキュリティ検査を通過し、最新ランキングを公開しました: {PUBLIC_LATEST}")
 
 
 if __name__ == "__main__":

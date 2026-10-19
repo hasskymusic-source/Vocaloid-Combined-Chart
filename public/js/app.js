@@ -36,8 +36,7 @@ function isDataSaverEnabled() {
 }
 
 /**
- * スマホ表示時の初期読み込み速度を落とさないための Chart.js 動的ローダー
- * ランキングインサイトタブを開いたとき、またはPCのアイドル時にのみ読み込む
+ * セキュリティ検証付きの Chart.js 動的ローダー
  */
 function ensureChartJsLoaded() {
   if (typeof Chart !== "undefined") {
@@ -49,6 +48,8 @@ function ensureChartJsLoaded() {
   chartJsLoadingPromise = new Promise((resolve) => {
     const script = document.createElement("script");
     script.src = "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js";
+    script.crossOrigin = "anonymous";
+    script.referrerPolicy = "no-referrer";
     script.async = true;
     script.onload = () => resolve(true);
     script.onerror = () => resolve(false);
@@ -57,12 +58,56 @@ function ensureChartJsLoaded() {
   return chartJsLoadingPromise;
 }
 
+/**
+ * セキュリティ関数: 動画IDおよび外部URLのホワイトリスト検証（XSS / スキーム注入対策）
+ */
+function sanitizeYoutubeId(rawId) {
+  if (!rawId || typeof rawId !== "string") return "";
+  const trimmed = rawId.trim();
+  return /^[A-Za-z0-9_-]{6,20}$/.test(trimmed) ? trimmed : "";
+}
+
+function sanitizeNiconicoId(rawId) {
+  if (!rawId || typeof rawId !== "string") return "";
+  const trimmed = rawId.trim();
+  return /^(sm|nm|so)?[0-9]{1,16}$/i.test(trimmed) ? trimmed : "";
+}
+
+function sanitizeThumbnailUrl(rawUrl, fallbackYtId) {
+  if (rawUrl && typeof rawUrl === "string") {
+    try {
+      const parsed = new URL(rawUrl, window.location.origin);
+      const allowedHosts = [
+        "i.ytimg.com",
+        "img.youtube.com",
+        "img.cdn.nimg.jp",
+        "nicovideo.cdn.nimg.jp",
+        window.location.hostname,
+      ];
+      if (parsed.protocol === "https:" && allowedHosts.includes(parsed.hostname)) {
+        return parsed.href;
+      }
+    } catch (_) {
+      // 不正なURLは破棄してフォールバックへ
+    }
+  }
+  const safeYt = sanitizeYoutubeId(fallbackYtId);
+  return safeYt ? `https://i.ytimg.com/vi/${safeYt}/mqdefault.jpg` : "";
+}
+
+function sanitizeArchiveFilename(rawVal) {
+  if (!rawVal || typeof rawVal !== "string") return "";
+  const base = rawVal.trim().replace(/^.*[/\\]/, "");
+  const withExt = base.endsWith(".json") ? base : `${base}.json`;
+  return /^[A-Za-z0-9_.-]+\.json$/.test(withExt) && !withExt.includes("..") ? withExt : "";
+}
+
 function startApp() {
   initTabs();
+  initRankingEventDelegation();
   initScrollHints();
   initChartApp();
 
-  // PC・タブレット表示時のみ、ブラウザのアイドル時間にChart.jsを事前準備
   if (!isSmartphoneViewport() && !isDataSaverEnabled()) {
     const idleFn = window.requestIdleCallback || ((cb) => setTimeout(cb, 1200));
     idleFn(() => ensureChartJsLoaded());
@@ -83,6 +128,24 @@ function getSongsArray(chartData) {
   return [];
 }
 
+/**
+ * インライン onclick を排除し、安全なイベント委譲で「詳細を見る」ボタンを制御
+ */
+function initRankingEventDelegation() {
+  const container = document.getElementById("ranking-container");
+  if (!container) return;
+
+  container.addEventListener("click", (e) => {
+    const btn = e.target.closest(".detail-toggle-btn");
+    if (!btn) return;
+    e.stopPropagation();
+    const rank = parseInt(btn.getAttribute("data-rank"), 10);
+    if (!isNaN(rank)) {
+      toggleRankDetail(rank);
+    }
+  });
+}
+
 function initTabs() {
   const tabButtons = document.querySelectorAll(".tab-btn");
   const tabContents = document.querySelectorAll(".tab-content");
@@ -99,7 +162,6 @@ function initTabs() {
         targetEl.classList.add("active");
       }
 
-      // スマホでタップしたタブが画面端で見切れている場合、スムーズに中央へスクロール
       if (typeof btn.scrollIntoView === "function") {
         btn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
       }
@@ -119,12 +181,7 @@ function initTabs() {
   });
 }
 
-/**
- * 画面に収まっていない部分（横スクロール可能なタブ・表、および縦スクロール領域）に
- * 「スクロールして表示」ガイドを動的に表示・制御するシステム
- */
 function initScrollHints() {
-  // 1. タブナビゲーションの横スクロール監視
   const tabNav = document.getElementById("tab-nav");
   const tabHint = document.getElementById("tab-scroll-hint");
   const tabWrapper = document.getElementById("tab-nav-wrapper");
@@ -146,7 +203,6 @@ function initScrollHints() {
     }
   }
 
-  // 2. テーブル（.table-responsive）の横スクロール監視と動的バッジ注入
   const setupTableScrollHints = () => {
     const containers = document.querySelectorAll(".table-responsive");
     containers.forEach((container) => {
@@ -177,7 +233,6 @@ function initScrollHints() {
     });
   };
 
-  // 3. スマホ向け：画面下方向のスクロール誘導ピル制御
   const vHint = document.getElementById("vertical-scroll-hint");
   let userHasScrolledVertically = false;
 
@@ -230,7 +285,7 @@ function refreshAllScrollHints() {
 async function fetchJsonWithFallback(urls) {
   for (const url of urls) {
     try {
-      const res = await fetch(url, { cache: "no-store" });
+      const res = await fetch(url, { cache: "no-store", credentials: "same-origin" });
       if (res.ok) {
         return await res.json();
       }
@@ -299,7 +354,6 @@ async function initChartApp() {
 
   try {
     await loadArchiveIndexOnly();
-    // すでに全曲に chart_in_count が付与されている場合、スマホでは不要な過去アーカイブ全件通信を省略して高速化
     const songs = getSongsArray(currentChartData);
     const needsHistoryEnrich = songs.some(
       (s) => typeof s.chart_in_count !== "number" || s.chart_in_count < 1
@@ -355,9 +409,10 @@ async function loadArchiveIndexOnly() {
           (m) => normalizePeriodString(m)
         );
       }
-      if (!fileVal) return;
+      const safeFile = sanitizeArchiveFilename(fileVal);
+      if (!safeFile) return;
       const opt = document.createElement("option");
-      opt.value = fileVal;
+      opt.value = safeFile;
       opt.textContent = labelText;
       selectEl.appendChild(opt);
     });
@@ -367,11 +422,11 @@ async function loadArchiveIndexOnly() {
       if (val === "latest") {
         await loadAndRenderChart();
       } else {
-        const cleanFile = val.endsWith(".json") ? val : `${val}.json`;
+        const cleanFile = sanitizeArchiveFilename(val);
+        if (!cleanFile) return;
         const archiveData = await fetchJsonWithFallback([
           `./data/archives/${cleanFile}`,
           `public/data/archives/${cleanFile}`,
-          val,
         ]);
         if (archiveData) {
           await ensureFullArchiveHistoryLoaded();
@@ -394,12 +449,11 @@ async function ensureFullArchiveHistoryLoaded() {
       typeof item === "string"
         ? item
         : item.file || item.path || (item.archiveId ? `${item.archiveId}.json` : item.id);
-    if (!rawFile) continue;
-    const cleanFile = rawFile.endsWith(".json") ? rawFile : `${rawFile}.json`;
+    const cleanFile = sanitizeArchiveFilename(rawFile);
+    if (!cleanFile) continue;
     const data = await fetchJsonWithFallback([
       `./data/archives/${cleanFile}`,
       `public/data/archives/${cleanFile}`,
-      rawFile,
     ]);
     if (data && getSongsArray(data).length > 0) {
       loadedArchives.push(data);
@@ -466,7 +520,6 @@ async function loadAndRenderChart() {
     "public/data/latest_ranking.json",
     "./data/weekly_draft.json",
     "data/weekly_draft.json",
-    "../data/weekly_draft.json",
     "latest_ranking.json",
   ]);
 
@@ -504,7 +557,6 @@ function renderAllViews(data) {
   renderInsightTable(ranking);
   renderCommentaryView(data, ranking);
 
-  // インサイトタブが開いている場合のみ即座にグラフを描画
   const insightSection = document.getElementById("tab-insight");
   if (insightSection && insightSection.classList.contains("active")) {
     ensureChartJsLoaded().then(() => renderTop10InsightChart(ranking));
@@ -556,9 +608,9 @@ function getPointsBreakdown(song) {
 }
 
 function formatRankDiffBadge(song) {
-  const prev = song.prev_rank !== undefined ? song.prev_rank : song.prevRank;
-  const curr = song.rank;
-  if (!prev || prev === null) {
+  const prev = parseInt(song.prev_rank !== undefined ? song.prev_rank : song.prevRank, 10);
+  const curr = parseInt(song.rank, 10);
+  if (!prev || isNaN(prev)) {
     return `<span class="rank-diff diff-new">NEW</span>`;
   }
   if (prev > curr) {
@@ -603,23 +655,16 @@ function formatPointRatioHTML(song) {
   }
 }
 
-/**
- * スマホの通信量を抑えるためのサムネイルURL選択＆遅延読み込み属性生成
- */
 function getOptimizedThumbnailAttrs(song, index) {
-  let thumbUrl =
-    song.thumbnail ||
-    (song.youtube_id ? `https://i.ytimg.com/vi/${song.youtube_id}/mqdefault.jpg` : "");
+  const safeThumbUrl = sanitizeThumbnailUrl(song.thumbnail, song.youtube_id);
+  if (!safeThumbUrl) return null;
 
-  if (!thumbUrl) return null;
-
-  // ファーストビューに入る上位3曲は優先取得、4位以降は遅延読み込みで初期表示を高速化
   const isAboveFold = index < 3;
   const loadingAttr = isAboveFold ? "eager" : "lazy";
   const priorityAttr = isAboveFold ? `fetchpriority="high"` : `fetchpriority="low"`;
 
   return {
-    url: thumbUrl,
+    url: safeThumbUrl,
     loadingAttr,
     priorityAttr,
   };
@@ -637,6 +682,7 @@ function renderRankingView(ranking) {
   container.innerHTML = ranking
     .slice(0, 20)
     .map((song, idx) => {
+      const rankNum = parseInt(song.rank, 10) || idx + 1;
       const bd = getPointsBreakdown(song);
       const raw = song.raw || {};
       const denom = bd.calcSum;
@@ -650,14 +696,16 @@ function renderRankingView(ranking) {
 
       const ytPercent = bd.total_pt > 0 ? ((bd.yt_total / bd.total_pt) * 100).toFixed(1) : "0.0";
       const ncPercent = bd.total_pt > 0 ? ((bd.nc_total / bd.total_pt) * 100).toFixed(1) : "0.0";
-      const chartInCount = song.chart_in_count || 1;
+      const chartInCount = parseInt(song.chart_in_count, 10) || 1;
       const thumbInfo = getOptimizedThumbnailAttrs(song, idx);
+      const safeYtId = sanitizeYoutubeId(song.youtube_id);
+      const safeNcId = sanitizeNiconicoId(song.niconico_id);
 
       return `
-      <article class="rank-card rank-${song.rank}" data-rank="${song.rank}">
+      <article class="rank-card rank-${rankNum}" data-rank="${rankNum}">
         <div class="rank-card-summary">
           <div class="rank-number-col">
-            <span class="rank-number">${song.rank}<small>位</small></span>
+            <span class="rank-number">${rankNum}<small>位</small></span>
             ${formatRankDiffBadge(song)}
             <span class="chart-in-mini">${chartInCount}週目</span>
           </div>
@@ -673,6 +721,7 @@ function renderRankingView(ranking) {
                      height="63"
                      loading="${thumbInfo.loadingAttr}"
                      decoding="async"
+                     referrerpolicy="no-referrer"
                      ${thumbInfo.priorityAttr}
                    />
                  </div>`
@@ -684,9 +733,9 @@ function renderRankingView(ranking) {
               <h3 class="song-title">${escapeHtml(song.title)}</h3>
               <button
                 type="button"
-                id="detail-btn-${song.rank}"
+                id="detail-btn-${rankNum}"
                 class="detail-toggle-btn"
-                onclick="toggleRankDetail(${song.rank}, event)"
+                data-rank="${rankNum}"
               >詳細を見る ▾</button>
             </div>
             <div class="song-meta">
@@ -712,7 +761,7 @@ function renderRankingView(ranking) {
           </div>
         </div>
 
-        <div id="detail-panel-${song.rank}" class="rank-detail-panel">
+        <div id="detail-panel-${rankNum}" class="rank-detail-panel">
           <div class="detail-grid">
             <div class="detail-box yt-detail-box">
               <h4>YouTube 指標内訳 (${Number(bd.yt_total).toLocaleString()} pt / ${ytPercent}%)</h4>
@@ -731,8 +780,8 @@ function renderRankingView(ranking) {
                 </li>
               </ul>
               ${
-                song.youtube_id
-                  ? `<a href="https://www.youtube.com/watch?v=${encodeURIComponent(song.youtube_id)}" target="_blank" rel="noopener noreferrer" class="video-link yt-link">▶ YouTubeで視聴する</a>`
+                safeYtId
+                  ? `<a href="https://www.youtube.com/watch?v=${encodeURIComponent(safeYtId)}" target="_blank" rel="noopener noreferrer" class="video-link yt-link">▶ YouTubeで視聴する</a>`
                   : ""
               }
             </div>
@@ -754,8 +803,8 @@ function renderRankingView(ranking) {
                 </li>
               </ul>
               ${
-                song.niconico_id
-                  ? `<a href="https://www.nicovideo.jp/watch/${encodeURIComponent(song.niconico_id)}" target="_blank" rel="noopener noreferrer" class="video-link nc-link">▶ ニコニコ動画で視聴する</a>`
+                safeNcId
+                  ? `<a href="https://www.nicovideo.jp/watch/${encodeURIComponent(safeNcId)}" target="_blank" rel="noopener noreferrer" class="video-link nc-link">▶ ニコニコ動画で視聴する</a>`
                   : ""
               }
             </div>
@@ -780,15 +829,17 @@ window.toggleRankDetail = function (rank, event) {
   if (event) {
     event.stopPropagation();
   }
-  const panel = document.getElementById(`detail-panel-${rank}`);
-  const btn = document.getElementById(`detail-btn-${rank}`);
+  const safeRank = parseInt(rank, 10);
+  if (isNaN(safeRank)) return;
+
+  const panel = document.getElementById(`detail-panel-${safeRank}`);
+  const btn = document.getElementById(`detail-btn-${safeRank}`);
   if (panel) {
     const isOpen = panel.classList.toggle("open");
     if (btn) {
       btn.textContent = isOpen ? "閉じる ▴" : "詳細を見る ▾";
       btn.classList.toggle("open", isOpen);
     }
-    // スマホで詳細パネルを開いた際、パネル下部が画面外にはみ出していればスムーズに少しスクロールして見せる
     if (isOpen && isSmartphoneViewport()) {
       setTimeout(() => {
         const rect = panel.getBoundingClientRect();
@@ -808,10 +859,11 @@ function renderTop10InsightChart(ranking) {
   if (!top10.length) return;
 
   const isMobile = isSmartphoneViewport();
-  const labels = top10.map((s) => {
+  const labels = top10.map((s, i) => {
+    const r = parseInt(s.rank, 10) || i + 1;
     const titleStr = String(s.title || "");
     const shortTitle = isMobile && titleStr.length > 10 ? titleStr.slice(0, 10) + "…" : titleStr;
-    return `${s.rank}位: ${shortTitle}`;
+    return `${r}位: ${shortTitle}`;
   });
   const breakdowns = top10.map((s) => getPointsBreakdown(s));
 
@@ -934,12 +986,13 @@ function renderTop10InsightChart(ranking) {
     <div class="fallback-chart-rows">
       ${top10
         .map((song, i) => {
+          const r = parseInt(song.rank, 10) || i + 1;
           const b = breakdowns[i];
           const wTotal = ((b.total_pt / maxPt) * 100).toFixed(2);
           const denom = b.calcSum;
           return `
             <div class="fallback-chart-row">
-              <div class="fallback-chart-label" title="${escapeHtml(song.title)}">${song.rank}位: ${escapeHtml(song.title)}</div>
+              <div class="fallback-chart-label" title="${escapeHtml(song.title)}">${r}位: ${escapeHtml(song.title)}</div>
               <div class="fallback-chart-bar-track">
                 <div class="fallback-chart-bar-fill" style="width: ${wTotal}%">
                   <div class="bar-seg seg-yt-views" style="width: ${((b.yt_views / denom) * 100).toFixed(2)}%"></div>
@@ -972,15 +1025,16 @@ function renderInsightTable(ranking) {
   }
 
   tbody.innerHTML = top10
-    .map((song) => {
+    .map((song, i) => {
+      const r = parseInt(song.rank, 10) || i + 1;
       const bd = getPointsBreakdown(song);
       const ytRatio = bd.total_pt > 0 ? ((bd.yt_total / bd.total_pt) * 100).toFixed(1) : "0.0";
       const ncRatio = bd.total_pt > 0 ? ((bd.nc_total / bd.total_pt) * 100).toFixed(1) : "0.0";
-      const chartInCount = song.chart_in_count || 1;
+      const chartInCount = parseInt(song.chart_in_count, 10) || 1;
 
       return `
         <tr>
-          <td class="col-rank">${song.rank}位</td>
+          <td class="col-rank">${r}位</td>
           <td class="col-song">
             <span class="insight-song-title">${escapeHtml(song.title)}</span>
             <span class="insight-song-producer">(${escapeHtml(song.producer)})</span>
@@ -1018,11 +1072,12 @@ function renderCommentaryView(data, ranking) {
   }
 
   listEl.innerHTML = commentedSongs
-    .map(
-      (song) => `
+    .map((song, i) => {
+      const r = parseInt(song.rank, 10) || i + 1;
+      return `
       <div class="commentary-card">
         <div class="commentary-card-header">
-          <span class="commentary-rank-badge">${song.rank}位</span>
+          <span class="commentary-rank-badge">${r}位</span>
           <h3 class="commentary-song-title">${escapeHtml(song.title)} <small>/ ${escapeHtml(song.producer)}</small></h3>
           <span class="commentary-song-pt">${Number(song.total_pt || 0).toLocaleString()} pt</span>
         </div>
@@ -1030,8 +1085,8 @@ function renderCommentaryView(data, ranking) {
           ${escapeHtml(song.commentary).replace(/\n/g, "<br>")}
         </div>
       </div>
-    `
-    )
+    `;
+    })
     .join("");
 }
 

@@ -3,40 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- セキュリティヘッダー: CSP / Referrer / MIME Sniffing 対策 -->
+  <meta
+    http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' https://i.ytimg.com https://img.cdn.nimg.jp https://nicovideo.cdn.nimg.jp data:; connect-src 'self'; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none';"
+  />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <title>週刊VOCALOID™複合ランキング</title>
-  <!-- 外部CSSのマルチパス読み込み -->
+  <!-- 外部CSSのマルチパス読み込み（カスタムされた style.css を優先適用） -->
   <link rel="stylesheet" href="./style.css" />
   <link rel="stylesheet" href="./css/style.css" />
-  <!-- 万が一外部CSSが読み込めない場合でも崩れないコアフォールバックCSS -->
+  <!-- 万が一外部CSSが読み込めない場合でも最低限の階層構造を保つコアフォールバック -->
   <style>
-    :root {
-      --bg-main: #0f172a;
-      --bg-card: #161f33;
-      --bg-table-header: #131c31;
-      --bg-table-row-hover: #1e293b;
-      --border-color: #26334d;
-      --accent-cyan: #00d2ff;
-      --text-primary: #f8fafc;
-      --text-secondary: #94a3b8;
-      --yt-views: #ef4444;
-      --yt-likes: #f97316;
-      --yt-comments: #eab308;
-      --nc-views: #3b82f6;
-      --nc-mylists: #06b6d4;
-      --nc-comments: #8b5cf6;
-      --yt-color: #f87171;
-      --nc-color: #60a5fa;
-      --up-green: #4ade80;
-      --down-red: #f87171;
-      --stay-gray: #94a3b8;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background-color: var(--bg-main);
-      color: var(--text-primary);
-      font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
-      line-height: 1.6;
-    }
     .tm-mark {
       font-size: 0.45em;
       font-weight: 700;
