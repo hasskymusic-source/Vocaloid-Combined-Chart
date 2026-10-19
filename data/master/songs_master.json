@@ -4272,14 +4272,6 @@
     "niconico_id": ""
   },
   {
-    "song_id": "song_sm46928401",
-    "title": "メテオラヴ/重音テト",
-    "producer": "Jelly______",
-    "vocal": "重音テト",
-    "youtube_id": "mrn5ePlvrug",
-    "niconico_id": "sm46928401"
-  },
-  {
     "song_id": "song_f0-NlB0mLLw",
     "title": "シャカシャカにしてあげる♪",
     "producer": "takimura",
@@ -4472,6 +4464,30 @@
     "niconico_id": ""
   },
   {
+    "song_id": "song_sm46933442",
+    "title": "Day by Day",
+    "producer": "さんま",
+    "vocal": "初音ミク",
+    "youtube_id": "UHx3SH3xyWE",
+    "niconico_id": "sm46933442"
+  },
+  {
+    "song_id": "song_QXOQyTCO4kc",
+    "title": "ピエニウム feat.重音テトSV",
+    "producer": "本人希望つくし",
+    "vocal": "重音テト",
+    "youtube_id": "QXOQyTCO4kc",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_uLaOZVeCsb0",
+    "title": "(AUDIO REPRINT REUPLOAD) Plastic Dinosaurs",
+    "producer": "Vocaloid Archival",
+    "vocal": "VOCALOID",
+    "youtube_id": "uLaOZVeCsb0",
+    "niconico_id": ""
+  },
+  {
     "song_id": "song_sm46934360",
     "title": "░░してよ",
     "producer": "¿?shimon",
@@ -4544,6 +4560,14 @@
     "niconico_id": ""
   },
   {
+    "song_id": "song_vz7zX-60D14",
+    "title": "シュガーコフィン",
+    "producer": "iroha(sasaki)",
+    "vocal": "音街ウナ",
+    "youtube_id": "vz7zX-60D14",
+    "niconico_id": ""
+  },
+  {
     "song_id": "song_LiKnXreq4JI",
     "title": "The Proper Way to Watch Paint Dry",
     "producer": "Rook, スーズィー",
@@ -4576,14 +4600,6 @@
     "niconico_id": ""
   },
   {
-    "song_id": "song_vz7zX-60D14",
-    "title": "シュガーコフィン",
-    "producer": "iroha(sasaki)",
-    "vocal": "音街ウナ",
-    "youtube_id": "vz7zX-60D14",
-    "niconico_id": ""
-  },
-  {
     "song_id": "song_sm46936677",
     "title": "待って！！！！うさぎ",
     "producer": "クラッドインザラストライン",
@@ -4608,6 +4624,14 @@
     "niconico_id": ""
   },
   {
+    "song_id": "song_zlUdteBFvbo",
+    "title": "糸",
+    "producer": "翠久怜音, Little Tanioka, Magnolia Cacophony",
+    "vocal": "重音テト",
+    "youtube_id": "zlUdteBFvbo",
+    "niconico_id": ""
+  },
+  {
     "song_id": "song_JkGyMUwzxQE",
     "title": "ただ浮かぶ脳裏のモーション",
     "producer": "バーバパパ",
@@ -4616,11 +4640,11 @@
     "niconico_id": ""
   },
   {
-    "song_id": "song_zlUdteBFvbo",
-    "title": "糸",
-    "producer": "翠久怜音, Little Tanioka, Magnolia Cacophony",
-    "vocal": "重音テト",
-    "youtube_id": "zlUdteBFvbo",
+    "song_id": "song_MFQXmWnVmes",
+    "title": "Gabriel Burning My Heart",
+    "producer": "Art Dave",
+    "vocal": "VOCALOID",
+    "youtube_id": "MFQXmWnVmes",
     "niconico_id": ""
   },
   {
@@ -4653,14 +4677,6 @@
     "producer": "Vane Lily, MonochroMenace, ジェイミー・ペイジュ",
     "vocal": "音街ウナ",
     "youtube_id": "qfhseuYZWlg",
-    "niconico_id": ""
-  },
-  {
-    "song_id": "song_85hw3r1_YDo",
-    "title": "UnaUnaRevolution",
-    "producer": "beat_shobon, スーズィー",
-    "vocal": "音街ウナ",
-    "youtube_id": "85hw3r1_YDo",
     "niconico_id": ""
   },
   {
@@ -4936,20 +4952,20 @@
     "niconico_id": ""
   },
   {
-    "song_id": "song_sm46537381",
-    "title": "ブレインロット",
-    "producer": "東京真中",
-    "vocal": "重音テト",
-    "youtube_id": "UsjsYMo3O1Q",
-    "niconico_id": "sm46537381"
-  },
-  {
     "song_id": "song_sm45883571",
     "title": "幸福刑",
     "producer": "ろねぴ",
     "vocal": "初音ミク",
     "youtube_id": "MlTQUSFr-gw",
     "niconico_id": "sm45883571"
+  },
+  {
+    "song_id": "song_sm46537381",
+    "title": "ブレインロット",
+    "producer": "東京真中",
+    "vocal": "重音テト",
+    "youtube_id": "UsjsYMo3O1Q",
+    "niconico_id": "sm46537381"
   },
   {
     "song_id": "song_CsYDv5Cf0yo",
@@ -5144,6 +5160,14 @@
     "niconico_id": "sm42576236"
   },
   {
+    "song_id": "song_sm46902260",
+    "title": "キミになっていく！",
+    "producer": "OSTER project",
+    "vocal": "小春六花・花隈千冬",
+    "youtube_id": "_CrLeREk4Pk",
+    "niconico_id": "sm46902260"
+  },
+  {
     "song_id": "song_sm40700016",
     "title": "海のサーチライト",
     "producer": "子牛",
@@ -5160,20 +5184,20 @@
     "niconico_id": "sm39374094"
   },
   {
+    "song_id": "song_sm46941186",
+    "title": "椿",
+    "producer": "丹羽",
+    "vocal": "重音テト",
+    "youtube_id": "",
+    "niconico_id": "sm46941186"
+  },
+  {
     "song_id": "song_sm46935395",
     "title": "落園 (feat. 裏命)",
     "producer": "_Asagi",
     "vocal": "裏命",
     "youtube_id": "CZTeGMKtDq0",
     "niconico_id": "sm46935395"
-  },
-  {
-    "song_id": "song_sm46902260",
-    "title": "キミになっていく！",
-    "producer": "OSTER project",
-    "vocal": "小春六花・花隈千冬",
-    "youtube_id": "_CrLeREk4Pk",
-    "niconico_id": "sm46902260"
   },
   {
     "song_id": "song_sm17520775",
@@ -5200,20 +5224,12 @@
     "niconico_id": "sm46907113"
   },
   {
-    "song_id": "song_sm38835941",
-    "title": "偽物人間40号",
-    "producer": "¿?shimon",
-    "vocal": "v_flower",
-    "youtube_id": "CSJTVDxHPGY",
-    "niconico_id": "sm38835941"
-  },
-  {
-    "song_id": "song_sm45571052",
-    "title": "ワルツ・ロサ・テスタロッサ",
-    "producer": "nyanyannya",
-    "vocal": "神威がくぽ",
-    "youtube_id": "403XN7xT9ZA",
-    "niconico_id": "sm45571052"
+    "song_id": "song_sm46940537",
+    "title": "Faraway, So Close feat.初音ミク",
+    "producer": "ぽちゃろふ",
+    "vocal": "初音ミク",
+    "youtube_id": "PkMidgaRuLA",
+    "niconico_id": "sm46940537"
   },
   {
     "song_id": "song_sm46875504",
@@ -5232,12 +5248,12 @@
     "niconico_id": "sm7706816"
   },
   {
-    "song_id": "song_sm31791630",
-    "title": "アンノウン・マザーグース",
-    "producer": "wowaka, ヒトリエ",
-    "vocal": "初音ミク",
-    "youtube_id": "P_CSdxSGfaA",
-    "niconico_id": "sm31791630"
+    "song_id": "song_sm45571052",
+    "title": "ワルツ・ロサ・テスタロッサ",
+    "producer": "nyanyannya",
+    "vocal": "神威がくぽ",
+    "youtube_id": "403XN7xT9ZA",
+    "niconico_id": "sm45571052"
   },
   {
     "song_id": "song_sm46843617",
@@ -5248,6 +5264,14 @@
     "niconico_id": "sm46843617"
   },
   {
+    "song_id": "song_sm31791630",
+    "title": "アンノウン・マザーグース",
+    "producer": "wowaka, ヒトリエ",
+    "vocal": "初音ミク",
+    "youtube_id": "P_CSdxSGfaA",
+    "niconico_id": "sm31791630"
+  },
+  {
     "song_id": "song_sm44044139",
     "title": "echo",
     "producer": "higma, Terufumi Miyazaki",
@@ -5256,27 +5280,35 @@
     "niconico_id": "sm44044139"
   },
   {
-    "song_id": "song_sm46933442",
-    "title": "Day by Day",
-    "producer": "さんま",
-    "vocal": "初音ミク",
-    "youtube_id": "",
-    "niconico_id": "sm46933442"
-  },
-  {
-    "song_id": "song_sm46932833",
-    "title": "たとえ違っても",
-    "producer": "Kage",
-    "vocal": "宮舞モカ",
-    "youtube_id": "PsHr5gE8TyI",
-    "niconico_id": "sm46932833"
-  },
-  {
-    "song_id": "song_QXOQyTCO4kc",
-    "title": "ピエニウム feat.重音テトSV",
-    "producer": "本人希望つくし",
+    "song_id": "song_sm46928401",
+    "title": "メテオラヴ/重音テト",
+    "producer": "Jelly______",
     "vocal": "重音テト",
-    "youtube_id": "QXOQyTCO4kc",
+    "youtube_id": "",
+    "niconico_id": "sm46928401"
+  },
+  {
+    "song_id": "song_sm10244728",
+    "title": "おちゃめ機能",
+    "producer": "ゴジマジＰ",
+    "vocal": "重音テト",
+    "youtube_id": "IzotoFg75O4",
+    "niconico_id": "sm10244728"
+  },
+  {
+    "song_id": "song_sm46907654",
+    "title": "ナイトウォーカー",
+    "producer": "神尾けい",
+    "vocal": "重音テト",
+    "youtube_id": "hOEXU4uynPE",
+    "niconico_id": "sm46907654"
+  },
+  {
+    "song_id": "song_w-yqipvEuKM",
+    "title": "嘘",
+    "producer": "___ official",
+    "vocal": "重音テト",
+    "youtube_id": "w-yqipvEuKM",
     "niconico_id": ""
   },
   {
@@ -5288,12 +5320,12 @@
     "niconico_id": "sm44677326"
   },
   {
-    "song_id": "song_sm44669739",
-    "title": "ガトン",
-    "producer": "＊-Teris.",
+    "song_id": "song_NwmTG1kPNOM",
+    "title": "IQ84",
+    "producer": "Uruha",
     "vocal": "可不",
-    "youtube_id": "GWYdLmCJUBk",
-    "niconico_id": "sm44669739"
+    "youtube_id": "NwmTG1kPNOM",
+    "niconico_id": ""
   },
   {
     "song_id": "song_sm46712665",
@@ -5304,11 +5336,19 @@
     "niconico_id": "sm46712665"
   },
   {
-    "song_id": "song_uLaOZVeCsb0",
-    "title": "(AUDIO REPRINT REUPLOAD) Plastic Dinosaurs",
-    "producer": "Vocaloid Archival",
+    "song_id": "song_f98zHUNlPoY",
+    "title": "세츠나 트립",
+    "producer": "우타이노",
+    "vocal": "GUMI",
+    "youtube_id": "f98zHUNlPoY",
+    "niconico_id": ""
+  },
+  {
+    "song_id": "song_s8akv55bT5Y",
+    "title": "39tuary",
+    "producer": "타레",
     "vocal": "VOCALOID",
-    "youtube_id": "uLaOZVeCsb0",
+    "youtube_id": "s8akv55bT5Y",
     "niconico_id": ""
   }
 ]
