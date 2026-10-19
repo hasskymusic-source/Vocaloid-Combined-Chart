@@ -1,0 +1,34 @@
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+
+/index.html
+  Cache-Control: public, max-age=0, s-maxage=60, stale-while-revalidate=86400
+
+/app.js
+  Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=86400
+
+/js/app.js
+  Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=86400
+
+/style.css
+  Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=86400
+
+/css/style.css
+  Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=86400
+
+/data/latest_ranking.json
+  Cache-Control: public, max-age=30, s-maxage=60, stale-while-revalidate=86400
+
+/public/data/latest_ranking.json
+  Cache-Control: public, max-age=30, s-maxage=60, stale-while-revalidate=86400
+
+/data/archive_index.json
+  Cache-Control: public, max-age=60, s-maxage=120, stale-while-revalidate=86400
+
+/data/archives/archive_index.json
+  Cache-Control: public, max-age=60, s-maxage=120, stale-while-revalidate=86400
+
+/data/archives/*
+  Cache-Control: public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800
