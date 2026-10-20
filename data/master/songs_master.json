@@ -5058,15 +5058,6 @@
     "published_at": "2026-10-18T11:13:02Z"
   },
   {
-    "song_id": "song_sm46928401",
-    "title": "メテオラヴ/重音テト",
-    "producer": "Jelly______",
-    "vocal": "重音テト",
-    "youtube_id": "mrn5ePlvrug",
-    "niconico_id": "sm46928401",
-    "published_at": "2026-10-15T18:27:45+09:00"
-  },
-  {
     "song_id": "song_sm10244728",
     "title": "おちゃめ機能",
     "producer": "ゴジマジＰ",
@@ -5394,10 +5385,10 @@
     "song_id": "song_sm46942244",
     "title": "盲信ガール",
     "producer": "MINUS4 / マイナスヨンド",
-    "vocal": "夏色花梨",
+    "vocal": "初音ミク・夏色花梨",
     "youtube_id": "RK_1PfAg5Yg",
     "niconico_id": "sm46942244",
-    "published_at": "2026-10-19T06:42:14+09:00"
+    "published_at": "2026-10-18T21:34:32Z"
   },
   {
     "song_id": "song_sm46942161",
@@ -5674,7 +5665,7 @@
     "title": "誰か気にする？",
     "producer": "GBurnP",
     "vocal": "歌愛ユキ",
-    "youtube_id": "",
+    "youtube_id": "8badB_crzc4",
     "niconico_id": "sm46945942",
     "published_at": "2026-10-20T08:36:57+09:00"
   },
@@ -5782,7 +5773,7 @@
     "title": "重なる生活",
     "producer": "Liminal Welfare",
     "vocal": "巡音ルカ",
-    "youtube_id": "",
+    "youtube_id": "imUKIiQjSqU",
     "niconico_id": "sm46944963",
     "published_at": "2026-10-19T23:43:30+09:00"
   },
@@ -5992,6 +5983,24 @@
     "youtube_id": "LaEgpNBt-bQ",
     "niconico_id": "sm43654892",
     "published_at": "2024-03-22T00:00:00Z"
+  },
+  {
+    "song_id": "song_sm46944979",
+    "title": "奥の細道序文 暗唱テスト用",
+    "producer": "まっさきにまさき",
+    "vocal": "初音ミク",
+    "youtube_id": "",
+    "niconico_id": "sm46944979",
+    "published_at": "2026-10-19T23:39:43+09:00"
+  },
+  {
+    "song_id": "song_sm46700781",
+    "title": "終末ふたりは",
+    "producer": "Noelcake__",
+    "vocal": "足立レイ・唄音ウタ(デフォ子)",
+    "youtube_id": "LLwM9-wRzx0",
+    "niconico_id": "sm46700781",
+    "published_at": "2026-08-21T00:00:00Z"
   },
   {
     "song_id": "song_sm46934360",
@@ -6615,6 +6624,15 @@
     "published_at": "2021-09-23T20:00:00+09:00"
   },
   {
+    "song_id": "song_sm46935395",
+    "title": "落園 (feat. 裏命)",
+    "producer": "_Asagi",
+    "vocal": "裏命",
+    "youtube_id": "CZTeGMKtDq0",
+    "niconico_id": "sm46935395",
+    "published_at": "2026-10-17T20:00:00+09:00"
+  },
+  {
     "song_id": "song_sm46902260",
     "title": "キミになっていく！",
     "producer": "OSTER project",
@@ -6624,13 +6642,40 @@
     "published_at": "2026-10-09T20:10:00+09:00"
   },
   {
-    "song_id": "song_sm46935395",
-    "title": "落園 (feat. 裏命)",
-    "producer": "_Asagi",
-    "vocal": "裏命",
-    "youtube_id": "CZTeGMKtDq0",
-    "niconico_id": "sm46935395",
-    "published_at": "2026-10-17T20:00:00+09:00"
+    "song_id": "song_sm46946404",
+    "title": "Herkaztika",
+    "producer": "Yuko",
+    "vocal": "初音ミク",
+    "youtube_id": "rB5lGVobEoc",
+    "niconico_id": "sm46946404",
+    "published_at": "2026-10-20T12:31:38+09:00"
+  },
+  {
+    "song_id": "song_sm46946402",
+    "title": "BAD END1",
+    "producer": "nurebairo.mouse",
+    "vocal": "可不",
+    "youtube_id": "BxJIb8L8zSc",
+    "niconico_id": "sm46946402",
+    "published_at": "2026-10-20T12:30:42+09:00"
+  },
+  {
+    "song_id": "song_sm46946388",
+    "title": "scary you are scary",
+    "producer": "nurebairo.mouse",
+    "vocal": "可不",
+    "youtube_id": "pFhrg6cIqx4",
+    "niconico_id": "sm46946388",
+    "published_at": "2026-10-20T12:24:54+09:00"
+  },
+  {
+    "song_id": "song_sm46946216",
+    "title": "先生、僕は駄目だ。",
+    "producer": "匿名",
+    "vocal": "VOCALOID",
+    "youtube_id": "",
+    "niconico_id": "sm46946216",
+    "published_at": "2026-10-20T10:39:36+09:00"
   },
   {
     "song_id": "song_sm46945473",
@@ -6651,31 +6696,31 @@
     "published_at": "2026-10-20T03:35:21+09:00"
   },
   {
-    "song_id": "song_sm46944979",
-    "title": "奥の細道序文 暗唱テスト用",
-    "producer": "まっさきにまさき",
+    "song_id": "song_sm46917429",
+    "title": "雲雀",
+    "producer": "雲雀野スピカ",
+    "vocal": "IA",
+    "youtube_id": "",
+    "niconico_id": "sm46917429",
+    "published_at": "2026-10-12T19:01:51+09:00"
+  },
+  {
+    "song_id": "song_sm46773388",
+    "title": "Sei / 初音ミク",
+    "producer": "hasu",
     "vocal": "初音ミク",
     "youtube_id": "",
-    "niconico_id": "sm46944979",
-    "published_at": "2026-10-19T23:39:43+09:00"
+    "niconico_id": "sm46773388",
+    "published_at": "2026-09-07T19:24:13+09:00"
   },
   {
-    "song_id": "song_sm46932822",
-    "title": "自然選択",
-    "producer": "Fover_p",
-    "vocal": "初音ミク",
-    "youtube_id": "NRs8uQnXPaI",
-    "niconico_id": "sm46932822",
-    "published_at": "2026-10-16T22:42:33+09:00"
-  },
-  {
-    "song_id": "song_sm46843617",
-    "title": "Desktop♡Princess",
-    "producer": "きさら",
-    "vocal": "初音ミク",
-    "youtube_id": "mZxDjbWrTbw",
-    "niconico_id": "sm46843617",
-    "published_at": "2026-10-09T20:00:00+09:00"
+    "song_id": "song_sm46776446",
+    "title": "君は天使になったんだ",
+    "producer": "ましも",
+    "vocal": "重音テト",
+    "youtube_id": "lWFH91qS4V8",
+    "niconico_id": "sm46776446",
+    "published_at": "2026-09-08T16:38:15+09:00"
   },
   {
     "song_id": "song_sm11956364",
@@ -6685,6 +6730,15 @@
     "youtube_id": "2CwBFr-Eoxg",
     "niconico_id": "sm11956364",
     "published_at": "2010-09-01T11:11:13+09:00"
+  },
+  {
+    "song_id": "song_sm46843617",
+    "title": "Desktop♡Princess",
+    "producer": "きさら",
+    "vocal": "初音ミク",
+    "youtube_id": "mZxDjbWrTbw",
+    "niconico_id": "sm46843617",
+    "published_at": "2026-10-09T20:00:00+09:00"
   },
   {
     "song_id": "song_sm31791630",
@@ -6705,6 +6759,24 @@
     "published_at": "2026-08-22T00:00:00Z"
   },
   {
+    "song_id": "song_6UHs4C6-p5I",
+    "title": "嘘つき花火",
+    "producer": "チキ",
+    "vocal": "初音ミク",
+    "youtube_id": "6UHs4C6-p5I",
+    "niconico_id": "",
+    "published_at": "2026-09-30T09:46:38Z"
+  },
+  {
+    "song_id": "song_N1KBxguO3DY",
+    "title": "ブレインロット",
+    "producer": "現実逃避 - XUE",
+    "vocal": "重音テト",
+    "youtube_id": "N1KBxguO3DY",
+    "niconico_id": "",
+    "published_at": "2026-02-28T03:00:29Z"
+  },
+  {
     "song_id": "song_sm44677326",
     "title": "カミングアウト",
     "producer": "ユラメ, かくりー",
@@ -6712,15 +6784,6 @@
     "youtube_id": "S07XAejKPE4",
     "niconico_id": "sm44677326",
     "published_at": "2025-02-24T00:00:00Z"
-  },
-  {
-    "song_id": "song_sm46690820",
-    "title": "Quon",
-    "producer": "＊-Teris.",
-    "vocal": "可不",
-    "youtube_id": "MRaoMgsXrmU",
-    "niconico_id": "sm46690820",
-    "published_at": "2026-08-22T00:00:00Z"
   },
   {
     "song_id": "song_sm46712665",
@@ -6732,12 +6795,102 @@
     "published_at": "2026-08-23T00:00:00Z"
   },
   {
-    "song_id": "song_sm46700781",
-    "title": "終末ふたりは",
-    "producer": "Noelcake__",
-    "vocal": "足立レイ・唄音ウタ(デフォ子)",
-    "youtube_id": "LLwM9-wRzx0",
-    "niconico_id": "sm46700781",
-    "published_at": "2026-08-21T00:00:00Z"
+    "song_id": "song_sm44669868",
+    "title": "生命",
+    "producer": "オヨイダキビス",
+    "vocal": "足立レイ",
+    "youtube_id": "wysR1-SDn4Y",
+    "niconico_id": "sm44669868",
+    "published_at": "2024-06-02T00:00:00Z"
+  },
+  {
+    "song_id": "song_umx6Q0ZW6Ds",
+    "title": "아무도 없나요",
+    "producer": "래오 - ani & music",
+    "vocal": "重音テト",
+    "youtube_id": "umx6Q0ZW6Ds",
+    "niconico_id": "",
+    "published_at": "2026-10-20T02:59:15Z"
+  },
+  {
+    "song_id": "song_sm46700474",
+    "title": "어딘가의 너에게",
+    "producer": "츠키유메, DID",
+    "vocal": "重音テト",
+    "youtube_id": "ZUowh5-9AtQ",
+    "niconico_id": "sm46700474",
+    "published_at": "2026-08-09T00:00:00Z"
+  },
+  {
+    "song_id": "song_j-X7_1RNpBo",
+    "title": "미쿠니까 Under My Heel(MIKU dashi)",
+    "producer": "KAMKI_Music",
+    "vocal": "初音ミク",
+    "youtube_id": "j-X7_1RNpBo",
+    "niconico_id": "",
+    "published_at": "2026-08-02T07:39:37Z"
+  },
+  {
+    "song_id": "song_YreLAuvJdN0",
+    "title": "It Could be Us",
+    "producer": "eggtan",
+    "vocal": "重音テト・亞北ネル",
+    "youtube_id": "YreLAuvJdN0",
+    "niconico_id": "",
+    "published_at": "2025-12-18T00:00:00Z"
+  },
+  {
+    "song_id": "song_sm43436193",
+    "title": "イガク",
+    "producer": "原口沙輔",
+    "vocal": "重音テト",
+    "youtube_id": "F38EuG2dAyM",
+    "niconico_id": "sm43436193",
+    "published_at": "2024-02-23T00:00:00Z"
+  },
+  {
+    "song_id": "song_sm32547140",
+    "title": "envelope",
+    "producer": "keisei",
+    "vocal": "初音ミク",
+    "youtube_id": "aYzTmmjYa9k",
+    "niconico_id": "sm32547140",
+    "published_at": "2018-01-07T00:00:00Z"
+  },
+  {
+    "song_id": "song_v-MWJoonXgU",
+    "title": "あまいひとこと",
+    "producer": "Shuna Music - 柊那(しゅうな)",
+    "vocal": "初音ミク",
+    "youtube_id": "v-MWJoonXgU",
+    "niconico_id": "",
+    "published_at": "2026-09-12T13:00:28Z"
+  },
+  {
+    "song_id": "song_sm32926231",
+    "title": "On Your Side",
+    "producer": "Yasuha.",
+    "vocal": "初音ミク",
+    "youtube_id": "mfFdc2kctQc",
+    "niconico_id": "sm32926231",
+    "published_at": "2018-03-22T00:00:00Z"
+  },
+  {
+    "song_id": "song_sm28930709",
+    "title": "Beautiful Sunrise",
+    "producer": "みちすけP",
+    "vocal": "初音ミク",
+    "youtube_id": "VEqKG3gB82k",
+    "niconico_id": "sm28930709",
+    "published_at": "2016-05-27T00:00:00Z"
+  },
+  {
+    "song_id": "song_sm27242325",
+    "title": "Turbo Orbit",
+    "producer": "keisei",
+    "vocal": "初音ミク",
+    "youtube_id": "DS4ZK3Gzwoo",
+    "niconico_id": "sm27242325",
+    "published_at": "2014-11-15T00:00:00Z"
   }
 ]
