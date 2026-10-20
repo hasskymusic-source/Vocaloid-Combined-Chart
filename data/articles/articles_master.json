@@ -1,0 +1,19 @@
+{
+  "articles": [],
+  "speakers": [
+    {
+      "id": "spk_host",
+      "name": "チャート分析班",
+      "side": "left",
+      "icon": "🎧",
+      "color": "#00d2ff"
+    },
+    {
+      "id": "spk_guest",
+      "name": "ボカロ解説員",
+      "side": "right",
+      "icon": "✨",
+      "color": "#f97316"
+    }
+  ]
+}
