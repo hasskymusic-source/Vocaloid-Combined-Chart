@@ -234,65 +234,151 @@
       </div>
     </section>
 
-    <!-- タブ4: ランキングについて -->
+<!-- タブ4: ランキングについて -->
     <section id="tab-method" class="tab-content">
+      <!-- 1. 集計方法・ポイント計算式・重み付けの根拠 -->
       <div class="insight-card">
-        <h2 class="insight-section-title">集計方法・ポイント計算式について</h2>
+        <h2 class="insight-section-title">集計方法・ポイント計算式と重み付けの根拠</h2>
         <p class="method-lead">
-          「週刊VOCALOID<sup class="tm-mark">TM</sup>複合ランキング」は、YouTubeとニコニコ動画の2大プラットフォームにおける週間純増数（月曜〜日曜の7日間）を取得し、ボカロリスナーの視聴・支持行動を多角的に反映して算出する複合チャートです。
+          「週刊VOCALOID<sup class="tm-mark">TM</sup>複合ランキング」は、YouTubeとニコニコ動画の2大プラットフォームにおける週間純増数（月曜0:00〜日曜23:59の7日間）を取得し、各プラットフォームのユーザー規模や視聴・支持行動の特性を踏まえた補正係数を乗じて算出する複合チャートです。
         </p>
+
+        <div class="method-schedule-banner">
+          <div class="method-schedule-item">
+            <span class="method-schedule-label">📊 データ取得（スナップショット）</span>
+            <strong>毎週月曜日 0:00頃（JST）自動取得</strong>
+          </div>
+          <div class="method-schedule-item">
+            <span class="method-schedule-label">🕒 チャート公開・更新日時</span>
+            <strong>毎週水曜日 13:00（JST）定期公開</strong>
+          </div>
+          <div class="method-schedule-item">
+            <span class="method-schedule-label">📢 更新遅延時の対応</span>
+            <span>API障害等で更新が遅れる場合はページ上部のバナー等で告知し、画面右上に実際のデータ更新日を常時表示します。</span>
+          </div>
+        </div>
+
         <div class="table-responsive" data-scroll-hint="true">
           <table class="insight-table method-table">
             <thead>
               <tr>
                 <th>プラットフォーム</th>
                 <th>指標</th>
-                <th>補正係数（重み付け）</th>
+                <th>補正係数</th>
                 <th>算出ルール</th>
+                <th>重み付け（補正係数）の根拠・設計意図</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>YouTube</td>
                 <td>週間再生数</td>
-                <td>× 1 pt</td>
+                <td><strong>× 1 pt</strong></td>
                 <td>期間内の再生数純増 × 1</td>
+                <td class="method-rationale-cell">全指標のベースライン（基準値＝1）。国内外の最も広いリスナー層へのリーチ規模をそのまま測定します。</td>
               </tr>
               <tr>
                 <td>YouTube</td>
                 <td>週間高評価数</td>
-                <td>× 50 pt</td>
+                <td><strong>× 50 pt</strong></td>
                 <td>期間内の高評価数純増 × 50</td>
+                <td class="method-rationale-cell">YouTubeにおける平均的な高評価率（再生数の約2〜3%）を踏まえ、受動的な再生だけでなく「楽曲を能動的に評価したアクション」を再生数と対等なスケールで反映するため50倍としています。</td>
               </tr>
               <tr>
                 <td>YouTube</td>
                 <td>週間コメント数</td>
-                <td>× 100 pt</td>
+                <td><strong>× 100 pt</strong></td>
                 <td>期間内のコメント数純増 × 100</td>
+                <td class="method-rationale-cell">YouTubeは1動画あたりのコメント投稿ハードルが高く発生率が低い（再生数の約0.1〜0.3%）ため、リスナーの強い熱量や考察・感想の盛り上がりを評価できるよう100倍に設定しています。</td>
               </tr>
               <tr>
                 <td>ニコニコ動画</td>
                 <td>週間再生数</td>
-                <td>× 5 pt</td>
+                <td><strong>× 5 pt</strong></td>
                 <td>期間内の再生数純増 × 5</td>
+                <td class="method-rationale-cell">YouTubeとニコニコ動画のアクティブユーザー規模（母数）の差を考慮し、ニコニコ動画内での再生トレンドが複合チャート上で埋もれず機能するよう5倍の補正をかけています。</td>
               </tr>
               <tr>
                 <td>ニコニコ動画</td>
-                <td>週間マイリスト数（いいね含む）</td>
-                <td>× 100 pt</td>
+                <td>週間マイリスト数</td>
+                <td><strong>× 100 pt</strong></td>
                 <td>期間内のマイリスト純増 × 100</td>
+                <td class="method-rationale-cell">「繰り返し聴きたい・保存したい」という強い支持行動（ブックマーク）を反映するため100倍に設定しています（※後述の通り、気軽な「いいね！」とは区別された純粋なマイリスト登録数を集計）。</td>
               </tr>
               <tr>
                 <td>ニコニコ動画</td>
                 <td>週間コメント数</td>
-                <td>× 10 pt</td>
+                <td><strong>× 10 pt</strong></td>
                 <td>期間内のコメント数純増 × 10</td>
+                <td class="method-rationale-cell">ニコニコ動画は動画上に弾幕や合いの手を流す独自のコメント文化があり、1人あたりのコメント数がYouTubeの約10倍発生しやすい特性があります。この文化差を平準化するため、YouTubeコメント（×100）の10分の1にあたる10倍に設定しています。</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
 
+      <!-- 2. 集計対象の選定ルール・複数アップロード・同点時の扱い -->
+      <div class="insight-card">
+        <h2 class="insight-section-title">集計対象楽曲の選定・統合・順位決定ルール</h2>
+        <p class="method-lead">
+          「どの楽曲が追跡対象になっているのか」「カバーや別MVはどう扱われるのか」といった選定バイアスや疑問を解消するため、以下の透明な自動収集・判定ルールに基づいて運用しています。
+        </p>
+        <div class="method-rule-grid">
+          <div class="method-rule-box">
+            <h3>① 候補楽曲の自動収集（選定バイアスの排除）</h3>
+            <p>
+              特定の投稿者リスト（ホワイトリスト）による限定は行いません。<strong>VocaDB API</strong>（国内外のボカロデータベース）、<strong>ニコニコ動画のタグ検索・RSS</strong>（<code>VOCALOID</code> / <code>ボカロオリジナル曲</code> / <code>SynthesizerVオリジナル曲</code> 等）、および<strong>YouTubeの日・韓・英マルチリンガル検索</strong>を組み合わせ、動画時間が<strong>90秒〜420秒</strong>の合成音声オリジナル楽曲を新人・海外P問わず自動収集しています。
+            </p>
+          </div>
+          <div class="method-rule-box">
+            <h3>② 新譜と過去曲（旧譜）の扱い</h3>
+            <p>
+              すでに追跡プールに登録されている楽曲は、投稿時期にかかわらず<strong>「前週月曜〜今週月曜の7日間の実測純増数」</strong>で毎週公平に集計されます（過去曲のリバイバルヒットも反映されます）。<br>
+              今週初めてシステムに検知された楽曲については、<strong>公開から10日以内の新譜のみ</strong>初週ポイントを算出し、公開から10日以上経過した過去曲が新規登録された場合は、過去累計値の混入を防ぐため初週は基準値記録のみ（0 pt）とし、翌週から7日間の実測純増数で集計します。
+            </p>
+          </div>
+          <div class="method-rule-box">
+            <h3>③ 同一曲の複数アップロード（本家・歌ってみた・MV違い）</h3>
+            <p>
+              「歌ってみた」「踊ってみた」「演奏してみた」「MMD」「切り抜き」「カラオケ（Off Vocal）」等の二次創作・人間歌唱カバーは自動フィルタで除外し、<strong>ボカロP本人（公式）による合成音声オリジナルMVのみ</strong>を集計対象とします。<br>
+              同一楽曲がYouTubeとニコニコ動画の両方に投稿されている場合は、VocaDBのPV情報・概要欄の相互リンク・曲名とP名の正規化照合により<strong>1曲として自動統合し、両サイトの純増ポイントを合算</strong>します。公式による別アレンジ（Remix等）や別動画IDのMVは、それぞれの動画単位で独立して集計します。
+            </p>
+          </div>
+          <div class="method-rule-box">
+            <h3>④ 同点時の順位決定ルール（タイブレーク）</h3>
+            <p>
+              週間総合ポイント（<code>total_pt</code>）が完全に同点となった場合は、恣意的な並び替えを排除するため、データベース上の固有楽曲ID（<code>song_id</code>）の昇順によって一意に順位を決定する決定論的（Deterministic）アルゴリズムを採用しています。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. データ品質管理・異常値処理に関する注意書き -->
+      <div class="insight-card">
+        <h2 class="insight-section-title">データ品質管理・異常値処理に関する注意書き</h2>
+        <div class="method-quality-list">
+          <div class="method-quality-item">
+            <h3>📉 マイナス純増・異常値の処理（動画削除・非公開・カウント補正など）</h3>
+            <p>
+              集計期間中に公式動画が削除・非公開化された場合（両プラットフォームの再生数がともに0となった場合）は、その週のランキング対象から自動的に除外されます。また、プラットフォーム側のスパムアカウント凍結・コメント削除・マイリスト解除・再生数再計算などにより特定の指標の週間純増数がマイナスとなった場合は、他の指標で獲得したポイントを不当に減算しないよう、<strong>各指標の純増下限を「0」（<code>max(0, 今週値 - 前週値)</code>）に補正</strong>して算出しています。
+            </p>
+          </div>
+          <div class="method-quality-item">
+            <h3>📁 ニコニコ動画「週間マイリスト数」と「いいね！数」の区別について</h3>
+            <p>
+              ニコニコ動画には、気軽に押せる応援アクションである「いいね！」と、繰り返し視聴するために保存する「マイリスト」の2種類が存在します。当チャートでは、ニコニコ動画の公式スナップショットAPIおよびサムネイル情報APIから確定値として安定取得できる <strong><code>mylistCounter</code>（純粋なマイリスト登録数）</strong> を集計対象としており、性質の異なる「いいね！数」は合算していません。リピート視聴を前提とした強い支持指標として、マイリスト純増数に ×100 pt の重み付けを行っています。
+            </p>
+          </div>
+          <div class="method-quality-item">
+            <h3>⏱️ データ取得日時と更新遅延時の表示について</h3>
+            <p>
+              各チャートの正確な「集計期間（月曜〜日曜）」および「更新日」は、ページ上部右側の「集計期間 / 更新日」ボックスに常時表示されます。各プラットフォームのAPIメンテナンスや通信障害等により水曜13:00の定期更新に遅れが生じる場合は、データの整合性が確認でき次第の公開とし、サイト上部のアナウンスバナーにて状況をお知らせいたします。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. ランキングを制作した背景 -->
       <div class="insight-card">
         <h2 class="insight-section-title">ランキングを制作した背景</h2>
         <div class="method-background-text">
@@ -306,12 +392,12 @@
             このような現状と課題意識から、当サイト「週刊VOCALOID<sup class="tm-mark">TM</sup>複合ランキング」では、YouTubeとニコニコ動画の双方から「再生数・高評価数・マイリスト数・コメント数」の計6指標を自動収集し、各プラットフォームのユーザー規模やアクションの重みに応じた独自の補正係数を掛け合わせて統合ポイント化しました。2つのプラットフォームの特性を掛け合わせることで、現在のボカロシーンにおける真のトレンドと楽曲の多面的な魅力を可視化することを目指しています。
           </p>
           <p class="trademark-note">
-            ※「VOCALOID（ボーカロイド）」はヤマハ株式会社の登録商標です。また、本ランキングでは広義のボカロ曲（CeVIO、Synthesizer V、UTAU、VoiSona等の各種合成音声ソフトウェアを用いた楽曲および派生キャラクター楽曲）も集計対象として網羅しています。
+            ※「VOCALOID（ボーカロイド）」はヤマハ株式会社の登録商標です。また、本ランキングでは広義のボカロ曲（CeVIO、Synthesizer V、UTAU、VOICEVOX、VoiSona等の各種合成音声ソフトウェアを用いた楽曲および派生キャラクター楽曲）も集計対象として網羅しています。
           </p>
         </div>
       </div>
 
-      <!-- 一番下に新たなカードを作成し、その中で TOTAL VIEWS を小さく表示 -->
+      <!-- 5. サイト累計アクセス数カード -->
       <div class="insight-card site-stats-card">
         <div class="site-stats-inner">
           <span class="site-stats-label">サイト累計アクセス数</span>
