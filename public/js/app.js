@@ -2051,12 +2051,79 @@ function ensureArticlesTabStructure() {
   return sectionEl;
 }
 
+let articlesDataLoaded = false;
+let articlesLoadingPromise = null;
+const DEFAULT_PAGE_TITLE = document.title || "週刊VOCALOID™複合ランキング";
+const DEFAULT_META_DESC = (function () {
+  const el = document.querySelector('meta[name="description"]');
+  return el ? el.getAttribute("content") || "" : "";
+})();
+
+function updatePageSeoMeta(article) {
+  const descEl = document.querySelector('meta[name="description"]');
+  const ogTitleEl = document.querySelector('meta[property="og:title"]');
+  const ogDescEl = document.querySelector('meta[property="og:description"]');
+  const ogUrlEl = document.querySelector('meta[property="og:url"]');
+  const canonicalEl = document.querySelector('link[rel="canonical"]');
+
+  if (article && article.title) {
+    const fullTitle = article.title + " | 週刊VOCALOID™複合ランキング";
+    const desc =
+      article.summary ||
+      article.title + " - 週刊VOCALOID™複合ランキング（" + (article.category || "コラム") + "）";
+    const articleUrl =
+      OFFICIAL_SITE_URL + "/articles/" + encodeURIComponent(article.id) + ".html";
+
+    document.title = fullTitle;
+    if (descEl) descEl.setAttribute("content", desc);
+    if (ogTitleEl) ogTitleEl.setAttribute("content", fullTitle);
+    if (ogDescEl) ogDescEl.setAttribute("content", desc);
+    if (ogUrlEl) ogUrlEl.setAttribute("content", articleUrl);
+    if (canonicalEl) canonicalEl.setAttribute("href", articleUrl);
+  } else {
+    document.title = DEFAULT_PAGE_TITLE;
+    if (descEl && DEFAULT_META_DESC) descEl.setAttribute("content", DEFAULT_META_DESC);
+    if (ogTitleEl) ogTitleEl.setAttribute("content", DEFAULT_PAGE_TITLE);
+    if (ogDescEl && DEFAULT_META_DESC) ogDescEl.setAttribute("content", DEFAULT_META_DESC);
+    if (ogUrlEl) ogUrlEl.setAttribute("content", OFFICIAL_SITE_URL);
+    if (canonicalEl) canonicalEl.setAttribute("href", OFFICIAL_SITE_URL);
+  }
+}
+
+async function ensureArticlesLoaded() {
+  if (articlesDataLoaded) return;
+  if (articlesLoadingPromise) return articlesLoadingPromise;
+  articlesLoadingPromise = loadArticlesData().finally(function () {
+    articlesDataLoaded = true;
+    articlesLoadingPromise = null;
+  });
+  return articlesLoadingPromise;
+}
+
 async function initArticlesSystem() {
   const sectionEl = ensureArticlesTabStructure();
   if (!sectionEl) return;
 
+  const articlesTabId = getArticlesTabId();
+  const tabBtn = document.querySelector('.tab-btn[data-tab="' + articlesTabId + '"]');
+  if (tabBtn) {
+    // 初期表示を重くしないため、「記事・コラム」タブにマウスを乗せた時またはクリックした時に初めて通信を行う
+    tabBtn.addEventListener(
+      "mouseenter",
+      function () {
+        if (!isDataSaverEnabled()) ensureArticlesLoaded();
+      },
+      { passive: true }
+    );
+    tabBtn.addEventListener("click", function () {
+      ensureArticlesLoaded();
+    });
+  }
+
   sectionEl.addEventListener("click", function (e) {
-    const catBtn = e.target.closest(".article-cat-btn, .category-pill, .column-cat-btn, [data-category]");
+    const catBtn = e.target.closest(
+      ".article-cat-btn, .category-pill, .column-cat-btn, [data-category]"
+    );
     if (catBtn && catBtn.hasAttribute("data-category")) {
       const cat = catBtn.getAttribute("data-category") || "all";
       currentArticleCategory = cat;
@@ -2072,20 +2139,31 @@ async function initArticlesSystem() {
       return;
     }
 
-    const openCard = e.target.closest("[data-article-id]");
-    if (openCard && !e.target.closest("a") && !e.target.closest("button")) {
-      const aid = openCard.getAttribute("data-article-id");
-      if (aid) {
-        openArticleById(aid, true);
+    // 個別URLリンク (<a class="article-seo-link" href="./articles/xxx.html">) が通常クリックされた場合はそのまま個別URLへ遷移させても良いし、
+    // Ctrl/Cmdクリック時はブラウザ標準の別タブ遷移に任せる
+    const seoLink = e.target.closest(".article-seo-link");
+    if (seoLink) {
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) {
+        return;
+      }
+      // プレビュー環境(localhost)では未ビルドの下書きも読めるようSPAリーダーで開く
+      if (isLocalOwnerPreview()) {
+        e.preventDefault();
+        const card = seoLink.closest("[data-article-id]");
+        if (card) openArticleById(card.getAttribute("data-article-id"), true);
       }
       return;
     }
 
-    const readBtn = e.target.closest(".article-read-btn");
-    if (readBtn) {
-      const aid = readBtn.getAttribute("data-article-id");
+    const openCard = e.target.closest("[data-article-id]");
+    if (openCard && !e.target.closest("a") && !e.target.closest("button")) {
+      const aid = openCard.getAttribute("data-article-id");
       if (aid) {
-        openArticleById(aid, true);
+        if (!isLocalOwnerPreview()) {
+          window.location.href = "./articles/" + encodeURIComponent(aid) + ".html";
+        } else {
+          openArticleById(aid, true);
+        }
       }
       return;
     }
@@ -2101,9 +2179,13 @@ async function initArticlesSystem() {
       const aid = shareArticleBtn.getAttribute("data-share-id");
       const title = shareArticleBtn.getAttribute("data-share-title");
       const cat = shareArticleBtn.getAttribute("data-share-cat") || "記事・コラム";
-      const shareUrl = OFFICIAL_SITE_URL + "/#article=" + encodeURIComponent(aid);
+      const shareUrl = OFFICIAL_SITE_URL + "/articles/" + encodeURIComponent(aid) + ".html";
       const text =
-        "【" + cat + "】" + title + "\n｜週刊VOCALOID™複合ランキング\n#週刊VOCALOID複合ランキング #ボカロ";
+        "【" +
+        cat +
+        "】" +
+        title +
+        "\n｜週刊VOCALOID™複合ランキング\n#週刊VOCALOID複合ランキング #ボカロ";
       const intentUrl =
         "https://twitter.com/intent/tweet?text=" +
         encodeURIComponent(text) +
@@ -2116,11 +2198,11 @@ async function initArticlesSystem() {
     const copyArticleUrlBtn = e.target.closest(".copy-article-url-btn");
     if (copyArticleUrlBtn) {
       const aid = copyArticleUrlBtn.getAttribute("data-share-id");
-      const shareUrl = OFFICIAL_SITE_URL + "/#article=" + encodeURIComponent(aid);
+      const shareUrl = OFFICIAL_SITE_URL + "/articles/" + encodeURIComponent(aid) + ".html";
       navigator.clipboard
         .writeText(shareUrl)
         .then(function () {
-          showToast("🔗 記事のURLをコピーしました！");
+          showToast("🔗 記事の個別URLをコピーしました！");
         })
         .catch(function () {
           showToast("コピーに失敗しました");
@@ -2142,19 +2224,46 @@ async function initArticlesSystem() {
     });
   }
 
-  await loadArticlesData();
-  checkAndHandleArticleHash();
-  window.addEventListener("hashchange", checkAndHandleArticleHash);
+  // 初回アクセス時にURLハッシュが #article= または #tab-articles の場合のみ即時読み込みし、
+  // 通常のトップページ表示時はバックグラウンドアイドル時まで待機して初期表示を高速化する
+  const initialHash = window.location.hash || "";
+  if (
+    initialHash.indexOf("#article=") === 0 ||
+    initialHash === "#" + articlesTabId ||
+    sectionEl.classList.contains("active")
+  ) {
+    await ensureArticlesLoaded();
+    checkAndHandleArticleHash();
+  } else if (!isSmartphoneViewport() && !isDataSaverEnabled()) {
+    const idleFn =
+      window.requestIdleCallback ||
+      function (cb) {
+        setTimeout(cb, 2800);
+      };
+    idleFn(function () {
+      ensureArticlesLoaded();
+    });
+  }
+
+  window.addEventListener("hashchange", function () {
+    ensureArticlesLoaded().then(checkAndHandleArticleHash);
+  });
 }
 
 async function loadArticlesData() {
+  // 本番環境では本文(body)を含まない超軽量な articles_index.json を最優先で読み込む
   const candidateUrls = isLocalOwnerPreview()
     ? [
         "./data/articles/articles_master.json",
+        "./data/articles_index.json",
         "./data/articles.json",
+        "public/data/articles_index.json",
         "public/data/articles.json"
       ]
     : [
+        "./data/articles_index.json",
+        "data/articles_index.json",
+        "public/data/articles_index.json",
         "./data/articles.json",
         "data/articles.json",
         "public/data/articles.json"
@@ -2190,6 +2299,9 @@ function checkAndHandleArticleHash() {
       activateTabById(tabId);
       openArticleById(targetId, false);
     }
+  } else if (hash === "#" + getArticlesTabId()) {
+    activateTabById(getArticlesTabId());
+    if (currentOpenArticleId) closeArticleDetail(false);
   } else if (currentOpenArticleId) {
     closeArticleDetail(false);
   }
@@ -2249,17 +2361,23 @@ function buildArticleTagRowHtml(tags) {
   return '<div class="article-tag-row">' + spans.join("") + "</div>";
 }
 
+function getArticlePermalink(article) {
+  const cleanId = encodeURIComponent(String(article.id || "").trim());
+  return "./articles/" + cleanId + ".html";
+}
+
 function buildHeroArticleHtml(heroArticle) {
   const thumbUrl = resolveArticleThumbnail(heroArticle);
   const dateStr = formatArticleDate(heroArticle);
   const tags = Array.isArray(heroArticle.tags) ? heroArticle.tags : [];
+  const permalink = getArticlePermalink(heroArticle);
 
   const thumbInner = thumbUrl
     ? '<img src="' +
       escapeHtml(thumbUrl) +
       '" alt="' +
       escapeHtml(heroArticle.title) +
-      '" class="article-hero-thumb" loading="lazy" referrerpolicy="no-referrer" />'
+      '" class="article-hero-thumb" loading="lazy" decoding="async" referrerpolicy="no-referrer" />'
     : '<div class="article-thumb-placeholder"><span>VOCALOID COLUMN</span></div>';
 
   const authorHtml = heroArticle.author
@@ -2284,14 +2402,18 @@ function buildHeroArticleHtml(heroArticle) {
     "</time>" +
     authorHtml +
     "</div>" +
-    '<h3 class="article-hero-title">' +
+    '<h3 class="article-hero-title"><a href="' +
+    escapeHtml(permalink) +
+    '" class="article-seo-link" style="color:inherit;text-decoration:none;">' +
     escapeHtml(heroArticle.title) +
-    "</h3>" +
+    "</a></h3>" +
     '<p class="article-hero-summary">' +
     escapeHtml(heroArticle.summary || "") +
     "</p>" +
     buildArticleTagRowHtml(tags) +
-    '<div class="article-read-more">記事を読む ➔</div>' +
+    '<a href="' +
+    escapeHtml(permalink) +
+    '" class="article-read-more article-seo-link" style="text-decoration:none;">記事を読む ➔</a>' +
     "</div>" +
     "</article>"
   );
@@ -2301,13 +2423,14 @@ function buildGridArticleCardHtml(art) {
   const thumbUrl = resolveArticleThumbnail(art);
   const dateStr = formatArticleDate(art);
   const tags = Array.isArray(art.tags) ? art.tags.slice(0, 4) : [];
+  const permalink = getArticlePermalink(art);
 
   const thumbInner = thumbUrl
     ? '<img src="' +
       escapeHtml(thumbUrl) +
       '" alt="' +
       escapeHtml(art.title) +
-      '" class="article-card-thumb" loading="lazy" referrerpolicy="no-referrer" />'
+      '" class="article-card-thumb" loading="lazy" decoding="async" referrerpolicy="no-referrer" />'
     : '<div class="article-thumb-placeholder"><span>COLUMN</span></div>';
 
   const authorHtml = art.author
@@ -2331,9 +2454,11 @@ function buildGridArticleCardHtml(art) {
     "</time>" +
     authorHtml +
     "</div>" +
-    '<h3 class="article-card-title">' +
+    '<h3 class="article-card-title"><a href="' +
+    escapeHtml(permalink) +
+    '" class="article-seo-link" style="color:inherit;text-decoration:none;">' +
     escapeHtml(art.title) +
-    "</h3>" +
+    "</a></h3>" +
     '<p class="article-card-summary">' +
     escapeHtml(art.summary || "") +
     "</p>" +
@@ -2420,8 +2545,9 @@ function renderArticlesView() {
   gridContainer.innerHTML = gridList.map(buildGridArticleCardHtml).join("");
 }
 
-function openArticleById(articleId, updateHash) {
-  const article = allArticlesData.find(function (a) {
+async function openArticleById(articleId, updateHash) {
+  await ensureArticlesLoaded();
+  let article = allArticlesData.find(function (a) {
     return String(a.id) === String(articleId);
   });
   if (!article) {
@@ -2429,10 +2555,34 @@ function openArticleById(articleId, updateHash) {
     return;
   }
 
+  // 軽量インデックス(articles_index.json)から読み込まれていて本文(body)が未取得の場合、オンデマンドで個別記事JSONを取得
+  if (!article.body && !article.content) {
+    const cleanId = encodeURIComponent(String(article.id).trim());
+    const fullArticle = await fetchJsonWithFallback(
+      [
+        "./data/articles/" + cleanId + ".json",
+        "public/data/articles/" + cleanId + ".json",
+        "./data/articles.json"
+      ],
+      "default"
+    );
+    if (fullArticle) {
+      if (Array.isArray(fullArticle.articles)) {
+        const found = fullArticle.articles.find(function (x) {
+          return String(x.id) === String(articleId);
+        });
+        if (found) Object.assign(article, found);
+      } else if (fullArticle.body || fullArticle.content) {
+        Object.assign(article, fullArticle);
+      }
+    }
+  }
+
   currentOpenArticleId = article.id;
   if (updateHash) {
     history.pushState(null, "", "#article=" + encodeURIComponent(article.id));
   }
+  updatePageSeoMeta(article);
 
   const sectionEl = document.getElementById(getArticlesTabId());
   if (!sectionEl) return;
@@ -2508,7 +2658,7 @@ function openArticleById(articleId, updateHash) {
     '">𝕏 記事をシェア</button>' +
     '<button type="button" class="action-btn copy-article-url-btn" data-share-id="' +
     escapeHtml(article.id) +
-    '">🔗 URLコピー</button>' +
+    '">🔗 個別URLをコピー</button>' +
     "</div>" +
     "</div>" +
     '<header class="article-reader-header">' +
@@ -2544,7 +2694,7 @@ function openArticleById(articleId, updateHash) {
     '">𝕏 ポストする</button>' +
     '<button type="button" class="action-btn copy-article-url-btn" data-share-id="' +
     escapeHtml(article.id) +
-    '">🔗 リンクをコピー</button>' +
+    '">🔗 個別URLをコピー</button>' +
     "</div>" +
     "</div>" +
     '<button type="button" class="article-back-btn bottom-back-btn">← 記事・コラム一覧へ戻る</button>' +
@@ -2557,6 +2707,7 @@ function openArticleById(articleId, updateHash) {
 
 function closeArticleDetail(clearHash) {
   currentOpenArticleId = null;
+  updatePageSeoMeta(null);
   if (clearHash && window.location.hash.indexOf("#article=") === 0) {
     history.pushState(null, "", window.location.pathname + window.location.search);
   }
