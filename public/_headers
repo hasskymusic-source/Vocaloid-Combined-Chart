@@ -24,6 +24,12 @@
 /public/data/latest_ranking.json
   Cache-Control: public, max-age=30, s-maxage=60, stale-while-revalidate=86400
 
+/data/articles.json
+  Cache-Control: public, max-age=30, s-maxage=60, stale-while-revalidate=86400
+
+/public/data/articles.json
+  Cache-Control: public, max-age=30, s-maxage=60, stale-while-revalidate=86400
+
 /data/archive_index.json
   Cache-Control: public, max-age=60, s-maxage=120, stale-while-revalidate=86400
 
