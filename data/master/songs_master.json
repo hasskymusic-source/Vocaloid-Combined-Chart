@@ -5328,15 +5328,6 @@
     "published_at": "2026-10-19T03:18:49Z"
   },
   {
-    "song_id": "song_sm46942510",
-    "title": "ロケットなう!(^^)!",
-    "producer": "NAO3",
-    "vocal": "ナースロボ＿タイプＴ",
-    "youtube_id": "BDezu1iaOtc",
-    "niconico_id": "sm46942510",
-    "published_at": "2026-10-19T10:10:55+09:00"
-  },
-  {
     "song_id": "song_sm46942499",
     "title": "青春OVERDOSE",
     "producer": "MINUS4 / マイナスヨンド",
@@ -6147,6 +6138,87 @@
     "published_at": "2014-11-15T00:00:00Z"
   },
   {
+    "song_id": "song_sm39336579",
+    "title": "シャンティ",
+    "producer": "wotaku",
+    "vocal": "KAITO",
+    "youtube_id": "POy0RvJeaqM",
+    "niconico_id": "sm39336579",
+    "published_at": "2021-09-17T10:00:09Z"
+  },
+  {
+    "song_id": "song_sm46945942",
+    "title": "誰か気にする？",
+    "producer": "GBurnP",
+    "vocal": "歌愛ユキ",
+    "youtube_id": "8badB_crzc4",
+    "niconico_id": "sm46945942",
+    "published_at": "2026-10-20T08:36:57+09:00"
+  },
+  {
+    "song_id": "song_sm46787667",
+    "title": "迷子のままで",
+    "producer": "メリエル",
+    "vocal": "可不",
+    "youtube_id": "KJzBpyJoxVA",
+    "niconico_id": "sm46787667",
+    "published_at": "2026-09-10T11:30:27Z"
+  },
+  {
+    "song_id": "song_t7xaFZL5e1Q",
+    "title": "전생사과",
+    "producer": "우타이노",
+    "vocal": "初音ミク",
+    "youtube_id": "t7xaFZL5e1Q",
+    "niconico_id": "",
+    "published_at": "2026-10-14T08:00:36Z"
+  },
+  {
+    "song_id": "song_fKVCkguZrn0",
+    "title": "메디신 판타지",
+    "producer": "우타이노",
+    "vocal": "初音ミク",
+    "youtube_id": "fKVCkguZrn0",
+    "niconico_id": "",
+    "published_at": "2026-10-13T08:00:30Z"
+  },
+  {
+    "song_id": "song_sm36936564",
+    "title": "誓い",
+    "producer": "カジャ, シリア",
+    "vocal": "初音ミク",
+    "youtube_id": "JH6ue-1C0pU",
+    "niconico_id": "sm36936564",
+    "published_at": "2020-01-27T00:00:00Z"
+  },
+  {
+    "song_id": "song_sm2302757",
+    "title": "편의점 PV(ver.유노미)",
+    "producer": "ちぼり",
+    "vocal": "初音ミク",
+    "youtube_id": "yp7cQyzo5MM",
+    "niconico_id": "sm2302757",
+    "published_at": "2009-05-30T16:11:51Z"
+  },
+  {
+    "song_id": "song_sm36962202",
+    "title": "スパイラル・デイズ",
+    "producer": "芳田",
+    "vocal": "初音ミク",
+    "youtube_id": "LI386NjCiK0",
+    "niconico_id": "sm36962202",
+    "published_at": "2020-01-26T00:00:00Z"
+  },
+  {
+    "song_id": "song_po-DGuC3h_E",
+    "title": "Sweet Hell",
+    "producer": "Legendary_Kat / すやすや〜めP",
+    "vocal": "重音テト",
+    "youtube_id": "po-DGuC3h_E",
+    "niconico_id": "",
+    "published_at": "2025-05-12T03:27:33Z"
+  },
+  {
     "song_id": "song_sm46934360",
     "title": "░░してよ",
     "producer": "¿?shimon",
@@ -6772,7 +6844,7 @@
     "title": "落園 (feat. 裏命)",
     "producer": "_Asagi",
     "vocal": "裏命",
-    "youtube_id": "CZTeGMKtDq0",
+    "youtube_id": "",
     "niconico_id": "sm46935395",
     "published_at": "2026-10-17T20:00:00+09:00"
   },
@@ -6784,24 +6856,6 @@
     "youtube_id": "_CrLeREk4Pk",
     "niconico_id": "sm46902260",
     "published_at": "2026-10-09T20:10:00+09:00"
-  },
-  {
-    "song_id": "song_sm39336579",
-    "title": "シャンティ",
-    "producer": "wotaku",
-    "vocal": "KAITO",
-    "youtube_id": "POy0RvJeaqM",
-    "niconico_id": "sm39336579",
-    "published_at": "2021-09-17T19:00:00+09:00"
-  },
-  {
-    "song_id": "song_sm46945942",
-    "title": "誰か気にする？",
-    "producer": "GBurnP",
-    "vocal": "歌愛ユキ",
-    "youtube_id": "",
-    "niconico_id": "sm46945942",
-    "published_at": "2026-10-20T08:36:57+09:00"
   },
   {
     "song_id": "song_sm46945473",
@@ -6822,13 +6876,49 @@
     "published_at": "2026-10-20T03:35:21+09:00"
   },
   {
-    "song_id": "song_sm46787667",
-    "title": "迷子のままで",
-    "producer": "メリエル",
-    "vocal": "可不",
-    "youtube_id": "KJzBpyJoxVA",
-    "niconico_id": "sm46787667",
-    "published_at": "2026-09-11T20:30:00+09:00"
+    "song_id": "song_sm7706816",
+    "title": "Paranoid Doll",
+    "producer": "Various artists",
+    "vocal": "神威がくぽ",
+    "youtube_id": "",
+    "niconico_id": "sm7706816",
+    "published_at": "2009-07-22T05:07:15+09:00"
+  },
+  {
+    "song_id": "song_sm46508001",
+    "title": "昏れなずむ追想を",
+    "producer": "えむぇぬ",
+    "vocal": "v_flower",
+    "youtube_id": "2xfmP3x1yyM",
+    "niconico_id": "sm46508001",
+    "published_at": "2026-07-03T20:00:05+09:00"
+  },
+  {
+    "song_id": "song_sm46605691",
+    "title": "あたしじゃない",
+    "producer": "NAZZ-P",
+    "vocal": "VOCALOID",
+    "youtube_id": "UBkAlM8cKY4",
+    "niconico_id": "sm46605691",
+    "published_at": "2026-07-30T20:59:42+09:00"
+  },
+  {
+    "song_id": "song_sm26416613",
+    "title": "はなまるセカイ",
+    "producer": "ふわりP",
+    "vocal": "初音ミク・神威がくぽ",
+    "youtube_id": "aH8BfT-Q6MI",
+    "niconico_id": "sm26416613",
+    "published_at": "2015-06-05T20:30:00+09:00"
+  },
+  {
+    "song_id": "song_sm26981566",
+    "title": "かろやかに、やさしく。",
+    "producer": "ふわりP",
+    "vocal": "初音ミク",
+    "youtube_id": "ve0ntf-2GBI",
+    "niconico_id": "sm26981566",
+    "published_at": "2015-08-21T21:51:00+09:00"
   },
   {
     "song_id": "song_sm11956364",
@@ -6894,66 +6984,57 @@
     "published_at": "2026-08-23T00:00:00Z"
   },
   {
-    "song_id": "song_sm46700474",
-    "title": "어딘가의 너에게",
-    "producer": "츠키유메, DID",
+    "song_id": "song_f6lTcVTWgJg",
+    "title": "토리노코시티",
+    "producer": "Alice Clipton",
+    "vocal": "初音ミク",
+    "youtube_id": "f6lTcVTWgJg",
+    "niconico_id": "",
+    "published_at": "2012-08-22T14:00:43Z"
+  },
+  {
+    "song_id": "song_fGFN_a0sY40",
+    "title": "밸패유기 (혼돈부기)",
+    "producer": "쵸마린 『ちょマリン』",
+    "vocal": "VOCALOID",
+    "youtube_id": "fGFN_a0sY40",
+    "niconico_id": "",
+    "published_at": "2024-12-24T02:00:06Z"
+  },
+  {
+    "song_id": "song__qLCdom6AiM",
+    "title": "ODDS & ENDS",
+    "producer": "Alice Clipton",
+    "vocal": "初音ミク",
+    "youtube_id": "_qLCdom6AiM",
+    "niconico_id": "",
+    "published_at": "2012-12-24T11:13:08Z"
+  },
+  {
+    "song_id": "song_U_EZFzCPThk",
+    "title": "Pear Teto",
+    "producer": "Turbo Lines Music",
     "vocal": "重音テト",
-    "youtube_id": "ZUowh5-9AtQ",
-    "niconico_id": "sm46700474",
-    "published_at": "2026-08-09T00:00:00Z"
-  },
-  {
-    "song_id": "song_t7xaFZL5e1Q",
-    "title": "전생사과",
-    "producer": "우타이노",
-    "vocal": "初音ミク",
-    "youtube_id": "t7xaFZL5e1Q",
+    "youtube_id": "U_EZFzCPThk",
     "niconico_id": "",
-    "published_at": "2026-10-14T08:00:36Z"
+    "published_at": "2025-03-22T00:00:00Z"
   },
   {
-    "song_id": "song_fKVCkguZrn0",
-    "title": "메디신 판타지",
-    "producer": "우타이노",
-    "vocal": "初音ミク",
-    "youtube_id": "fKVCkguZrn0",
-    "niconico_id": "",
-    "published_at": "2026-10-13T08:00:30Z"
-  },
-  {
-    "song_id": "song_sm36936564",
-    "title": "誓い",
-    "producer": "カジャ, シリア",
-    "vocal": "初音ミク",
-    "youtube_id": "JH6ue-1C0pU",
-    "niconico_id": "sm36936564",
-    "published_at": "2020-01-27T00:00:00Z"
-  },
-  {
-    "song_id": "song_sm2302757",
-    "title": "편의점 PV(ver.유노미)",
-    "producer": "ちぼり",
-    "vocal": "初音ミク",
-    "youtube_id": "yp7cQyzo5MM",
-    "niconico_id": "sm2302757",
-    "published_at": "2009-05-30T16:11:51Z"
-  },
-  {
-    "song_id": "song_sm36962202",
-    "title": "スパイラル・デイズ",
-    "producer": "芳田",
-    "vocal": "初音ミク",
-    "youtube_id": "LI386NjCiK0",
-    "niconico_id": "sm36962202",
-    "published_at": "2020-01-26T00:00:00Z"
-  },
-  {
-    "song_id": "song_po-DGuC3h_E",
-    "title": "Sweet Hell",
-    "producer": "Legendary_Kat / すやすや〜めP",
+    "song_id": "song_sm43436193",
+    "title": "イガク",
+    "producer": "原口沙輔",
     "vocal": "重音テト",
-    "youtube_id": "po-DGuC3h_E",
-    "niconico_id": "",
-    "published_at": "2025-05-12T03:27:33Z"
+    "youtube_id": "F38EuG2dAyM",
+    "niconico_id": "sm43436193",
+    "published_at": "2024-02-23T00:00:00Z"
+  },
+  {
+    "song_id": "song_sm25759628",
+    "title": "ブライトシティ",
+    "producer": "keisei",
+    "vocal": "初音ミク",
+    "youtube_id": "vu55sqRabEg",
+    "niconico_id": "sm25759628",
+    "published_at": "2015-02-25T00:00:00Z"
   }
 ]
