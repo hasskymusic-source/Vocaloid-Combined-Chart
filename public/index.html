@@ -6,7 +6,7 @@
   <!-- セキュリティヘッダー: CSP -->
   <meta
     http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' https://i.ytimg.com https://img.youtube.com https://img.cdn.nimg.jp https://nicovideo.cdn.nimg.jp data:; connect-src 'self' https://api.counterapi.dev https://cloudflareinsights.com https://*.google-analytics.com; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none';"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' https://i.ytimg.com https://img.youtube.com https://img.cdn.nimg.jp https://nicovideo.cdn.nimg.jp https: data:; connect-src 'self' https://api.counterapi.dev https://cloudflareinsights.com https://*.google-analytics.com; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none';"
   />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
@@ -67,6 +67,7 @@
       <nav class="tab-nav" id="tab-nav" aria-label="メインナビゲーション">
         <button class="tab-btn active" data-tab="tab-ranking">週間ランキング TOP 20</button>
         <button class="tab-btn" data-tab="tab-insight">ランキングインサイト・解説</button>
+        <button class="tab-btn" data-tab="tab-columns">記事・コラム</button>
         <button class="tab-btn" data-tab="tab-method">ランキングについて</button>
       </nav>
       <div class="scroll-hint-pill tab-scroll-hint" id="tab-scroll-hint" aria-hidden="true">
@@ -123,7 +124,7 @@
       </div>
     </section>
 
-    <!-- タブ2: ランキングインサイト・解説（旧タブ2と旧タブ3を統合） -->
+    <!-- タブ2: ランキングインサイト・解説 -->
     <section id="tab-insight" class="tab-content">
       <div class="insight-card">
         <h2 class="insight-section-title">TOP 10 ポイント構成比（6指標内訳）</h2>
@@ -172,7 +173,68 @@
       </div>
     </section>
 
-    <!-- タブ3: ランキングについて -->
+    <!-- タブ3: 記事・コラム（新規追加） -->
+    <section id="tab-columns" class="tab-content">
+      <!-- 記事一覧ビュー -->
+      <div id="columns-list-view">
+        <div class="section-header section-header-flex">
+          <div>
+            <h2 class="section-title">記事・コラム / FEATURES &amp; COLUMNS</h2>
+            <p class="columns-lead-text">ボカロシーンのトレンド深掘り、楽曲レビュー、チャート考察などを不定期でお届けする特集・コラムコーナーです。</p>
+          </div>
+        </div>
+
+        <!-- カテゴリフィルタ＆記事検索バー -->
+        <div class="columns-toolbar" aria-label="記事・コラムの絞り込み">
+          <div id="column-category-pills" class="column-category-pills">
+            <button type="button" class="column-cat-btn active" data-cat="ALL">すべて</button>
+            <button type="button" class="column-cat-btn" data-cat="チャート分析">チャート分析</button>
+            <button type="button" class="column-cat-btn" data-cat="楽曲レビュー">楽曲レビュー</button>
+            <button type="button" class="column-cat-btn" data-cat="ボカロP特集">ボカロP特集</button>
+            <button type="button" class="column-cat-btn" data-cat="対談・コラム">対談・コラム</button>
+          </div>
+          <div class="column-search-wrap">
+            <input
+              type="search"
+              id="column-search-input"
+              class="ranking-search-input"
+              placeholder="記事タイトル・タグ・キーワードで検索..."
+              autocomplete="off"
+            />
+          </div>
+        </div>
+
+        <!-- ピックアップ記事（1件以上ある場合に表示） -->
+        <div id="columns-featured-container"></div>
+
+        <!-- 記事カードグリッド -->
+        <div id="columns-grid-container" class="columns-grid">
+          <div class="loading-state">記事・コラムを読み込んでいます...</div>
+        </div>
+      </div>
+
+      <!-- 個別記事リーダービュー（カードクリック時・URL直リンク時に表示） -->
+      <div id="columns-detail-view" class="columns-detail-view" style="display: none;">
+        <div class="article-nav-bar">
+          <button type="button" id="back-to-columns-btn" class="action-btn back-to-columns-btn">
+            ← 記事・コラム一覧へ戻る
+          </button>
+          <button type="button" id="share-article-x-btn" class="action-btn share-x-btn">
+            𝕏 この記事をシェア
+          </button>
+        </div>
+
+        <article id="article-reader-card" class="article-reader-card"></article>
+
+        <div class="article-bottom-nav">
+          <button type="button" id="back-to-columns-bottom-btn" class="action-btn back-to-columns-btn">
+            ← 記事・コラム一覧へ戻る
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- タブ4: ランキングについて -->
     <section id="tab-method" class="tab-content">
       <div class="insight-card">
         <h2 class="insight-section-title">集計方法・ポイント計算式について</h2>

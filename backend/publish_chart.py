@@ -33,6 +33,9 @@ PUBLIC_LATEST = resolve_config_path(["PUBLIC_LATEST", "LATEST_RANKING_FILE"], "p
 ARCHIVE_DIR = resolve_config_path(["ARCHIVE_DIR", "ARCHIVES_DIR"], "public/data/archives")
 ARCHIVE_INDEX = resolve_config_path(["ARCHIVE_INDEX"], "public/data/archives/archive_index.json")
 
+ARTICLES_MASTER_FILE = resolve_config_path(["ARTICLES_MASTER_FILE"], "data/articles/articles_master.json")
+PUBLIC_ARTICLES_FILE = resolve_config_path(["PUBLIC_ARTICLES_FILE"], "public/data/articles.json")
+
 # 漏洩防止パターン（Google APIキー / GitHub Token / 秘密鍵）
 SECRET_PATTERNS = [
     (re.compile(r"AIza[0-9A-Za-z\-_]{35}"), "Google/YouTube API Key"),
@@ -73,6 +76,12 @@ CLOUDFLARE_HEADERS_CONTENT = """/*
   Cache-Control: public, max-age=30, s-maxage=60, stale-while-revalidate=86400
 
 /public/data/latest_ranking.json
+  Cache-Control: public, max-age=30, s-maxage=60, stale-while-revalidate=86400
+
+/data/articles.json
+  Cache-Control: public, max-age=30, s-maxage=60, stale-while-revalidate=86400
+
+/public/data/articles.json
   Cache-Control: public, max-age=30, s-maxage=60, stale-while-revalidate=86400
 
 /data/archive_index.json
@@ -150,9 +159,6 @@ def normalize_period_str(period_str, now_dt=None):
 
 
 def get_release_datetime_jst(chart_data: dict) -> datetime:
-    """
-    チャートデータに設定された解禁日時（原則：publishDate の 13:00:00 JST）を返す。
-    """
     if not isinstance(chart_data, dict):
         return datetime.min.replace(tzinfo=JST)
 
@@ -178,11 +184,81 @@ def get_release_datetime_jst(chart_data: dict) -> datetime:
 
 
 def is_chart_released(chart_data: dict, now_dt: datetime = None) -> bool:
-    """現在時刻が解禁日時（水曜13:00 JST）に到達しているか判定する"""
     if now_dt is None:
         now_dt = datetime.now(JST)
     release_dt = get_release_datetime_jst(chart_data)
     return now_dt >= release_dt
+
+
+def is_article_released(article: dict, now_dt: datetime = None) -> bool:
+    """
+    記事・コラムの公開判定：
+    - status が 'draft'（下書き）の場合は非公開
+    - publishAt（予約公開日時）が設定されており、現在時刻がまだ到達していない場合は非公開
+    """
+    if not isinstance(article, dict):
+        return False
+    status = str(article.get("status", "published")).lower()
+    if status == "draft":
+        return False
+
+    if now_dt is None:
+        now_dt = datetime.now(JST)
+
+    pub_at_str = article.get("publishAt") or ""
+    if pub_at_str and isinstance(pub_at_str, str):
+        try:
+            cleaned = pub_at_str.strip()
+            if cleaned.endswith("Z"):
+                cleaned = cleaned[:-1] + "+00:00"
+            dt = datetime.fromisoformat(cleaned)
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=JST)
+            else:
+                dt = dt.astimezone(JST)
+            if now_dt < dt:
+                return False
+        except Exception:
+            pass
+
+    return True
+
+
+def sync_published_articles(now_dt: datetime = None):
+    """
+    記事・コラム執筆スタジオで保存されたマスターデータ(data/articles/articles_master.json)から、
+    公開中かつ解禁日時到達済みの記事のみをフィルタリングし、本番公開用の articles.json に書き出す。
+    """
+    if now_dt is None:
+        now_dt = datetime.now(JST)
+
+    master_data = load_json(ARTICLES_MASTER_FILE, default={"articles": [], "speakers": []})
+    raw_articles = (
+        master_data.get("articles", [])
+        if isinstance(master_data, dict)
+        else (master_data if isinstance(master_data, list) else [])
+    )
+
+    published_list = [a for a in raw_articles if is_article_released(a, now_dt)]
+
+    # ピックアップ(featured)優先 ＋ 公開日降順でソート
+    published_list.sort(
+        key=lambda a: (
+            1 if a.get("featured") else 0,
+            str(a.get("publishedAt") or a.get("publishAt") or a.get("updatedAt") or ""),
+        ),
+        reverse=True,
+    )
+
+    payload = {
+        "updatedAt": now_dt.strftime("%Y-%m-%d %H:%M"),
+        "articles": published_list,
+    }
+
+    save_json(PUBLIC_ARTICLES_FILE, payload)
+    save_json(PROJECT_ROOT / "data/articles.json", payload)
+    print(f"[SYNC & SECURE] 記事・コラムデータを公開同期しました (公開中: {len(published_list)} 件)")
+    return published_list
 
 
 def sanitize_frontend_content(text, filename=""):
@@ -242,12 +318,6 @@ def sync_frontend_assets():
 
 
 def rollback_unreleased_public_files(now_dt: datetime):
-    """
-    【フライング公開データの自動ロールバック保護】
-    もし水曜13:00より前に誤って公開されたデータ（例：10/19月曜に公開された 2026-10-21 分）が
-    public/data/latest_ranking.json や public/data/archives/ に存在していた場合、
-    自動的に削除して「直前の解禁済みアーカイブ」へ巻き戻す。
-    """
     if not ARCHIVE_DIR.exists():
         return
 
@@ -269,7 +339,6 @@ def rollback_unreleased_public_files(now_dt: datetime):
             aid = data.get("archiveId") or data.get("publishDate") or p.stem
             released_archives.append((str(aid), data))
 
-    # archive_index.json からも未解禁エントリを除外
     for idx_path in (ARCHIVE_INDEX, PROJECT_ROOT / "public/data/archive_index.json", PROJECT_ROOT / "data/archive_index.json"):
         if not idx_path.exists():
             continue
@@ -296,7 +365,6 @@ def rollback_unreleased_public_files(now_dt: datetime):
         )
         save_json(idx_path, {"archives": filtered_list} if is_wrapped else filtered_list)
 
-    # public/data/latest_ranking.json が未解禁データだった場合、直前の解禁済みアーカイブに復元
     current_public = load_json(PUBLIC_LATEST)
     if isinstance(current_public, dict) and not is_chart_released(current_public, now_dt):
         if released_archives:
@@ -362,7 +430,9 @@ def main(force_publish: bool = False):
 
     print("=== 週刊VOCALOID複合ランキング 公開・予約管理処理開始 ===")
 
+    now_dt = datetime.now(JST)
     sync_frontend_assets()
+    sync_published_articles(now_dt)
 
     draft_candidates = [
         DRAFT_FILE,
@@ -380,9 +450,9 @@ def main(force_publish: bool = False):
             break
 
     if not isinstance(draft_data, dict):
-        raise RuntimeError("有効な weekly_draft.json が見つかりません。先に build_draft.py を実行してください。")
+        print("[INFO] weekly_draft.json が見つからないため、記事・アセット同期のみ完了しました。")
+        return False
 
-    now_dt = datetime.now(JST)
     publish_date = draft_data.get("publishDate") or now_dt.strftime("%Y-%m-%d")
     archive_id = draft_data.get("archiveId") or publish_date
     publish_at = draft_data.get("publishAt") or f"{publish_date}T13:00:00+09:00"
@@ -405,7 +475,6 @@ def main(force_publish: bool = False):
     draft_data["period"] = period_str
     draft_data["updated_at"] = draft_data.get("updated_at") or now_str
 
-    # まず手元・予約用ドラフトファイル（weekly_draft.json）をセキュリティ検査付きで保存
     save_json(used_draft_path, draft_data)
     if DRAFT_FILE.resolve() != used_draft_path.resolve():
         save_json(DRAFT_FILE, draft_data)
@@ -415,10 +484,7 @@ def main(force_publish: bool = False):
 
     release_dt = get_release_datetime_jst(draft_data)
 
-    # 水曜13:00 JST 解禁チェック
     if not force_publish and now_dt < release_dt:
-        # まだ水曜13:00より前の場合は、本番公開用JSON（latest_ranking.json）を更新せず、
-        # もしフライング公開されていたデータがあれば直前の公開済みアーカイブへ自動ロールバックする
         rollback_unreleased_public_files(now_dt)
         print(
             f"[SCHEDULED / 予約待機中] 解禁日時 ({release_dt.strftime('%Y-%m-%d %H:%M JST')}) より前のため、"
@@ -426,7 +492,6 @@ def main(force_publish: bool = False):
         )
         return False
 
-    # 水曜13:00 JST 以降（または --force 指定時）は本番公開ファイルへ昇格
     draft_data["published_at"] = now_str
     save_json(PUBLIC_LATEST, draft_data)
     save_json(PROJECT_ROOT / "data/latest_ranking.json", draft_data)

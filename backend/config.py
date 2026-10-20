@@ -30,7 +30,13 @@ _DRAFT_CANDIDATE_2 = BASE_DIR / "data" / "weekly_draft.json"
 DRAFT_FILE = _DRAFT_CANDIDATE_1 if _DRAFT_CANDIDATE_1.exists() or _DRAFT_CANDIDATE_1.parent.exists() else _DRAFT_CANDIDATE_2
 BACKUP_DRAFT_FILE = DRAFT_FILE.parent / "weekly_draft.backup.json"
 
+# 記事・コラム執筆スタジオ用データパス
+ARTICLES_DIR = BASE_DIR / "data" / "articles"
+ARTICLES_MASTER_FILE = ARTICLES_DIR / "articles_master.json"
+ARTICLES_BACKUP_FILE = ARTICLES_DIR / "articles_master.backup.json"
+
 PUBLIC_DATA_DIR = BASE_DIR / "public" / "data"
 PUBLIC_LATEST = PUBLIC_DATA_DIR / "latest_ranking.json"
+PUBLIC_ARTICLES_FILE = PUBLIC_DATA_DIR / "articles.json"
 ARCHIVE_DIR = PUBLIC_DATA_DIR / "archives"
 ARCHIVE_INDEX = ARCHIVE_DIR / "archive_index.json"
