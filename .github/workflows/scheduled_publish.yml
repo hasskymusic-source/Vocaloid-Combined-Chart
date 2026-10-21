@@ -28,12 +28,16 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tweepy
+
       - name: Publish reserved draft to public site
         run: |
           if [ "${{ github.event.inputs.force_publish }}" = "true" ]; then
             python publish_chart.py --force
           else
-            # cron起動時は水曜13:00 JSTに到達しているため自動で本番公開される
             python publish_chart.py --force
           fi
           python export_blog.py
@@ -46,6 +50,15 @@ jobs:
           if git diff --staged --quiet; then
             echo "変更はありません。"
           else
-            git commit -m "📅 水曜13:00 定期更新：最新ランキングと解説記事を本番公開"
+            git commit -m "📅 水曜13:00 定期更新：最新ランキング公開およびX自動投稿"
             git push origin main
           fi
+
+      - name: Post update to X (Twitter)
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+        run: |
+          python post_to_x.py
